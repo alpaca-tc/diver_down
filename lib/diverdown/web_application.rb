@@ -30,7 +30,7 @@ module Diverdown
         reload_store
         action.index
       in ['POST', '/definitions/combine.json']
-        ids = request.params['ids'].to_s.split(',')
+        ids = request.params['ids'].to_s.split(Diverdown::DELIMITER)
         action.combine_definitions(ids)
       else
         action.not_found

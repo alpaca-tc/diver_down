@@ -59,7 +59,7 @@ module Diverdown
 
       definitions = ids.map { get(_1) }
 
-      definitions.inject(Diverdown::Definition.new(id: ids.sort.join(','), title: 'combined')) do |single_definition, other_definition|
+      definitions.inject(Diverdown::Definition.new(id: ids.sort.join(Diverdown::DELIMITER), title: 'combined')) do |single_definition, other_definition|
         single_definition.combine(other_definition)
       end
     end

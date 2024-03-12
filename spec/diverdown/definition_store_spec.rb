@@ -54,7 +54,7 @@ RSpec.describe Diverdown::DefinitionStore do
         store.set(definition_a, definition_b)
 
         combined_definition = store.combined([definition_a.id, definition_b.id])
-        expect(combined_definition.id).to eq('1,2')
+        expect(combined_definition.id).to eq([1, 2].join(Diverdown::DELIMITER))
         expect(combined_definition.sources.size).to eq(2)
         expect(combined_definition.sources.map(&:source).sort).to eq(['a.rb', 'b.rb'])
       end

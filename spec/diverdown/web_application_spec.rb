@@ -41,7 +41,7 @@ RSpec.describe Diverdown::WebApplication do
       )
       store.set(definition)
 
-      post '/definitions/combine.json', ids: [definition.id].join(',')
+      post '/definitions/combine.json', ids: [definition.id].join(Diverdown::DELIMITER)
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
@@ -70,7 +70,7 @@ RSpec.describe Diverdown::WebApplication do
       store.set(definition_1)
       store.set(definition_2)
 
-      post '/definitions/combine.json', ids: [definition_1.id, definition_2.id].join(',')
+      post '/definitions/combine.json', ids: [definition_1.id, definition_2.id].join(Diverdown::DELIMITER)
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
