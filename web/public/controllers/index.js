@@ -10,7 +10,7 @@ const renderDot = async (response) => {
   document.querySelector("[data-target='definition-title']").innerText = response.title
   document.querySelector("[data-target='definition-id']").innerText = response.id
 
-  history.pushState(null, null, `#definition-${btoa(response.id)}`)
+  history.pushState(null, null, `#definition-${encodeURIComponent(response.id)}`)
 
   d3
     .select("[data-target='definition-graph']")
@@ -84,8 +84,7 @@ export const start = async () => {
 
   const hash = window.location.hash
   if (hash) {
-    console.log(atob(hash.split("definition-")[1]))
-    const ids = String(atob(hash.split("definition-")[1])).split(",")
+    const ids = String(decodeURIComponent(hash.split("definition-")[1])).split(",")
     const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
 
     checkboxes.forEach((checkbox) => {
