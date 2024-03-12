@@ -150,5 +150,11 @@ RSpec.describe Diverdown::Helper do
         expect(described_class.constantize('String')).to eq(String)
       end
     end
+
+    describe '.hexdigest' do
+      it 'returns hexdigest given string' do
+        expect(described_class.hexdigest('あi')).to match(/^[a-z0-9]+$/)
+      end
+    end
   end
 end

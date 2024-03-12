@@ -6,6 +6,7 @@
     "controllers/index": "/controllers/index.js",
     "utils/request": "/utils/request.js",
     "utils/delegate": "/utils/delegate.js",
-    "utils/path": "/utils/path.js"
+    "utils/path": "/utils/path.js",
+    "utils/debounse": "/utils/debounse.js"
   }
 }

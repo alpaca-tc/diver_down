@@ -16,28 +16,34 @@
   <body>
     <main>
       <aside class="sidebar">
+        <header class="sidebar-header">
+          <input id="sidebar-check-all" data-action="definitionToggleAll" type="checkbox" />
+          <label for="sidebar-check-all" class="sidebar-check-all">
+            All
+          </label>
+          <input type="text" data-action="definition-filter-input" placeholder="Filter definition" />
+        </header>
 
         <ul>
-          <label>
-            <input data-action="definitionToggleAll" type="checkbox" />
-            Check All
-          </label>
-
           <% each_definition(store) do |definition| %>
-            <li class="definition-indent-<%= definition.level %>">
+            <li class="definition-indent-<%= definition.level %>" data-target="definition-li" data-title="<%= definition.title[0..200].tr(%(\n '"), '') %>">
               <label>
                 <input data-target="definition-checkbox" data-id="<%= definition.id %>" type="checkbox" />
-                <%= definition.title %>
+                <%= definition.title[0..200].tr(%(\n '"), '') %>
               </label>
             </li>
           <% end %>
         </ul>
       </aside>
       <article class="content">
-        <h1 data-target="definition-title"></h1>
-        <h4 data-target="definition-id"></h4>
+        <header class="content-header">
+          <h1 data-target="definition-title"></h1>
+          <h4 data-target="definition-id"></h4>
+        </header>
         <div data-target="definition-graph" />
       </article>
+      <aside class="menu">
+      </aside>
     </main>
   </body>
 </html>

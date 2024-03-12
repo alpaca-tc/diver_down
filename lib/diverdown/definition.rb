@@ -26,8 +26,8 @@ module Diverdown
 
     # @param title [String]
     # @param sources [Array<Diverdown::Definition::Source>]
-    def initialize(id: SecureRandom.uuid, title: '', sources: [], parent: nil, children: [])
-      @id = id
+    def initialize(id: SecureRandom.hex, title: '', sources: [], parent: nil, children: [])
+      @id = id.gsub(/\s+/, '+')
       @title = title
       @source_map = sources.map { [_1.source, _1] }.to_h
       @parent = parent

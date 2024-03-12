@@ -1,24 +1,67 @@
 main {
-  flex: 1 1 auto;
-  display: grid;
-  grid-template: "sidebar article" / 450px minmax(auto, calc(100% - 450px));
+  display: flex;
+}
+
+body {
+  margin: 0;
+  font-size: 8px;
 }
 
 .sidebar {
-  grid-area: sidebar;
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: [ space ] minmax(40px, 1fr) [ nav ] 232px;
+  width: 500px;
   border-right: 1px solid rgb(214, 211, 208);
-  margin-right: 40px;
   position: sticky;
   top: 0px;
   align-self: start;
   height: 100vh;
-  overflow-y: scroll;
+  overflow: scroll;
+  font-size: 8px;
+
+  .hidden {
+    display: none;
+  }
+
+  & .sidebar-header {
+    height: 25px;
+    line-height: 25px;
+    display: block;
+    border-bottom: 1px solid rgb(214, 211, 208);
+    display: flex;
+    vertical-align: middle;
+
+    & .sidebar-check-all {
+      width: 30px;
+      height: 25px;
+      line-height: 25px;
+      padding: 0 0 0 1em;
+
+      & input[type="checkbox"] {
+        height: 2em;
+        line-height: 2em;
+        padding: 0;
+        margin: 0;
+      }
+    }
+
+    & input[type="text"] {
+      height: 100%;
+      width: 100%;
+      border: none;
+      padding: 0 1em;
+      font-size: 1em;
+      outline: none;
+      background: #ececec;
+    }
+  }
 
   ul {
-    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    & li {
+      width: 100%;
+    }
   }
 
   & .definition-indent-1 {
@@ -38,7 +81,28 @@ main {
 }
 
 .content {
-  grid-area: article;
+  width: calc(100% - 500px - 300px);
+
+  & .content-header {
+    height: 40px;
+    display: block;
+    border-bottom: 1px solid rgb(214, 211, 208);
+  }
+
+  [data-target="definition-graph"] {
+    overflow: scroll;
+  }
+}
+
+.menu {
+  box-sizing: border-box;
+  width: 300px;
+  border-left: 1px solid rgb(214, 211, 208);
+  position: sticky;
+  top: 0px;
+  align-self: start;
+  height: 100vh;
+  overflow: scroll;
 }
 
 #graph {

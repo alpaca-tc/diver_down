@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'openssl'
+
 module Diverdown
   module Helper
     CLASS_NAME_QUERY = Module.method(:name).unbind.freeze
@@ -55,6 +57,12 @@ module Diverdown
     # @return [Module]
     def self.constantize(str)
       ::ActiveSupport::Inflector.constantize(str)
+    end
+
+    # @param str [String]
+    # @return [String]
+    def self.hexdigest(str)
+      OpenSSL::Digest::SHA256.hexdigest(str)
     end
   end
 end

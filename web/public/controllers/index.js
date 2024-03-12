@@ -5,12 +5,13 @@ import "d3-graphviz";
 import path from "utils/path"
 import { delegate } from "utils/delegate";
 import { request, buildFormData } from "utils/request";
+import { debounse } from "utils/debounse";
 
 const renderDot = async (response) => {
   document.querySelector("[data-target='definition-title']").innerText = response.title
   document.querySelector("[data-target='definition-id']").innerText = response.id
 
-  history.pushState(null, null, `#definition-${encodeURIComponent(response.id)}`)
+  history.pushState(null, null, `#definition-${response.id}`)
 
   d3
     .select("[data-target='definition-graph']")
@@ -38,7 +39,7 @@ const drawInitial = () => {
   document.querySelector("[data-target='definition-graph']").innerHTML = ''
 }
 
-const drawCheckedDefinitions = () => {
+const drawCheckedDefinitions = async () => {
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']:checked")
   const ids = Array.from(checkboxes).map((el) => el.getAttribute("data-id"))
 
@@ -71,6 +72,22 @@ const definitionToggleAll = (event) => {
   drawCheckedDefinitions()
 }
 
+const filterDefinitions = (value) => {
+  const list = document.querySelectorAll("[data-target='definition-li']")
+  value = value.toLowerCase()
+
+  list.forEach((li) => {
+    const title = li.getAttribute('data-title')
+    const visible = value === "" || title.toLowerCase().includes(value)
+
+    if (visible) {
+      li.classList.remove('hidden')
+    } else {
+      li.classList.add('hidden')
+    }
+  })
+}
+
 export const start = async () => {
   delegate(document, '[data-target="definition-checkbox"]', "change", (event) => {
     definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
@@ -82,9 +99,13 @@ export const start = async () => {
     definitionToggleAll(event)
   })
 
+  delegate(document, '[data-action="definition-filter-input"]', 'input', debounse((event) => {
+    filterDefinitions(event.target.value)
+  }, 100))
+
   const hash = window.location.hash
   if (hash) {
-    const ids = String(decodeURIComponent(hash.split("definition-")[1])).split(",")
+    const ids = String(hash.split("definition-")[1]).split(",")
     const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
 
     checkboxes.forEach((checkbox) => {
