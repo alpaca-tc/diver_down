@@ -1,0 +1,103 @@
+import * as d3 from "d3";
+import "hpcc-js";
+import "d3-graphviz";
+
+import path from "utils/path"
+import { delegate } from "utils/delegate";
+import { request, buildFormData } from "utils/request";
+
+const renderDot = async (response) => {
+  document.querySelector("[data-target='definition-title']").innerText = response.title
+  document.querySelector("[data-target='definition-id']").innerText = response.id
+
+  history.pushState(null, null, `#definition-${btoa(response.id)}`)
+
+  d3
+    .select("[data-target='definition-graph']")
+    .graphviz()
+    .renderDot(response.dot);
+}
+
+const drawDefinitions = async (ids) => {
+  const response = await request(
+    path.definitions.combine,
+    {
+      method: "POST",
+      headers: { 'Accept': 'application/json' },
+      body: buildFormData({ ids: ids.join(',') })
+    }
+  )
+  await renderDot(response)
+}
+
+const drawInitial = () => {
+  history.pushState(null, null, '#')
+
+  document.querySelector("[data-target='definition-title']").innerText = ''
+  document.querySelector("[data-target='definition-id']").innerText = ''
+  document.querySelector("[data-target='definition-graph']").innerHTML = ''
+}
+
+const drawCheckedDefinitions = () => {
+  const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']:checked")
+  const ids = Array.from(checkboxes).map((el) => el.getAttribute("data-id"))
+
+  if (ids.length === 0) {
+    drawInitial()
+  } else {
+    drawDefinitions(ids)
+  }
+}
+
+const definitionToggleChildren = (parentId, checked) => {
+  const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
+  const ids = Array.from(checkboxes).map((el) => el.getAttribute("data-id"))
+  const filteredIds = ids.filter((id) => id.startsWith(parentId))
+
+  filteredIds.forEach((id) => {
+    const checkbox = document.querySelector(`[data-id='${id}']`)
+    checkbox.checked = checked
+  })
+}
+
+const definitionToggleAll = (event) => {
+  const checked = event.target.checked
+  const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
+
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = checked
+  })
+
+  drawCheckedDefinitions()
+}
+
+export const start = async () => {
+  delegate(document, '[data-target="definition-checkbox"]', "change", (event) => {
+    definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
+
+    drawCheckedDefinitions()
+  })
+
+  delegate(document, '[data-action="definitionToggleAll"]', 'click', (event) => {
+    definitionToggleAll(event)
+  })
+
+  const hash = window.location.hash
+  if (hash) {
+    console.log(atob(hash.split("definition-")[1]))
+    const ids = String(atob(hash.split("definition-")[1])).split(",")
+    const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
+
+    checkboxes.forEach((checkbox) => {
+      if (ids.includes(checkbox.getAttribute('data-id'))) {
+        checkbox.checked = true
+      }
+    })
+
+    try {
+      await drawDefinitions(ids)
+    } catch(e) {
+      console.error(e)
+    }
+  }
+}

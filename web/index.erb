@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/controllers/index.css" rel="stylesheet" />
+    <%= javascript_importmap_tags %>
+    <script type="module">
+      import { start } from "controllers/index"
+
+      document.addEventListener("DOMContentLoaded", () => {
+        start()
+      })
+    </script>
+  </head>
+  <body>
+    <main>
+      <aside class="sidebar">
+
+        <ul>
+          <label>
+            <input data-action="definitionToggleAll" type="checkbox" />
+            Check All
+          </label>
+
+          <% each_definition(store) do |definition| %>
+            <li class="definition-indent-<%= definition.level %>">
+              <label>
+                <input data-target="definition-checkbox" data-id="<%= definition.id %>" type="checkbox" />
+                <%= definition.title %>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      </aside>
+      <article class="content">
+        <h1 data-target="definition-title"></h1>
+        <h4 data-target="definition-id"></h4>
+        <div data-target="definition-graph" />
+      </article>
+    </main>
+  </body>
+</html>

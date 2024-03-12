@@ -1,0 +1,47 @@
+main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template: "sidebar article" / 450px minmax(auto, calc(100% - 450px));
+}
+
+.sidebar {
+  grid-area: sidebar;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: [ space ] minmax(40px, 1fr) [ nav ] 232px;
+  border-right: 1px solid rgb(214, 211, 208);
+  margin-right: 40px;
+  position: sticky;
+  top: 0px;
+  align-self: start;
+  height: 100vh;
+  overflow-y: scroll;
+
+  ul {
+    width: 100%;
+  }
+
+  & .definition-indent-1 {
+    margin-left: calc(15px * 1);
+  }
+
+  & .definition-indent-2 {
+    margin-left: calc(15px * 2);
+  }
+}
+
+[data-target="definition-id"] {
+  /* 一定の文字列の長さでtrimする */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  grid-area: article;
+}
+
+#graph {
+  width: 100%;
+  height: 100%;
+}
