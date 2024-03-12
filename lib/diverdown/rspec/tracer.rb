@@ -17,20 +17,22 @@ module Diverdown
 
       # @param id [String]
       # @param title [String]
-      # @param target_modules [Array<Module, String>]
+      # @param module_set [Diverdown::RSpec::ModuleSet, Array<Module, String>]
       # @param target_files [Array<String>, nil] if nil, trace all files
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [Diverdown::RSpec::ModuleSet, nil] for optimization
-      # @param target_file_set [Set<String>, nil] for optimization
-      # rubocop:disable Metrics/ParameterLists
-      def initialize(id:, title:, target_modules: [], target_files: nil, filter_method_id_path: nil, module_set: nil, target_file_set: nil)
+      def initialize(id:, title:, module_set: [], target_files: nil, filter_method_id_path: nil)
         @id = id
         @title = title
-        @module_set = module_set || Diverdown::RSpec::ModuleSet.new(target_modules)
-        @target_file_set = target_file_set || target_files&.to_set
+        @module_set = if module_set.is_a?(Diverdown::RSpec::ModuleSet)
+                        module_set
+                      else
+                        Diverdown::RSpec::ModuleSet.new(module_set)
+                      end
+
+        @target_file_set = target_files&.to_set
         @filter_method_id_path = filter_method_id_path
       end
-      # rubocop:enable Metrics/ParameterLists
 
       # Trace the call stack of the block and build the definition
       #

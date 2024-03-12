@@ -5,7 +5,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
     describe 'when tracing script' do
       # @param path [String]
       # @return [Diverdown::Definition]
-      def trace_fixture(path, target_modules: [], target_files: nil, filter_method_id_path: nil)
+      def trace_fixture(path, module_set: [], target_files: nil, filter_method_id_path: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -14,7 +14,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
         tracer = described_class.new(
           id: 'id',
           title: 'title',
-          target_modules:,
+          module_set:,
           target_files:,
           filter_method_id_path:
         )
@@ -50,7 +50,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_module.rb' do
         definition = trace_fixture(
           'tracer_module.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::B',
             'AntipollutionModule::C',
@@ -103,7 +103,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_module.rb with target_files' do
         definition = trace_fixture(
           'tracer_module.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::B',
             'AntipollutionModule::C',
@@ -131,7 +131,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_class.rb' do
         definition = trace_fixture(
           'tracer_class.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::B',
             'AntipollutionModule::C',
@@ -204,7 +204,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_class.rb with filter path' do
         definition = trace_fixture(
           'tracer_class.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::B',
             'AntipollutionModule::C',
@@ -222,7 +222,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_instance.rb' do
         definition = trace_fixture(
           'tracer_instance.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::B',
             'AntipollutionModule::C',
@@ -309,7 +309,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_subclass.rb' do
         definition = trace_fixture(
           'tracer_subclass.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::D',
           ]
@@ -398,7 +398,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
 
         definition = trace_fixture(
           'tracer_separated_file.rb',
-          target_modules: [
+          module_set: [
             '::A',
             '::C',
           ],
@@ -438,7 +438,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       it 'traces tracer_deep_stack.rb' do
         definition = trace_fixture(
           'tracer_deep_stack.rb',
-          target_modules: [
+          module_set: [
             'AntipollutionModule::A',
             'AntipollutionModule::D',
           ]
@@ -493,7 +493,7 @@ RSpec.describe Diverdown::RSpec::Tracer do
       #     tracer = described_class.new(
       #       id: 'id',
       #       title: 'title',
-      #       target_modules: [
+      #       module_set: [
       #         AntipollutionModule::A,
       #         AntipollutionModule::D,
       #       ]
