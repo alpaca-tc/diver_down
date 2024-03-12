@@ -46,10 +46,9 @@ module Diverdown
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
             mod = Diverdown::Helper.resolve_module(tp.self)
             module_name = Diverdown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            pushed = false
 
-            if module_name.nil?
-              call_stack.push
-            else
+            unless module_name.nil?
               source = definition.source(module_name)
 
               unless call_stack.empty?
@@ -73,6 +72,7 @@ module Diverdown
               caller_location = find_neast_caller_location
 
               if caller_location
+                pushed = true
                 call_stack.push(
                   StackContext.new(
                     source:,
@@ -80,10 +80,10 @@ module Diverdown
                     caller_location:
                   )
                 )
-              else
-                call_stack.pop
               end
             end
+
+            call_stack.push unless pushed
           when :return, :c_return
             call_stack.pop
           end

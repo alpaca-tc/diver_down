@@ -100,6 +100,34 @@ RSpec.describe Diverdown::RSpec::Tracer do
         ))
       end
 
+      it 'traces tracer_module.rb with target_files' do
+        definition = trace_fixture(
+          'tracer_module.rb',
+          target_modules: [
+            'AntipollutionModule::A',
+            'AntipollutionModule::B',
+            'AntipollutionModule::C',
+          ],
+          target_files: []
+        )
+
+        expect(definition.to_h).to match(fill_default(
+          id: 'id',
+          title: 'title',
+          sources: [
+            {
+              source: 'AntipollutionModule::A',
+              dependencies: [],
+            }, {
+              source: 'AntipollutionModule::B',
+              dependencies: [],
+            }, {
+              source: 'AntipollutionModule::C',
+            },
+          ]
+        ))
+      end
+
       it 'traces tracer_class.rb' do
         definition = trace_fixture(
           'tracer_class.rb',
