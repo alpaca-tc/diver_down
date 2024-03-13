@@ -70,5 +70,16 @@ RSpec.describe Diverdown::DefinitionStore do
         expect(store.length).to eq(0)
       end
     end
+
+    describe '#empty?' do
+      it 'returns length == 0' do
+        store = described_class.new
+        expect(store.empty?).to be(true)
+
+        definition = Diverdown::Definition.new
+        store.set(definition)
+        expect(store.empty?).to be(false)
+      end
+    end
   end
 end

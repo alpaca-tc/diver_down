@@ -23,11 +23,12 @@ module Diverdown
       request = Rack::Request.new(env)
       action = Diverdown::WebApplication::Action.new(store: @store, request:)
 
+      reload_store if @store.empty?
+
       case [request.request_method, request.path]
       in ['GET', /\.(?:js|css)\z/]
         @files_server.call(env)
       in ['GET', '/']
-        reload_store
         action.index
       in ['POST', '/definitions/combine.json']
         ids = request.params['ids'].to_s.split(Diverdown::DELIMITER)

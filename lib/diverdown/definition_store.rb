@@ -36,6 +36,11 @@ module Diverdown
     end
     alias size length
 
+    # @return [Boolean]
+    def empty?
+      @store.empty?
+    end
+
     # Clear the store
     # @return [void]
     def clear
