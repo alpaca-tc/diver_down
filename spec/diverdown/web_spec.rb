@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::WebApplication do
+RSpec.describe Diverdown::Web do
   include Rack::Test::Methods
 
   def app
-    @app ||= Diverdown::WebApplication.new(definition_dir:, store:)
+    @app ||= described_class.new(definition_dir:, store:)
   end
 
   let(:definition_dir) do

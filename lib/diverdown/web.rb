@@ -4,10 +4,10 @@ require 'rack'
 require 'yaml'
 
 module Diverdown
-  class WebApplication
+  class Web
     WEB_DIR = File.expand_path('../../web', __dir__)
 
-    require 'diverdown/web_application/action'
+    require 'diverdown/web/action'
 
     # @param definition_dir [String]
     # @param store [Diverdown::DefinitionStore]
@@ -21,7 +21,7 @@ module Diverdown
     # @return [Array[Integer, Hash, Array]]
     def call(env)
       request = Rack::Request.new(env)
-      action = Diverdown::WebApplication::Action.new(store: @store, request:)
+      action = Diverdown::Web::Action.new(store: @store, request:)
 
       reload_store if @store.empty?
 

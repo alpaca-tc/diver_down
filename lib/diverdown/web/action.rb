@@ -3,7 +3,7 @@
 require 'json'
 
 module Diverdown
-  class WebApplication
+  class Web
     class Action
       IMPORTMAP_JSON = File.join(WEB_DIR, 'importmap.json')
       private_constant :IMPORTMAP_JSON
