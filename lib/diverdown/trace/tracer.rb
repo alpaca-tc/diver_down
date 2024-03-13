@@ -21,6 +21,10 @@ module Diverdown
       # @param module_set [Diverdown::Trace::ModuleSet, nil] for optimization
       # @param module_finder [#call] find module from source
       def initialize(module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
+        if target_files && !target_files.all? { Pathname.new(_1).absolute? }
+          raise ArgumentError, "target_files must be absolute path(#{target_files})"
+        end
+
         @module_set = if module_set.is_a?(Diverdown::Trace::ModuleSet)
                         module_set
                       else

@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 RSpec.describe Diverdown::Trace::Tracer do
+  describe '#initialize' do
+    describe 'with relative path target_files' do
+      it 'raises ArgumentError' do
+        expect {
+          described_class.new(
+            target_files: ['relative/path']
+          )
+        }.to raise_error(ArgumentError, /target_files must be absolute path/)
+      end
+    end
+  end
+
   describe '#trace' do
     describe 'when tracing script' do
       # @param path [String]
