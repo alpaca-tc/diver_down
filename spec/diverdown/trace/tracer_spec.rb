@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::RSpec::Tracer do
+RSpec.describe Diverdown::Trace::Tracer do
   describe '#trace' do
     describe 'when tracing script' do
       # @param path [String]

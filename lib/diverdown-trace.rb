@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
 require 'diverdown'
-require 'diverdown/rspec'
+require 'diverdown/trace'

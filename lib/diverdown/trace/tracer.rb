@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Diverdown
-  module RSpec
+  module Trace
     class Tracer
       StackContext = Data.define(:source, :method_id, :caller_location)
 
@@ -17,17 +17,17 @@ module Diverdown
 
       # @param id [String]
       # @param title [String]
-      # @param module_set [Diverdown::RSpec::ModuleSet, Array<Module, String>]
+      # @param module_set [Diverdown::Trace::ModuleSet, Array<Module, String>]
       # @param target_files [Array<String>, nil] if nil, trace all files
       # @param filter_method_id_path [#call, nil] filter method_id.path
-      # @param module_set [Diverdown::RSpec::ModuleSet, nil] for optimization
+      # @param module_set [Diverdown::Trace::ModuleSet, nil] for optimization
       def initialize(id:, title:, module_set: [], target_files: nil, filter_method_id_path: nil)
         @id = id
         @title = title
-        @module_set = if module_set.is_a?(Diverdown::RSpec::ModuleSet)
+        @module_set = if module_set.is_a?(Diverdown::Trace::ModuleSet)
                         module_set
                       else
-                        Diverdown::RSpec::ModuleSet.new(module_set)
+                        Diverdown::Trace::ModuleSet.new(module_set)
                       end
 
         @target_file_set = target_files&.to_set
@@ -38,7 +38,7 @@ module Diverdown
       #
       # @return [Diverdown::Definition]
       def trace(&)
-        call_stack = Diverdown::RSpec::CallStack.new
+        call_stack = Diverdown::Trace::CallStack.new
         definition = Diverdown::Definition.new(
           id: @id,
           title: @title

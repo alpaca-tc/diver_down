@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Diverdown
-  module RSpec
+  module Trace
     # A class to quickly determine if a TracePoint is a module to be traced.
     class ModuleSet
       # @param [Array<Module, String>] modules

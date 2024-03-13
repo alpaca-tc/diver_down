@@ -2,7 +2,7 @@
 
 require 'diverdown'
 require 'diverdown-web'
-require 'diverdown-rspec'
+require 'diverdown-trace'
 
 Dir['./spec/support/**/*.rb'].each { require(_1) }
 

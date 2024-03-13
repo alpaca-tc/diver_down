@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::RSpec::RedefineRubyMethods do
+RSpec.describe Diverdown::Trace::RedefineRubyMethods do
   describe 'ClassMethods' do
     describe '.redefine_c_methods' do
       it 'redefines c methods to ruby methods' do
