@@ -19,6 +19,9 @@ Bundler:
 Naming:
   Enabled: false
 
+Metrics/ParameterLists:
+  Enabled: false
+
 Metrics/BlockNesting:
   Enabled: false
 

@@ -5,7 +5,7 @@ RSpec.describe Diverdown::Trace::Tracer do
     describe 'when tracing script' do
       # @param path [String]
       # @return [Diverdown::Definition]
-      def trace_fixture(path, module_set: [], target_files: nil, filter_method_id_path: nil)
+      def trace_fixture(path, module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -16,7 +16,8 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           module_set:,
           target_files:,
-          filter_method_id_path:
+          filter_method_id_path:,
+          module_finder:
         )
 
         tracer.trace do
@@ -91,6 +92,77 @@ RSpec.describe Diverdown::Trace::Tracer do
                       ],
                     },
                   ],
+                },
+              ],
+            }, {
+              source: 'AntipollutionModule::C',
+            },
+          ]
+        ))
+      end
+
+      it 'traces tracer_module.rb with module_finder' do
+        definition = trace_fixture(
+          'tracer_module.rb',
+          module_set: [
+            'AntipollutionModule::A',
+            'AntipollutionModule::B',
+            'AntipollutionModule::C',
+          ],
+          module_finder: ->(source) {
+            case source.source
+            when 'AntipollutionModule::A'
+              'Module A'
+            when 'AntipollutionModule::B'
+              'Module B'
+            end
+          }
+        )
+
+        expect(definition.to_h).to match(fill_default(
+          id: 'id',
+          title: 'title',
+          sources: [
+            {
+              source: 'AntipollutionModule::A',
+              dependencies: [
+                {
+                  source: 'AntipollutionModule::B',
+                  method_ids: [
+                    {
+                      context: 'class',
+                      name: 'call_c',
+                      paths: [
+                        match('tracer_module.rb:8'),
+                      ],
+                    },
+                  ],
+                },
+              ],
+              modules: [
+                {
+                  name: 'Module A',
+                },
+              ],
+            }, {
+              source: 'AntipollutionModule::B',
+              dependencies: [
+                {
+                  source: 'AntipollutionModule::C',
+                  method_ids: [
+                    {
+                      context: 'class',
+                      name: 'call_d',
+                      paths: [
+                        match('tracer_module.rb:14'),
+                      ],
+                    },
+                  ],
+                },
+              ],
+              modules: [
+                {
+                  name: 'Module B',
                 },
               ],
             }, {

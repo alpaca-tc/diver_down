@@ -59,6 +59,23 @@ RSpec.describe Diverdown::Definition::Source do
       end
     end
 
+    describe '#module' do
+      it 'adds non-duplicated dependencies' do
+        source = described_class.new(source: 'a.rb')
+        module_1 = source.module('A')
+        module_2 = source.module('A')
+
+        expect(source.modules).to eq(
+          [
+            Diverdown::Definition::Modulee.new(
+              name: 'A'
+            ),
+          ]
+        )
+        expect(module_1).to eq(module_2)
+      end
+    end
+
     describe '#<=>' do
       it 'compares sources' do
         sources = [

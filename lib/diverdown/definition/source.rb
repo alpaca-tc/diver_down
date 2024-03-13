@@ -14,7 +14,7 @@ module Diverdown
         )
       end
 
-      attr_reader :source, :modules
+      attr_reader :source
 
       # @param source [String] filename of the source file
       # @param dependencies [Array<Diverdown::Definition::Dependency>]
@@ -22,7 +22,7 @@ module Diverdown
       def initialize(source:, dependencies: [], modules: [])
         @source = source
         @dependency_map = dependencies.map { [_1.source, _1] }.to_h
-        @modules = modules
+        @module_map = modules.map { [_1.name, _1] }.to_h
       end
 
       # @param source [String]
@@ -33,10 +33,22 @@ module Diverdown
         @dependency_map[source] ||= Diverdown::Definition::Dependency.new(source:)
       end
 
+      # @param name [String]
+      # @return [Diverdown::Definition::Modulee]
+      def module(name)
+        @module_map[name] ||= Diverdown::Definition::Modulee.new(name: name)
+      end
+
       # @return [Array<Diverdown::Definition::Dependency>]
       def dependencies
         @dependency_map.values.sort
       end
+
+      # @return [Array<Diverdown::Definition::Modulee>]
+      def modules
+        @module_map.values.sort
+      end
+
 
       # @param other_source [Diverdown::Definition::Source]
       # @return [Diverdown::Definition::Source]
@@ -48,7 +60,7 @@ module Diverdown
         self.class.new(
           source:,
           dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
-          modules: (@modules + other_source.modules).uniq
+          modules: (modules + other_source.modules).uniq
         )
       end
 

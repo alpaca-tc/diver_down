@@ -21,7 +21,8 @@ module Diverdown
       # @param target_files [Array<String>, nil] if nil, trace all files
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [Diverdown::Trace::ModuleSet, nil] for optimization
-      def initialize(id:, title:, module_set: [], target_files: nil, filter_method_id_path: nil)
+      # @param module_finder [#call] find module from source
+      def initialize(id:, title:, module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
         @id = id
         @title = title
         @module_set = if module_set.is_a?(Diverdown::Trace::ModuleSet)
@@ -32,6 +33,7 @@ module Diverdown
 
         @target_file_set = target_files&.to_set
         @filter_method_id_path = filter_method_id_path
+        @module_finder = module_finder
       end
 
       # Trace the call stack of the block and build the definition
@@ -56,6 +58,10 @@ module Diverdown
 
             unless module_name.nil?
               source = definition.source(module_name)
+
+              # Determine module name from source
+              modulee_name = @module_finder&.call(source)
+              source.module(modulee_name) if modulee_name
 
               unless call_stack.empty?
                 # Add dependency to called source
