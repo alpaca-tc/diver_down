@@ -36,7 +36,7 @@ module Diverdown
       # @param name [String]
       # @return [Diverdown::Definition::Modulee]
       def module(name)
-        @module_map[name] ||= Diverdown::Definition::Modulee.new(name: name)
+        @module_map[name] ||= Diverdown::Definition::Modulee.new(name:)
       end
 
       # @return [Array<Diverdown::Definition::Dependency>]
@@ -48,7 +48,6 @@ module Diverdown
       def modules
         @module_map.values.sort
       end
-
 
       # @param other_source [Diverdown::Definition::Source]
       # @return [Diverdown::Definition::Source]

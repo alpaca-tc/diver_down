@@ -15,16 +15,12 @@ module Diverdown
         attr_writer :trace_events
       end
 
-      # @param id [String]
-      # @param title [String]
       # @param module_set [Diverdown::Trace::ModuleSet, Array<Module, String>]
       # @param target_files [Array<String>, nil] if nil, trace all files
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [Diverdown::Trace::ModuleSet, nil] for optimization
       # @param module_finder [#call] find module from source
-      def initialize(id:, title:, module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
-        @id = id
-        @title = title
+      def initialize(module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
         @module_set = if module_set.is_a?(Diverdown::Trace::ModuleSet)
                         module_set
                       else
@@ -39,16 +35,14 @@ module Diverdown
       # Trace the call stack of the block and build the definition
       #
       # @return [Diverdown::Definition]
-      def trace(&)
+      def trace(id:, title:, &)
         call_stack = Diverdown::Trace::CallStack.new
         definition = Diverdown::Definition.new(
-          id: @id,
-          title: @title
+          id:,
+          title:
         )
 
         tracer = TracePoint.new(*self.class.trace_events) do |tp|
-          tp.disable
-
           case tp.event
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
@@ -99,8 +93,6 @@ module Diverdown
           when :return, :c_return
             call_stack.pop
           end
-
-          tp.enable
         end
 
         tracer.enable(&)

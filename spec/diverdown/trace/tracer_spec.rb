@@ -12,15 +12,16 @@ RSpec.describe Diverdown::Trace::Tracer do
         antipollution_environment = AntipollutionKlass.allocate
 
         tracer = described_class.new(
-          id: 'id',
-          title: 'title',
           module_set:,
           target_files:,
           filter_method_id_path:,
           module_finder:
         )
 
-        tracer.trace do
+        tracer.trace(
+          id: 'id',
+          title: 'title'
+        ) do
           antipollution_environment.send(:run)
         end
       end
@@ -571,7 +572,7 @@ RSpec.describe Diverdown::Trace::Tracer do
       #       ]
       #     )
       #
-      #     tracer.trace do
+      #     tracer.trace(id: '', title: '') do
       #       antipollution_environment.send(:run)
       #     end
       #   end
