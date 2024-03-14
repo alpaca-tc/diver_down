@@ -34,11 +34,11 @@ RSpec.describe Diverdown::Definition::Source do
   end
 
   describe 'InstanceMethods' do
-    describe '#dependency' do
+    describe '#find_or_build_dependency' do
       it 'adds non-duplicated dependencies' do
         source = described_class.new(source: 'a.rb')
-        dependency_1 = source.dependency('b.rb')
-        dependency_2 = source.dependency('b.rb')
+        dependency_1 = source.find_or_build_dependency('b.rb')
+        dependency_2 = source.find_or_build_dependency('b.rb')
 
         expect(source.dependencies).to eq(
           [
@@ -52,10 +52,20 @@ RSpec.describe Diverdown::Definition::Source do
 
       it "doesn't add self" do
         source = described_class.new(source: 'a.rb')
-        dependency = source.dependency('a.rb')
+        dependency = source.find_or_build_dependency('a.rb')
 
         expect(source.dependencies).to eq([])
         expect(dependency).to be_nil
+      end
+    end
+
+    describe '#dependency' do
+      it 'returns dependency if it is found' do
+        source = described_class.new(source: 'a.rb')
+        dependency = source.find_or_build_dependency('b.rb')
+
+        expect(source.dependency(dependency.source)).to eq(dependency)
+        expect(source.dependency('unknown')).to be_nil
       end
     end
 

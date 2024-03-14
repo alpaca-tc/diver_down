@@ -35,8 +35,14 @@ module Diverdown
 
     # @param source [String]
     # @return [Diverdown::Definition::Source]
-    def source(source)
+    def find_or_build_source(source)
       @source_map[source] ||= Diverdown::Definition::Source.new(source:)
+    end
+
+    # @param source [String]
+    # @return [Diverdown::Definition::Source, nil]
+    def source(source)
+      @source_map[source]
     end
 
     # @return [Array<Diverdown::Definition::Source>]

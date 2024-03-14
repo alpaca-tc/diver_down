@@ -27,10 +27,16 @@ module Diverdown
 
       # @param source [String]
       # @return [Diverdown::Definition::Dependency, nil] return nil if source is self.source
-      def dependency(source)
+      def find_or_build_dependency(source)
         return if self.source == source
 
         @dependency_map[source] ||= Diverdown::Definition::Dependency.new(source:)
+      end
+
+      # @param source [String]
+      # @return [Diverdown::Definition::Dependency, nil]
+      def dependency(source)
+        @dependency_map[source]
       end
 
       # @param name [String]

@@ -55,7 +55,7 @@ module Diverdown
             pushed = false
 
             unless module_name.nil?
-              source = definition.source(module_name)
+              source = definition.find_or_build_source(module_name)
 
               # Determine module name from source
               modulee_name = @module_finder&.call(source)
@@ -65,13 +65,13 @@ module Diverdown
                 # Add dependency to called source
                 called_stack_context = call_stack.stack[-1]
                 called_source = called_stack_context.source
-                dependency = called_source.dependency(module_name)
+                dependency = called_source.find_or_build_dependency(module_name)
 
                 # `dependency.nil?` means module_name equals to called_source.source.
                 # self-references are not tracked because it is not "dependency".
                 if dependency
                   context = Diverdown::Helper.module?(tp.self) ? 'class' : 'instance'
-                  method_id = dependency.method_id(name: tp.method_id, context:)
+                  method_id = dependency.find_or_build_method_id(name: tp.method_id, context:)
                   method_id_path = "#{called_stack_context.caller_location.path}:#{called_stack_context.caller_location.lineno}"
                   method_id_path = @filter_method_id_path.call(method_id_path) if @filter_method_id_path
                   method_id.add_path(method_id_path)

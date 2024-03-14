@@ -32,6 +32,33 @@ RSpec.describe Diverdown::Definition do
   end
 
   describe 'InstanceMethods' do
+    describe '#find_or_build_source' do
+      it 'finds or builds source' do
+        definition = described_class.new
+        expect(definition.sources.length).to eq(0)
+
+        source_1 = definition.find_or_build_source('a.rb')
+        expect(definition.sources.length).to eq(1)
+
+        source_2 = definition.find_or_build_source('a.rb')
+        expect(definition.sources.length).to eq(1)
+        expect(source_1).to eq(source_2)
+
+        definition.find_or_build_source('b.rb')
+        expect(definition.sources.length).to eq(2)
+      end
+    end
+
+    describe '#source' do
+      it 'finds source by source name' do
+        definition = described_class.new
+        expect(definition.source('a.rb')).to be_nil
+
+        source_1 = definition.find_or_build_source('a.rb')
+        expect(definition.source(source_1.source)).to eq(source_1)
+      end
+    end
+
     describe '#top?' do
       it "set parent and add self to parent's children" do
         parent = described_class.new

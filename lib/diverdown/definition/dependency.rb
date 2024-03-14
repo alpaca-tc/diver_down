@@ -26,7 +26,7 @@ module Diverdown
 
           same_source_dependencies.each do |dependency|
             dependency.method_ids.each do |method_id|
-              new_method_id = new_dependency.method_id(name: method_id.name, context: method_id.context)
+              new_method_id = new_dependency.find_or_build_method_id(name: method_id.name, context: method_id.context)
               new_method_id.add_path(*method_id.paths)
             end
           end
@@ -54,8 +54,15 @@ module Diverdown
       # @param name [String]
       # @param context ['instance', 'class']
       # @return [Diverdown::Definition::MethodId]
-      def method_id(name:, context:)
+      def find_or_build_method_id(name:, context:)
         @method_id_map[context.to_s][name.to_s] ||= Diverdown::Definition::MethodId.new(name:, context:)
+      end
+
+      # @param name [String, Symbol]
+      # @param context ['instance', 'class']
+      # @return [Diverdown::Definition::MethodId, nil]
+      def method_id(name:, context:)
+        @method_id_map[context.to_s][name.to_s]
       end
 
       # @return [Array<Diverdown::Definition::MethodId>]

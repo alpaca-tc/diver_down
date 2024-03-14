@@ -123,6 +123,47 @@ RSpec.describe Diverdown::Definition::Dependency do
       end
     end
 
+    describe '#find_or_build_method_id' do
+      it 'returns existing method_id if method_id exists' do
+        class_method_id = Diverdown::Definition::MethodId.new(
+          name: 'to_s',
+          context: 'class',
+          paths: ['a.rb']
+        )
+        instance_method_id = Diverdown::Definition::MethodId.new(
+          name: 'to_s',
+          context: 'instance',
+          paths: ['a.rb']
+        )
+
+        dependency = described_class.new(
+          source: 'a.rb',
+          method_ids: [class_method_id, instance_method_id]
+        )
+
+        expect(dependency.find_or_build_method_id(name: 'to_s', context: 'class')).to eq(class_method_id)
+      end
+
+      it "returns new method_id if method_id doesn't exist" do
+        method_id = Diverdown::Definition::MethodId.new(
+          name: 'to_s',
+          context: 'class',
+          paths: ['a.rb']
+        )
+        dependency = described_class.new(
+          source: 'a.rb',
+          method_ids: [method_id]
+        )
+
+        expect(dependency.find_or_build_method_id(name: 'to_i', context: 'class')).to eq(
+          Diverdown::Definition::MethodId.new(
+            context: 'class',
+            name: 'to_i'
+          )
+        )
+      end
+    end
+
     describe '#method_id' do
       it 'returns existing method_id if method_id exists' do
         class_method_id = Diverdown::Definition::MethodId.new(
@@ -142,25 +183,8 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         expect(dependency.method_id(name: 'to_s', context: 'class')).to eq(class_method_id)
-      end
-
-      it "returns new method_id if method_id doesn't exist" do
-        method_id = Diverdown::Definition::MethodId.new(
-          name: 'to_s',
-          context: 'class',
-          paths: ['a.rb']
-        )
-        dependency = described_class.new(
-          source: 'a.rb',
-          method_ids: [method_id]
-        )
-
-        expect(dependency.method_id(name: 'to_i', context: 'class')).to eq(
-          Diverdown::Definition::MethodId.new(
-            context: 'class',
-            name: 'to_i'
-          )
-        )
+        expect(dependency.method_id(name: 'to_s', context: 'instance')).to eq(instance_method_id)
+        expect(dependency.method_id(name: 'unknown', context: 'class')).to be_nil
       end
     end
 
