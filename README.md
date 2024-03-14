@@ -1,24 +1,47 @@
 # Diverdown
 
-TODO: Delete this and the text below, and describe your gem
+`divertdown` is a tool that dynamically analyzes application dependencies and creates a dependency map.
+This tool was created to analyze Ruby applications for use in large-scale refactoring such as moduler monolith.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/diverdown`. To experiment with that code, run `bin/console` for an interactive prompt.
+The results of the analysis can be viewed in a browser, allowing you to deepen your architectural considerations while viewing the results.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+gem 'diverdown'
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+And then execute:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+    $ bundle
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Or install it yourself as:
+
+    $ gem install active_record_bitmask
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+tracer = Diverdown::Trace::Tracer.new(
+  # @param target_files [Array<String>, Set<String>, nil] If nil, all files are targeted but slow.
+  # List of target files to be analyzed. Usually, gem and other files are excluded and specified.
+  target_files: Dir["app/**/*.rb"],
+  # @param module_set [Array<String>, Diverdown::Trace::ModuleSet] List of modules to be analyzed.
+  # When analyzing a your Rails application, set all classes/modules under app/.
+  module_set: [
+    'User',
+    'Item',
+    'Order',
+    ...
+  ],
+  # @param filter_method_id_path [#call, nil] The analysis result outputs the absolute path of the caller. To convert to a relative path, define the conversion logic manually.
+  filter_method_id_path: -> (path) { path.remove(Rails.root.to_s) },
+  # @param module_finder [#call, nil] Specify the logic to determine which module the source found. diverdown promote moduler monolithization, so such an option exists.
+  module_finder: -> (source) { 'OrderSystem' if source.source == 'Order' },
+)
+```
 
 ## Development
 
@@ -28,7 +51,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/diverdown. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/diverdown/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/alpaca-tc/diverdown. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/alpaca-tc/diverdown/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -36,4 +59,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Diverdown project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/diverdown/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Diverdown project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/alpaca-tc/diverdown/blob/main/CODE_OF_CONDUCT.md).

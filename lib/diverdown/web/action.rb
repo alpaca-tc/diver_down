@@ -75,7 +75,7 @@ module Diverdown
       # @param source [String]
       def source(source)
         related_definitions = []
-        reverse_dependencies = Hash.new { |h,k| h[k] = Set.new }
+        reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
 
         @store.each do |definition|
           found_source = nil
