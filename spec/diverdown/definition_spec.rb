@@ -71,19 +71,6 @@ RSpec.describe Diverdown::Definition do
       end
     end
 
-    describe '#to_dot' do
-      it 'returns digraph' do
-        definition = described_class.new(
-          title: 'title'
-        )
-
-        expect(definition.to_dot).to eq(<<~DOT)
-          strict digraph "title" {
-          }
-        DOT
-      end
-    end
-
     describe '#to_h' do
       it 'converts definition to hash' do
         definition = described_class.new(

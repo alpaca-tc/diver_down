@@ -64,7 +64,7 @@ module Diverdown
           json(
             id: definition.id,
             title: definition.title,
-            dot: definition.to_dot
+            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s
           )
         else
           not_found

@@ -8,6 +8,7 @@ module Diverdown
     WEB_DIR = File.expand_path('../../web', __dir__)
 
     require 'diverdown/web/action'
+    require 'diverdown/web/definition_to_dot'
 
     # @param definition_dir [String]
     # @param store [Diverdown::DefinitionStore]

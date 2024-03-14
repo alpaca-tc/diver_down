@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Diverdown
-  class Definition
-    class ToDot
+  class Web
+    class DefinitionToDot
       class SourceDecorator < BasicObject
         attr_reader :dependencies
 

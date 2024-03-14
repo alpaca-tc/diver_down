@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition::ToDot do
+RSpec.describe Diverdown::Web::DefinitionToDot do
   describe 'InstanceMethods' do
     describe '#to_s' do
       def build_definition(title: 'title', sources: [])
@@ -25,7 +25,7 @@ RSpec.describe Diverdown::Definition::ToDot do
             title: 'title'
           )
 
-          expect(definition.to_dot).to eq(<<~DOT)
+          expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
             }
           DOT
@@ -42,7 +42,7 @@ RSpec.describe Diverdown::Definition::ToDot do
             ]
           )
 
-          expect(definition.to_dot).to eq(<<~DOT)
+          expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb"]
             }
@@ -65,7 +65,7 @@ RSpec.describe Diverdown::Definition::ToDot do
             ]
           )
 
-          expect(definition.to_dot).to eq(<<~DOT)
+          expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb"]
                 "a.rb" -> "b.rb"
@@ -91,7 +91,7 @@ RSpec.describe Diverdown::Definition::ToDot do
             ]
           )
 
-          expect(definition.to_dot).to eq(<<~DOT)
+          expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
               subgraph "cluster_A" {
                 label="A" subgraph "cluster_B" {

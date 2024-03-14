@@ -8,7 +8,6 @@ module Diverdown
     require 'diverdown/definition/dependency'
     require 'diverdown/definition/modulee'
     require 'diverdown/definition/method_id'
-    require 'diverdown/definition/to_dot'
 
     # @param hash [Hash]
     # @return [Diverdown::Definition]
@@ -62,11 +61,6 @@ module Diverdown
       return 0 if top?
 
       parent.level + 1
-    end
-
-    # @return [String]
-    def to_dot
-      Diverdown::Definition::ToDot.new(self).to_s
     end
 
     # @return [String]
