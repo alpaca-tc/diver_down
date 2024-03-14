@@ -2,6 +2,13 @@
 
 RSpec.describe Diverdown::Definition::MethodId do
   describe 'InstanceMethods' do
+    describe '#human_method_name' do
+      it 'returns a string' do
+        expect(described_class.new(name: 'to_s', context: 'class').human_method_name).to eq('.to_s')
+        expect(described_class.new(name: 'to_s', context: 'instance').human_method_name).to eq('#to_s')
+      end
+    end
+
     describe '#hash' do
       it 'returns a hash' do
         method_id_1 = described_class.new(name: 'to_s', context: 'class')

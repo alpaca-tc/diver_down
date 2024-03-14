@@ -72,6 +72,39 @@ module Diverdown
         end
       end
 
+      # @param source [String]
+      def source(source)
+        related_definitions = []
+        reverse_dependencies = Hash.new { |h,k| h[k] = Set.new }
+
+        @store.each do |definition|
+          found_source = nil
+
+          definition.sources.each do |definition_source|
+            found_source = definition_source if definition_source.source == source
+
+            dependencies = definition_source.dependencies.select do |dependency|
+              dependency.source == source
+            end
+
+            method_ids = dependencies.flat_map(&:method_ids).uniq.sort
+
+            method_ids.each do |method_id|
+              reverse_dependencies[definition_source.source].add(method_id)
+            end
+          end
+
+          related_definitions << definition if found_source
+        end
+
+        if related_definitions.empty?
+          not_found
+        else
+          body = erb(:source, locals: { source:, related_definitions:, reverse_dependencies: })
+          [200, { 'content-type' => 'text/html' }, [body]]
+        end
+      end
+
       # @return [Array[Integer, Hash, Array]]
       def not_found
         [404, { 'content-type' => 'text/plain' }, ['not found']]

@@ -34,6 +34,9 @@ module Diverdown
       in ['POST', '/definitions/combine.json']
         ids = request.params['ids'].to_s.split(Diverdown::DELIMITER)
         action.combine_definitions(ids)
+      in ['GET', %r{\A/sources/(?<source>.+)\z}]
+        source = Regexp.last_match[:source]
+        action.source(source)
       else
         action.not_found
       end

@@ -33,6 +33,12 @@ module Diverdown
         @paths.sort
       end
 
+      # @return [String]
+      def human_method_name
+        prefix = context == 'instance' ? '#' : '.'
+        "#{prefix}#{name}"
+      end
+
       # @return [Hash]
       def to_h
         {
@@ -66,8 +72,7 @@ module Diverdown
 
       # @return [String]
       def inspect
-        prefix = context == 'instance' ? '#' : '.'
-        %(#<#{self.class} #{prefix}#{name} paths=#{paths.inspect}>")
+        %(#<#{self.class} #{human_method_name} paths=#{paths.inspect}>")
       end
     end
   end

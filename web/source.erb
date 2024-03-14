@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/controllers/source.css" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <h1><%= source %></h1>
+
+      <h2>Related Definitions <a href="/#definition-<%= CGI.escape(related_definitions.map(&:id).join(Diverdown::DELIMITER)) %>">All</a></h2>
+      <ul>
+        <% related_definitions.each do |definition| %>
+          <li>
+            <a href="/#definition-<%= CGI.escape(definition.id) %>">
+              <%= definition.title %>
+            </a>
+          </li>
+        <% end %>
+      </ul>
+
+      <h2>Reverse Dependencies</h2>
+      <ul>
+        <% reverse_dependencies.each do |(definition_source, method_ids)| %>
+          <li>
+            <a href="/sources/<%= definition_source %>">
+              <%= definition_source %>
+            </a>
+            <small>
+            <% method_ids.each_with_index do |method_id, index| %>
+              <%= ', ' unless index == 0 %>
+              <%= method_id.human_method_name %>
+            <% end %>
+            </small>
+          </li>
+        <% end %>
+      </ul>
+    </main>
+  </body>
+</html>

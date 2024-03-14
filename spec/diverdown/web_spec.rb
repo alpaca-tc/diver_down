@@ -77,4 +77,39 @@ RSpec.describe Diverdown::Web do
       expect(last_response.body).to include('digraph')
     end
   end
+
+  describe 'GET /sources/:source.json' do
+    it 'returns 404 if source is not found' do
+      get '/sources/unknown.json'
+
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'returns response if source is found' do
+      definition_1 = Diverdown::Definition.new(
+        id: SecureRandom.uuid,
+        title: 'title',
+        sources: [
+          Diverdown::Definition::Source.new(
+            source: 'a.rb'
+          ),
+        ]
+      )
+      definition_2 = Diverdown::Definition.new(
+        id: SecureRandom.uuid,
+        title: 'second title',
+        sources: [
+          Diverdown::Definition::Source.new(
+            source: 'b.rb'
+          ),
+        ]
+      )
+      store.set(definition_1)
+      store.set(definition_2)
+
+      get '/sources/a.rb'
+
+      expect(last_response.status).to eq(200)
+    end
+  end
 end
