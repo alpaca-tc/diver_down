@@ -85,13 +85,11 @@ const definitionToggleChildren = (parentId, checked) => {
   })
 }
 
-const definitionToggleAll = (event) => {
-  const checked = event.target.checked
+const definitionCheckReset = () => {
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
 
   checkboxes.forEach((checkbox) => {
-    const li = checkbox.closest("[data-target='definition-li']")
-    checkbox.checked = !!(!li.classList.contains("hidden") && checked)
+    checkbox.checked = false
   })
 
   drawCheckedDefinitions()
@@ -120,8 +118,8 @@ export const start = async () => {
     drawCheckedDefinitions()
   }, 500))
 
-  delegate(document, '[data-action="definitionToggleAll"]', 'click', (event) => {
-    definitionToggleAll(event)
+  delegate(document, '[data-action="definitionCheckReset"]', 'click', () => {
+    definitionCheckReset()
   })
 
   delegate(document, '[data-action="definition-filter-input"]', 'input', debounse((event) => {
