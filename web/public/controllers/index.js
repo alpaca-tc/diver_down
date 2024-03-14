@@ -13,10 +13,12 @@ const renderDot = async (response) => {
 
   history.pushState(null, null, `#definition-${response.id}`)
 
-  d3
+  const graphviz = d3
     .select("[data-target='definition-graph']")
     .graphviz()
-    .renderDot(response.dot);
+
+  graphviz.renderDot(response.dot)
+  graphviz.resetZoom()
 }
 
 const drawDefinitions = async (ids) => {
@@ -66,7 +68,8 @@ const definitionToggleAll = (event) => {
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
 
   checkboxes.forEach((checkbox) => {
-    checkbox.checked = checked
+    const li = checkbox.closest("[data-target='definition-li']")
+    checkbox.checked = !!(!li.classList.contains("hidden") && checked)
   })
 
   drawCheckedDefinitions()
@@ -89,11 +92,11 @@ const filterDefinitions = (value) => {
 }
 
 export const start = async () => {
-  delegate(document, '[data-target="definition-checkbox"]', "change", (event) => {
+  delegate(document, '[data-target="definition-checkbox"]', "change", debounse((event) => {
     definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
 
     drawCheckedDefinitions()
-  })
+  }, 500))
 
   delegate(document, '[data-action="definitionToggleAll"]', 'click', (event) => {
     definitionToggleAll(event)
