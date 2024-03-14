@@ -55,18 +55,5 @@ module Diverdown
       end
       # rubocop:enable Style/HashEachMethods
     end
-
-    # Combine multiple definitions into a single definition
-    # @param ids [Array<String>]
-    # @return [Diverdown::Definition]
-    def combined(ids)
-      raise ArgumentError, 'ids must be an non-blank array' if ids.empty?
-
-      definitions = ids.map { get(_1) }
-
-      definitions.inject(Diverdown::Definition.new(id: ids.sort.join(Diverdown::DELIMITER), title: 'combined')) do |single_definition, other_definition|
-        single_definition.combine(other_definition)
-      end
-    end
   end
 end

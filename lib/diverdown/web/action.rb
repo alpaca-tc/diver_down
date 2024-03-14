@@ -87,7 +87,15 @@ module Diverdown
         when 1
           @store.get(ids[0])
         else
-          @store.combined(ids)
+          combine_ids_definitions(ids)
+        end
+      end
+
+      def combine_ids_definitions(ids)
+        definitions = ids.map { @store.get(_1) }
+
+        definitions.inject(Diverdown::Definition.new(id: ids.sort.join(Diverdown::DELIMITER), title: 'combined')) do
+          _1.combine(_2)
         end
       end
 
