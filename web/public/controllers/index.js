@@ -7,6 +7,23 @@ import { delegate } from "utils/delegate";
 import { request, buildFormData } from "utils/request";
 import { debounse } from "utils/debounse";
 
+const renderSources = (sources) => {
+  const ul = document.querySelector("[data-target='definition-sources']")
+  ul.innerHTML = ''
+
+  sources.forEach((source) => {
+    const li = document.createElement("li")
+    const anchor = document.createElement("a")
+
+    anchor.innerText = source.source
+    anchor.setAttribute("href", path.sources.show(source.source))
+    anchor.setAttribute("_target", 'blank')
+
+    li.appendChild(anchor)
+    ul.appendChild(li)
+  })
+}
+
 const renderDot = async (response) => {
   document.querySelector("[data-target='definition-title']").innerText = response.title
   document.querySelector("[data-target='definition-id']").innerText = response.id
@@ -18,7 +35,11 @@ const renderDot = async (response) => {
     .graphviz()
 
   graphviz.renderDot(response.dot)
-  graphviz.resetZoom()
+
+  try {
+    // Error occurs when the graph is not zoomed yet
+    graphviz.resetZoom()
+  } catch(e) {}
 }
 
 const drawDefinitions = async (ids) => {
@@ -31,6 +52,7 @@ const drawDefinitions = async (ids) => {
     }
   )
   await renderDot(response)
+  renderSources(response.sources)
 }
 
 const drawInitial = () => {

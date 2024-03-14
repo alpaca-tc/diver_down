@@ -64,7 +64,8 @@ module Diverdown
           json(
             id: definition.id,
             title: definition.title,
-            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s
+            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
+            sources: definition.sources.map { { source: _1.source } }
           )
         else
           not_found
