@@ -84,17 +84,13 @@ body {
     border-bottom: 1px solid rgb(214, 211, 208);
   }
 
-  [data-target="definition-graph"] {
-    overflow: scroll;
+  & [data-target="definition-graph-wrapper"] {
+    height: 100%;
   }
 
-  .zoom {
-    position: fixed;
-    bottom: 10px;
-    z-index: 100;
-    background: white;
-    padding: 0.5em;
-    border: 1px solid #ccc;
+  [data-target="definition-graph"] {
+    height: 100%;
+    overflow: scroll;
   }
 }
 

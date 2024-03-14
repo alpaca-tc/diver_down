@@ -30,11 +30,19 @@ const renderDot = async (response) => {
 
   history.pushState(null, null, `#definition-${encodeURIComponent(response.id)}`)
 
+  const graphEl = document.querySelector("[data-target='definition-graph']")
   const graphviz = d3
     .select("[data-target='definition-graph']")
     .graphviz()
 
-  graphviz.renderDot(response.dot)
+  graphviz
+    .options({
+      fit: true,
+      width: graphEl.clientWidth,
+      height: graphEl.clientHeight,
+      zoom: true,
+    })
+    .renderDot(response.dot)
 
   try {
     // Error occurs when the graph is not zoomed yet
