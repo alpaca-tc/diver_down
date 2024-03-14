@@ -36,6 +36,24 @@
           </li>
         <% end %>
       </ul>
+
+      <h2>Method Ids</h2>
+      <ul>
+        <% reverse_dependencies.values.inject(Set.new, &:union).group_by { [_1.context, _1.name] }.sort.each do |_, method_ids| %>
+          <% method_id = method_ids[0] %>
+          <% paths = method_ids.flat_map(&:paths).uniq.sort %>
+
+          <li>
+            <%= method_id.human_method_name %>
+            <small>
+            <% paths.each do |path, index| %>
+              <%= '<br>' unless index == 0 %>
+              <%= path %>
+            <% end %>
+            </small>
+          </li>
+        <% end %>
+      </ul>
     </main>
   </body>
 </html>

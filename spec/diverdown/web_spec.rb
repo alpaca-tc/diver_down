@@ -78,7 +78,7 @@ RSpec.describe Diverdown::Web do
     end
   end
 
-  describe 'GET /sources/:source.json' do
+  describe 'GET /sources/:source' do
     it 'returns 404 if source is not found' do
       get '/sources/unknown.json'
 
