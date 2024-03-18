@@ -31,6 +31,97 @@ RSpec.describe Diverdown::Definition::Source do
         expect(described_class.from_hash(source.to_h)).to eq(source)
       end
     end
+
+    describe '.combine' do
+      it 'combines simple sources' do
+        source_a = described_class.new(
+          source: 'a.rb'
+        )
+
+        source_b = described_class.new(
+          source: 'a.rb'
+        )
+
+        expect(described_class.combine(source_a, source_b)).to eq(
+          described_class.new(
+            source: 'a.rb'
+          )
+        )
+      end
+
+      it 'raises exception if sources are empty' do
+        expect { described_class.combine }.to raise_error(ArgumentError, 'sources are empty')
+      end
+
+      it 'raises exception if source is unmatched' do
+        source_a = described_class.new(
+          source: 'a.rb'
+        )
+
+        source_b = described_class.new(
+          source: 'b.rb'
+        )
+
+        expect { described_class.combine(source_a, source_b) }.to raise_error(ArgumentError, 'sources are unmatched. (["a.rb", "b.rb"])')
+      end
+
+      it 'combines sources with dependencies' do
+        source_a = described_class.new(
+          source: 'a.rb',
+          dependencies: [
+            Diverdown::Definition::Dependency.new(
+              source: 'b.rb'
+            ),
+            Diverdown::Definition::Dependency.new(
+              source: 'c.rb'
+            ),
+          ]
+        )
+
+        source_b = described_class.new(
+          source: 'a.rb',
+          dependencies: [
+            Diverdown::Definition::Dependency.new(
+              source: 'b.rb',
+              method_ids: [
+                Diverdown::Definition::MethodId.new(
+                  name: 'to_s',
+                  context: 'class',
+                  paths: ['a.rb']
+                ),
+              ]
+            ),
+            Diverdown::Definition::Dependency.new(
+              source: 'd.rb'
+            ),
+          ]
+        )
+
+        expect(described_class.combine(source_a, source_b)).to eq(
+          described_class.new(
+            source: 'a.rb',
+            dependencies: [
+              Diverdown::Definition::Dependency.new(
+                source: 'b.rb',
+                method_ids: [
+                  Diverdown::Definition::MethodId.new(
+                    name: 'to_s',
+                    context: 'class',
+                    paths: ['a.rb']
+                  ),
+                ]
+              ),
+              Diverdown::Definition::Dependency.new(
+                source: 'c.rb'
+              ),
+              Diverdown::Definition::Dependency.new(
+                source: 'd.rb'
+              ),
+            ]
+          )
+        )
+      end
+    end
   end
 
   describe 'InstanceMethods' do
@@ -95,93 +186,6 @@ RSpec.describe Diverdown::Definition::Source do
         ]
 
         expect(sources.shuffle.sort).to eq(sources)
-      end
-    end
-
-    describe '#combine' do
-      it 'combines simple sources' do
-        source_a = described_class.new(
-          source: 'a.rb'
-        )
-
-        source_b = described_class.new(
-          source: 'a.rb'
-        )
-
-        expect(source_a.combine(source_b)).to eq(
-          described_class.new(
-            source: 'a.rb'
-          )
-        )
-      end
-
-      it 'raises exception if source is unmatched' do
-        source_a = described_class.new(
-          source: 'a.rb'
-        )
-
-        source_b = described_class.new(
-          source: 'b.rb'
-        )
-
-        expect { source_a.combine(source_b) }.to raise_error(ArgumentError, 'source is unmatched. (a.rb, b.rb)')
-      end
-
-      it 'combines sources with dependencies' do
-        source_a = described_class.new(
-          source: 'a.rb',
-          dependencies: [
-            Diverdown::Definition::Dependency.new(
-              source: 'b.rb'
-            ),
-            Diverdown::Definition::Dependency.new(
-              source: 'c.rb'
-            ),
-          ]
-        )
-
-        source_b = described_class.new(
-          source: 'a.rb',
-          dependencies: [
-            Diverdown::Definition::Dependency.new(
-              source: 'b.rb',
-              method_ids: [
-                Diverdown::Definition::MethodId.new(
-                  name: 'to_s',
-                  context: 'class',
-                  paths: ['a.rb']
-                ),
-              ]
-            ),
-            Diverdown::Definition::Dependency.new(
-              source: 'd.rb'
-            ),
-          ]
-        )
-
-        expect(source_a.combine(source_b)).to eq(
-          described_class.new(
-            source: 'a.rb',
-            dependencies: [
-              Diverdown::Definition::Dependency.new(
-                source: 'b.rb',
-                method_ids: [
-                  Diverdown::Definition::MethodId.new(
-                    name: 'to_s',
-                    context: 'class',
-                    paths: ['a.rb']
-                  ),
-                ]
-              ),
-              Diverdown::Definition::Dependency.new(
-                source: 'c.rb'
-              ),
-              Diverdown::Definition::Dependency.new(
-                source: 'd.rb'
-              ),
-            ]
-          )
-        )
       end
     end
 

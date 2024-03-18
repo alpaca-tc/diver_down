@@ -21,6 +21,23 @@ module Diverdown
       )
     end
 
+    # @param id [String]
+    # @param title [String]
+    # @param definitions [Array<Diverdown::Definition>]
+    def self.combine(id:, title:, definitions: [])
+      all_sources = definitions.flat_map(&:sources)
+
+      sources = all_sources.group_by(&:source).map do |_, same_sources|
+        Diverdown::Definition::Source.combine(*same_sources)
+      end
+
+      new(
+        id:,
+        title:,
+        sources:
+      )
+    end
+
     attr_reader :id, :title, :parent, :children
 
     # @param title [String]

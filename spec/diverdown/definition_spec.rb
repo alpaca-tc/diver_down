@@ -29,6 +29,60 @@ RSpec.describe Diverdown::Definition do
         expect(described_class.from_hash(definition.to_h)).to eq(definition)
       end
     end
+
+    describe '.combine' do
+      it 'combines definitions' do
+        definition_1 = described_class.new(
+          title: 'title',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source: 'a.rb',
+              dependencies: [
+                Diverdown::Definition::Dependency.new(
+                  source: 'b.rb'
+                ),
+                Diverdown::Definition::Dependency.new(
+                  source: 'c.rb'
+                ),
+              ],
+              modules: [
+                Diverdown::Definition::Modulee.new(
+                  name: 'A'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        definition_2 = described_class.new(
+          title: 'title',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source: 'd.rb',
+              dependencies: [
+                Diverdown::Definition::Dependency.new(
+                  source: 'e.rb'
+                ),
+                Diverdown::Definition::Dependency.new(
+                  source: 'f.rb'
+                ),
+              ],
+              modules: [
+                Diverdown::Definition::Modulee.new(
+                  name: 'B'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        definition = described_class.combine(id: '1', title: '2', definitions: [definition_1, definition_2])
+
+        expect(definition.sources.length).to eq(2)
+        expect(definition.sources[0].source).to eq('a.rb')
+        expect(definition.sources[1].source).to eq('d.rb')
+      end
+    end
   end
 
   describe 'InstanceMethods' do

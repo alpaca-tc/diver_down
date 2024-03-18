@@ -14,6 +14,23 @@ module Diverdown
         )
       end
 
+      # @param sources [Array<Diverdown::Definition::Source>]
+      # @return [Diverdown::Definition::Source]
+      def self.combine(*sources)
+        raise ArgumentError, 'sources are empty' if sources.empty?
+
+        uniq_sources = sources.map(&:source).uniq
+        raise ArgumentError, "sources are unmatched. (#{uniq_sources})" unless uniq_sources.length == 1
+
+        all_dependencies = sources.flat_map(&:dependencies)
+
+        new(
+          source: uniq_sources[0],
+          dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
+          modules: sources.flat_map(&:modules)
+        )
+      end
+
       attr_reader :source
 
       # @param source [String] filename of the source file
@@ -53,20 +70,6 @@ module Diverdown
       # @return [Array<Diverdown::Definition::Modulee>]
       def modules
         @module_map.values.sort
-      end
-
-      # @param other_source [Diverdown::Definition::Source]
-      # @return [Diverdown::Definition::Source]
-      def combine(other_source)
-        raise ArgumentError, "source is unmatched. (#{source}, #{other_source.source})" unless source == other_source.source
-
-        all_dependencies = dependencies + other_source.dependencies
-
-        self.class.new(
-          source:,
-          dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
-          modules: (modules + other_source.modules).uniq
-        )
       end
 
       # @return [Hash]
