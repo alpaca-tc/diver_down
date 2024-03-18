@@ -48,6 +48,7 @@ module Diverdown
     def load_store
       # TODO: Optimize load yaml
       # TODO: How to implement packages and modules...
+      # TODO: Loading all yaml is slow. Need to filter to load only wanted yaml.
       packages = Hash.new { |h, k| h[k] = [] }
       yaml_files = Dir[File.join(@definition_dir, '**', '*.{yml,yaml}')].sort
 
