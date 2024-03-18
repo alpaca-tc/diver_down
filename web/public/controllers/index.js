@@ -15,8 +15,8 @@ const renderSources = (sources) => {
     const li = document.createElement("li")
     const anchor = document.createElement("a")
 
-    anchor.innerText = source.source
-    anchor.setAttribute("href", path.sources.show(source.source))
+    anchor.innerText = source.source_name
+    anchor.setAttribute("href", path.sources.show(source.source_name))
     anchor.setAttribute("_target", 'blank')
 
     li.appendChild(anchor)

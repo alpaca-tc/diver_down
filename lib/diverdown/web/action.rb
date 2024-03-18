@@ -65,15 +65,15 @@ module Diverdown
             id: definition.id,
             title: definition.title,
             dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
-            sources: definition.sources.map { { source: _1.source } }
+            sources: definition.sources.map { { source_name: _1.source_name } }
           )
         else
           not_found
         end
       end
 
-      # @param source [String]
-      def source(source)
+      # @param source_name [String]
+      def source(source_name)
         related_definitions = []
         reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
 
@@ -81,16 +81,16 @@ module Diverdown
           found_source = nil
 
           definition.sources.each do |definition_source|
-            found_source = definition_source if definition_source.source == source
+            found_source = definition_source if definition_source.source_name == source_name
 
             dependencies = definition_source.dependencies.select do |dependency|
-              dependency.source == source
+              dependency.source_name == source_name
             end
 
             method_ids = dependencies.flat_map(&:method_ids).uniq.sort
 
             method_ids.each do |method_id|
-              reverse_dependencies[definition_source.source].add(method_id)
+              reverse_dependencies[definition_source.source_name].add(method_id)
             end
           end
 
@@ -100,7 +100,7 @@ module Diverdown
         if related_definitions.empty?
           not_found
         else
-          body = erb(:source, locals: { source:, related_definitions:, reverse_dependencies: })
+          body = erb(:source, locals: { source_name:, related_definitions:, reverse_dependencies: })
           [200, { 'content-type' => 'text/html' }, [body]]
         end
       end

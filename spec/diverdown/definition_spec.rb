@@ -8,18 +8,18 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           sources: [
             Diverdown::Definition::Source.new(
-              source: 'a.rb',
+              source_name: 'a.rb',
               dependencies: [
                 Diverdown::Definition::Dependency.new(
-                  source: 'b.rb'
+                  source_name: 'b.rb'
                 ),
                 Diverdown::Definition::Dependency.new(
-                  source: 'c.rb'
+                  source_name: 'c.rb'
                 ),
               ],
               modules: [
                 Diverdown::Definition::Modulee.new(
-                  name: 'A'
+                  module_name: 'A'
                 ),
               ]
             ),
@@ -36,18 +36,18 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           sources: [
             Diverdown::Definition::Source.new(
-              source: 'a.rb',
+              source_name: 'a.rb',
               dependencies: [
                 Diverdown::Definition::Dependency.new(
-                  source: 'b.rb'
+                  source_name: 'b.rb'
                 ),
                 Diverdown::Definition::Dependency.new(
-                  source: 'c.rb'
+                  source_name: 'c.rb'
                 ),
               ],
               modules: [
                 Diverdown::Definition::Modulee.new(
-                  name: 'A'
+                  module_name: 'A'
                 ),
               ]
             ),
@@ -58,18 +58,18 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           sources: [
             Diverdown::Definition::Source.new(
-              source: 'd.rb',
+              source_name: 'd.rb',
               dependencies: [
                 Diverdown::Definition::Dependency.new(
-                  source: 'e.rb'
+                  source_name: 'e.rb'
                 ),
                 Diverdown::Definition::Dependency.new(
-                  source: 'f.rb'
+                  source_name: 'f.rb'
                 ),
               ],
               modules: [
                 Diverdown::Definition::Modulee.new(
-                  name: 'B'
+                  module_name: 'B'
                 ),
               ]
             ),
@@ -79,8 +79,8 @@ RSpec.describe Diverdown::Definition do
         definition = described_class.combine(id: '1', title: '2', definitions: [definition_1, definition_2])
 
         expect(definition.sources.length).to eq(2)
-        expect(definition.sources[0].source).to eq('a.rb')
-        expect(definition.sources[1].source).to eq('d.rb')
+        expect(definition.sources[0].source_name).to eq('a.rb')
+        expect(definition.sources[1].source_name).to eq('d.rb')
       end
     end
   end
@@ -109,7 +109,7 @@ RSpec.describe Diverdown::Definition do
         expect(definition.source('a.rb')).to be_nil
 
         source_1 = definition.find_or_build_source('a.rb')
-        expect(definition.source(source_1.source)).to eq(source_1)
+        expect(definition.source(source_1.source_name)).to eq(source_1)
       end
     end
 
@@ -158,10 +158,10 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           sources: [
             Diverdown::Definition::Source.new(
-              source: 'a.rb',
+              source_name: 'a.rb',
               dependencies: [
                 Diverdown::Definition::Dependency.new(
-                  source: 'b.rb',
+                  source_name: 'b.rb',
                   method_ids: [
                     Diverdown::Definition::MethodId.new(
                       name: 'A',
@@ -171,12 +171,12 @@ RSpec.describe Diverdown::Definition do
                   ]
                 ),
                 Diverdown::Definition::Dependency.new(
-                  source: 'c.rb'
+                  source_name: 'c.rb'
                 ),
               ],
               modules: [
                 Diverdown::Definition::Modulee.new(
-                  name: 'A'
+                  module_name: 'A'
                 ),
               ]
             ),
@@ -188,10 +188,10 @@ RSpec.describe Diverdown::Definition do
           title: definition.title,
           sources: [
             {
-              source: 'a.rb',
+              source_name: 'a.rb',
               dependencies: [
                 {
-                  source: 'b.rb',
+                  source_name: 'b.rb',
                   method_ids: [
                     {
                       name: 'A',
@@ -200,13 +200,13 @@ RSpec.describe Diverdown::Definition do
                     },
                   ],
                 }, {
-                  source: 'c.rb',
+                  source_name: 'c.rb',
                   method_ids: [],
                 },
               ],
               modules: [
                 {
-                  name: 'A',
+                  module_name: 'A',
                 },
               ],
             },

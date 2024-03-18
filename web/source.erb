@@ -7,7 +7,7 @@
   </head>
   <body>
     <main>
-      <h1><%= source %></h1>
+      <h1><%= source_name %></h1>
 
       <h2>Related Definitions <a href="/#definition-<%= CGI.escape(related_definitions.map(&:id).join(Diverdown::DELIMITER)) %>">All</a></h2>
       <ul>

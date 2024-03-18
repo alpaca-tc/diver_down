@@ -8,7 +8,7 @@ module Diverdown
       # @param hash [Hash]
       def self.from_hash(hash)
         new(
-          source: hash[:source],
+          source_name: hash[:source_name],
           dependencies: (hash[:dependencies] || []).map { Diverdown::Definition::Dependency.from_hash(_1) },
           modules: (hash[:modules] || []).map { Diverdown::Definition::Modulee.new(**_1) }
         )
@@ -19,47 +19,47 @@ module Diverdown
       def self.combine(*sources)
         raise ArgumentError, 'sources are empty' if sources.empty?
 
-        uniq_sources = sources.map(&:source).uniq
+        uniq_sources = sources.map(&:source_name).uniq
         raise ArgumentError, "sources are unmatched. (#{uniq_sources})" unless uniq_sources.length == 1
 
         all_dependencies = sources.flat_map(&:dependencies)
 
         new(
-          source: uniq_sources[0],
+          source_name: uniq_sources[0],
           dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
           modules: sources.flat_map(&:modules)
         )
       end
 
-      attr_reader :source
+      attr_reader :source_name
 
-      # @param source [String] filename of the source file
+      # @param source_name [String] filename of the source file
       # @param dependencies [Array<Diverdown::Definition::Dependency>]
       # @param modules [Array<Diverdown::Definition::Modulee>]
-      def initialize(source:, dependencies: [], modules: [])
-        @source = source
-        @dependency_map = dependencies.map { [_1.source, _1] }.to_h
-        @module_map = modules.map { [_1.name, _1] }.to_h
+      def initialize(source_name:, dependencies: [], modules: [])
+        @source_name = source_name
+        @dependency_map = dependencies.map { [_1.source_name, _1] }.to_h
+        @module_map = modules.map { [_1.module_name, _1] }.to_h
       end
 
       # @param source [String]
       # @return [Diverdown::Definition::Dependency, nil] return nil if source is self.source
-      def find_or_build_dependency(source)
-        return if self.source == source
+      def find_or_build_dependency(dependency_source_name)
+        return if source_name == dependency_source_name
 
-        @dependency_map[source] ||= Diverdown::Definition::Dependency.new(source:)
+        @dependency_map[dependency_source_name] ||= Diverdown::Definition::Dependency.new(source_name: dependency_source_name)
       end
 
-      # @param source [String]
+      # @param dependency_source_name [String]
       # @return [Diverdown::Definition::Dependency, nil]
-      def dependency(source)
-        @dependency_map[source]
+      def dependency(dependency_source_name)
+        @dependency_map[dependency_source_name]
       end
 
-      # @param name [String]
+      # @param module_name [String]
       # @return [Diverdown::Definition::Modulee]
-      def module(name)
-        @module_map[name] ||= Diverdown::Definition::Modulee.new(name:)
+      def module(module_name)
+        @module_map[module_name] ||= Diverdown::Definition::Modulee.new(module_name:)
       end
 
       # @return [Array<Diverdown::Definition::Dependency>]
@@ -75,7 +75,7 @@ module Diverdown
       # @return [Hash]
       def to_h
         {
-          source:,
+          source_name:,
           dependencies: dependencies.map(&:to_h),
           modules: modules.map(&:to_h),
         }
@@ -84,14 +84,14 @@ module Diverdown
       # @param other [Diverdown::Definition::Source]
       # @return [Integer]
       def <=>(other)
-        source <=> other.source
+        source_name <=> other.source_name
       end
 
       # @param other [Object, Diverdown::Definition::Source]
       # @return [Boolean]
       def ==(other)
         other.is_a?(self.class) &&
-          source == other.source &&
+          source_name == other.source_name &&
           dependencies == other.dependencies &&
           modules.sort == other.modules.sort
       end
@@ -100,7 +100,7 @@ module Diverdown
 
       # @return [Integer]
       def hash
-        [self.class, source, dependencies, modules.sort].hash
+        [self.class, source_name, dependencies, modules.sort].hash
       end
     end
   end

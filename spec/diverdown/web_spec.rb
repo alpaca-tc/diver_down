@@ -35,7 +35,7 @@ RSpec.describe Diverdown::Web do
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
-            source: 'a.rb'
+            source_name: 'a.rb'
           ),
         ]
       )
@@ -54,7 +54,7 @@ RSpec.describe Diverdown::Web do
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
-            source: 'a.rb'
+            source_name: 'a.rb'
           ),
         ]
       )
@@ -63,7 +63,7 @@ RSpec.describe Diverdown::Web do
         title: 'second title',
         sources: [
           Diverdown::Definition::Source.new(
-            source: 'b.rb'
+            source_name: 'b.rb'
           ),
         ]
       )
@@ -91,7 +91,7 @@ RSpec.describe Diverdown::Web do
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
-            source: 'a.rb'
+            source_name: 'a.rb'
           ),
         ]
       )
@@ -100,7 +100,7 @@ RSpec.describe Diverdown::Web do
         title: 'second title',
         sources: [
           Diverdown::Definition::Source.new(
-            source: 'b.rb'
+            source_name: 'b.rb'
           ),
         ]
       )

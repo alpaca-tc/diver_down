@@ -5,7 +5,7 @@ RSpec.describe Diverdown::Definition::Dependency do
     describe '.from_hash' do
       it 'loads hash' do
         dependency = described_class.new(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [
             Diverdown::Definition::MethodId.new(
               name: 'A',
@@ -22,7 +22,7 @@ RSpec.describe Diverdown::Definition::Dependency do
     describe '.combine' do
       it 'combines with other' do
         dependency_a = described_class.new(
-          source: 'b.rb',
+          source_name: 'b.rb',
           method_ids: [
             Diverdown::Definition::MethodId.new(
               name: 'to_s',
@@ -33,7 +33,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         dependency_b = described_class.new(
-          source: 'b.rb',
+          source_name: 'b.rb',
           method_ids: [
             Diverdown::Definition::MethodId.new(
               name: 'to_s',
@@ -54,7 +54,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         dependency_c = described_class.new(
-          source: 'c.rb',
+          source_name: 'c.rb',
           method_ids: [
             Diverdown::Definition::MethodId.new(
               name: 'to_z',
@@ -67,7 +67,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         expect(described_class.combine(dependency_a, dependency_b, dependency_c)).to eq(
           [
             described_class.new(
-              source: 'b.rb',
+              source_name: 'b.rb',
               method_ids: [
                 Diverdown::Definition::MethodId.new(
                   name: 'to_s',
@@ -87,7 +87,7 @@ RSpec.describe Diverdown::Definition::Dependency do
               ]
             ),
             described_class.new(
-              source: 'c.rb',
+              source_name: 'c.rb',
               method_ids: [
                 Diverdown::Definition::MethodId.new(
                   name: 'to_z',
@@ -105,13 +105,13 @@ RSpec.describe Diverdown::Definition::Dependency do
   describe 'InstanceMethods' do
     describe '#hash' do
       it 'returns a hash' do
-        source = described_class.new(source: 'a.rb')
+        source = described_class.new(source_name: 'a.rb')
 
-        expect(source.hash).to eq(described_class.new(source: 'a.rb').hash)
-        expect(source.hash).to_not eq(described_class.new(source: 'b.rb').hash)
+        expect(source.hash).to eq(described_class.new(source_name: 'a.rb').hash)
+        expect(source.hash).to_not eq(described_class.new(source_name: 'b.rb').hash)
         expect(source.hash).to_not eq(
           described_class.new(
-            source: 'a.rb',
+            source_name: 'a.rb',
             method_ids: [
               Diverdown::Definition::MethodId.new(
                 name: 'A',
@@ -137,7 +137,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         dependency = described_class.new(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [class_method_id, instance_method_id]
         )
 
@@ -151,7 +151,7 @@ RSpec.describe Diverdown::Definition::Dependency do
           paths: ['a.rb']
         )
         dependency = described_class.new(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [method_id]
         )
 
@@ -178,7 +178,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         dependency = described_class.new(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [class_method_id, instance_method_id]
         )
 
@@ -191,7 +191,7 @@ RSpec.describe Diverdown::Definition::Dependency do
     describe '#to_h' do
       it 'returns a hash' do
         dependency = described_class.new(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [
             Diverdown::Definition::MethodId.new(
               name: 'A',
@@ -202,7 +202,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         expect(dependency.to_h).to eq(
-          source: 'a.rb',
+          source_name: 'a.rb',
           method_ids: [
             {
               name: 'A',
@@ -218,17 +218,17 @@ RSpec.describe Diverdown::Definition::Dependency do
       it 'compares with other' do
         array = [
           described_class.new(
-            source: 'a.rb'
+            source_name: 'a.rb'
           ),
           described_class.new(
-            source: 'b.rb'
+            source_name: 'b.rb'
           ),
           described_class.new(
-            source: 'c.rb'
+            source_name: 'c.rb'
           ),
         ].shuffle
 
-        expect(array.sort.map(&:source)).to eq(%w[a.rb b.rb c.rb])
+        expect(array.sort.map(&:source_name)).to eq(%w[a.rb b.rb c.rb])
       end
     end
   end

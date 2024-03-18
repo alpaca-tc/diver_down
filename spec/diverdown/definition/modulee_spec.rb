@@ -4,7 +4,7 @@ RSpec.describe Diverdown::Definition::Modulee do
   describe 'InstanceMethods' do
     describe '#hash' do
       it 'returns a hash' do
-        modulee = described_class.new(name: 'A')
+        modulee = described_class.new(module_name: 'A')
 
         expect(modulee.hash).to eq(modulee.dup.hash)
       end
@@ -14,26 +14,26 @@ RSpec.describe Diverdown::Definition::Modulee do
       it 'compares with other' do
         array = [
           Diverdown::Definition::Modulee.new(
-            name: 'a'
+            module_name: 'a'
           ),
           Diverdown::Definition::Modulee.new(
-            name: 'b'
+            module_name: 'b'
           ),
           Diverdown::Definition::Modulee.new(
-            name: 'c'
+            module_name: 'c'
           ),
         ].shuffle
 
-        expect(array.sort.map(&:name)).to eq(%w[a b c])
+        expect(array.sort.map(&:module_name)).to eq(%w[a b c])
       end
     end
 
     describe '#==' do
       it 'compares with other' do
-        modulee = described_class.new(name: 'A')
+        modulee = described_class.new(module_name: 'A')
 
-        expect(modulee).to eq(described_class.new(name: 'A'))
-        expect(modulee).to_not eq(described_class.new(name: 'B'))
+        expect(modulee).to eq(described_class.new(module_name: 'A'))
+        expect(modulee).to_not eq(described_class.new(module_name: 'B'))
         expect(modulee).to_not eq(Object.new)
       end
     end
@@ -41,11 +41,11 @@ RSpec.describe Diverdown::Definition::Modulee do
     describe '#to_h' do
       it 'returns a hash' do
         modulee = Diverdown::Definition::Modulee.new(
-          name: 'A'
+          module_name: 'A'
         )
 
         expect(modulee.to_h).to eq(
-          name: 'A'
+          module_name: 'A'
         )
       end
     end

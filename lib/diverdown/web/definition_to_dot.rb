@@ -14,7 +14,7 @@ module Diverdown
 
         # @return [String]
         def label
-          @source.source
+          @source.source_name
         end
 
         # @return [String, nil]
@@ -100,7 +100,7 @@ module Diverdown
         #   }
         # EOS
         sources = definition.sources
-          .sort_by(&:source)
+          .sort_by(&:source_name)
           .map { SourceDecorator.new(_1) }
 
         io.puts %(strict digraph "#{definition.title}" {)
@@ -119,7 +119,7 @@ module Diverdown
 
       def insert_source(source)
         if source.modules.empty?
-          io.puts %("#{source.source}" #{build_attributes(label: source.label)})
+          io.puts %("#{source.source_name}" #{build_attributes(label: source.label)})
         else
           insert_modules(source)
         end
@@ -127,7 +127,7 @@ module Diverdown
         io.indented do
           source.dependencies.each do
             attributes = build_attributes(tooltip: _1.tooltip)
-            io.write %("#{source.source}" -> "#{_1.source}")
+            io.write %("#{source.source_name}" -> "#{_1.source_name}")
             io.write %( #{attributes}) if attributes
             io.write "\n"
           end
@@ -140,12 +140,12 @@ module Diverdown
 
           # last subgraph
           last_module_writer = proc do
-            io.puts %( subgraph "cluster_#{last_module.name}" {), indent: false
+            io.puts %( subgraph "cluster_#{last_module.module_name}" {), indent: false
             io.indented do
-              source_attributes = build_attributes(label: last_module.name, _wrap: false)
-              module_attributes = build_attributes(label: source.source)
+              source_attributes = build_attributes(label: last_module.module_name, _wrap: false)
+              module_attributes = build_attributes(label: source.source_name)
 
-              io.write %(#{source_attributes} "#{source.source}")
+              io.write %(#{source_attributes} "#{source.source_name}")
               io.write(" #{module_attributes}", indent: false) if module_attributes
               io.write "\n"
             end
@@ -155,9 +155,9 @@ module Diverdown
           # wrapper subgraph
           modules_writer = modules.inject(last_module_writer) do |next_writer, mod|
             proc do
-              io.puts %(subgraph "cluster_#{mod.name}" {)
+              io.puts %(subgraph "cluster_#{mod.module_name}" {)
               io.indented do
-                attributes = build_attributes(label: mod.name, _wrap: false)
+                attributes = build_attributes(label: mod.module_name, _wrap: false)
                 io.write attributes
                 next_writer.call
               end

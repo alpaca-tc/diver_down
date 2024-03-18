@@ -13,7 +13,7 @@ module Diverdown
         end
 
         new(
-          source: hash[:source],
+          source_name: hash[:source_name],
           method_ids:
         )
       end
@@ -21,8 +21,8 @@ module Diverdown
       # @param dependencies [Array<Diverdown::Definition::Dependency>]
       # @return [Array<Diverdown::Definition::Dependency>]
       def self.combine(*dependencies)
-        dependencies.group_by(&:source).map do |source, same_source_dependencies|
-          new_dependency = new(source:)
+        dependencies.group_by(&:source_name).map do |source_name, same_source_dependencies|
+          new_dependency = new(source_name:)
 
           same_source_dependencies.each do |dependency|
             dependency.method_ids.each do |method_id|
@@ -35,12 +35,12 @@ module Diverdown
         end
       end
 
-      attr_reader :source
+      attr_reader :source_name
 
-      # @param source [String]
+      # @param source_name [String]
       # @param method_ids [Array<Diverdown::Definition::MethodId>]
-      def initialize(source:, method_ids: [])
-        @source = source
+      def initialize(source_name:, method_ids: [])
+        @source_name = source_name
         @method_id_map = {
           'class' => {},
           'instance' => {},
@@ -73,21 +73,21 @@ module Diverdown
       # @return [Hash]
       def to_h
         {
-          source:,
+          source_name:,
           method_ids: method_ids.map(&:to_h),
         }
       end
 
       # @return [Integer]
       def <=>(other)
-        source <=> other.source
+        source_name <=> other.source_name
       end
 
       # @param other [Object, Diverdown::Definition::Source]
       # @return [Boolean]
       def ==(other)
         other.is_a?(self.class) &&
-          source == other.source &&
+          source_name == other.source_name &&
           method_ids == other.method_ids
       end
       alias eq? ==
@@ -95,12 +95,12 @@ module Diverdown
 
       # @return [Integer]
       def hash
-        [self.class, source, method_ids].hash
+        [self.class, source_name, method_ids].hash
       end
 
       # @return [String]
       def inspect
-        %(#<#{self.class} source="#{source}" method_ids=#{method_ids}>")
+        %(#<#{self.class} source_name="#{source_name}" method_ids=#{method_ids}>")
       end
     end
   end

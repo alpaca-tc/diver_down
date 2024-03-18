@@ -76,10 +76,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::B',
+                  source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
                       context: 'class',
@@ -92,10 +92,10 @@ RSpec.describe Diverdown::Trace::Tracer do
                 },
               ],
             }, {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::C',
+                  source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
                       context: 'class',
@@ -108,7 +108,7 @@ RSpec.describe Diverdown::Trace::Tracer do
                 },
               ],
             }, {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
             },
           ]
         ))
@@ -123,7 +123,7 @@ RSpec.describe Diverdown::Trace::Tracer do
             'AntipollutionModule::C',
           ],
           module_finder: ->(source) {
-            case source.source
+            case source.source_name
             when 'AntipollutionModule::A'
               'Module A'
             when 'AntipollutionModule::B'
@@ -137,10 +137,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::B',
+                  source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
                       context: 'class',
@@ -154,14 +154,14 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
               modules: [
                 {
-                  name: 'Module A',
+                  module_name: 'Module A',
                 },
               ],
             }, {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::C',
+                  source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
                       context: 'class',
@@ -175,11 +175,11 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
               modules: [
                 {
-                  name: 'Module B',
+                  module_name: 'Module B',
                 },
               ],
             }, {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
             },
           ]
         ))
@@ -201,13 +201,13 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [],
             }, {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [],
             }, {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
             },
           ]
         ))
@@ -229,10 +229,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::B',
+                  source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
                       name: 'call_c',
@@ -246,10 +246,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::C',
+                  source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
                       name: 'call_d',
@@ -263,10 +263,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::D',
+                  source_name: 'AntipollutionModule::D',
                   method_ids: [
                     {
                       name: 'name',
@@ -280,7 +280,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::D',
+              source_name: 'AntipollutionModule::D',
             },
           ]
         ))
@@ -320,10 +320,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::B',
+                  source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
                       name: 'call_c',
@@ -344,10 +344,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::C',
+                  source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
                       name: 'call_d',
@@ -368,10 +368,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::D',
+                  source_name: 'AntipollutionModule::D',
                   method_ids: [
                     {
                       name: 'name',
@@ -385,7 +385,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::D',
+              source_name: 'AntipollutionModule::D',
             },
           ]
         ))
@@ -405,10 +405,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::B',
+                  source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
                       name: 'call_c',
@@ -429,10 +429,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::B',
+              source_name: 'AntipollutionModule::B',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::C',
+                  source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
                       name: 'call_d',
@@ -453,10 +453,10 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::C',
+              source_name: 'AntipollutionModule::C',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::D',
+                  source_name: 'AntipollutionModule::D',
                   method_ids: [
                     {
                       name: 'new',
@@ -470,7 +470,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::D',
+              source_name: 'AntipollutionModule::D',
             },
           ]
         ))
@@ -497,10 +497,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'A',
+              source_name: 'A',
               dependencies: [
                 {
-                  source: 'C',
+                  source_name: 'C',
                   method_ids: [
                     {
                       name: 'name',
@@ -514,7 +514,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'C',
+              source_name: 'C',
             },
           ]
         ))
@@ -534,10 +534,10 @@ RSpec.describe Diverdown::Trace::Tracer do
           title: 'title',
           sources: [
             {
-              source: 'AntipollutionModule::A',
+              source_name: 'AntipollutionModule::A',
               dependencies: [
                 {
-                  source: 'AntipollutionModule::D',
+                  source_name: 'AntipollutionModule::D',
                   method_ids: [
                     {
                       name: 'name',
@@ -551,7 +551,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
             },
             {
-              source: 'AntipollutionModule::D',
+              source_name: 'AntipollutionModule::D',
             },
           ]
         ))

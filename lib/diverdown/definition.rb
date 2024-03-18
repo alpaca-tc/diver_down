@@ -27,7 +27,7 @@ module Diverdown
     def self.combine(id:, title:, definitions: [])
       all_sources = definitions.flat_map(&:sources)
 
-      sources = all_sources.group_by(&:source).map do |_, same_sources|
+      sources = all_sources.group_by(&:source_name).map do |_, same_sources|
         Diverdown::Definition::Source.combine(*same_sources)
       end
 
@@ -45,21 +45,21 @@ module Diverdown
     def initialize(id: SecureRandom.hex, title: '', sources: [], parent: nil, children: [])
       @id = id.gsub(/\s+/, '+')
       @title = title
-      @source_map = sources.map { [_1.source, _1] }.to_h
+      @source_map = sources.map { [_1.source_name, _1] }.to_h
       @parent = parent
       @children = children.to_set
     end
 
-    # @param source [String]
+    # @param source_name [String]
     # @return [Diverdown::Definition::Source]
-    def find_or_build_source(source)
-      @source_map[source] ||= Diverdown::Definition::Source.new(source:)
+    def find_or_build_source(source_name)
+      @source_map[source_name] ||= Diverdown::Definition::Source.new(source_name:)
     end
 
-    # @param source [String]
+    # @param source_name [String]
     # @return [Diverdown::Definition::Source, nil]
-    def source(source)
-      @source_map[source]
+    def source(source_name)
+      @source_map[source_name]
     end
 
     # @return [Array<Diverdown::Definition::Source>]
@@ -99,14 +99,14 @@ module Diverdown
     # @param other_definition [Diverdown::Definition]
     # @return [self]
     def combine(other_definition)
-      new_sources = (sources + other_definition.sources).group_by(&:source).map do |_, same_sources|
+      new_sources = (sources + other_definition.sources).group_by(&:source_name).map do |_, same_sources|
         last_source = same_sources.pop
         same_sources.inject(last_source) do |source, other_source|
           source.combine(other_source)
         end
       end
 
-      @source_map = new_sources.map { [_1.source, _1] }.to_h
+      @source_map = new_sources.map { [_1.source_name, _1] }.to_h
 
       self
     end

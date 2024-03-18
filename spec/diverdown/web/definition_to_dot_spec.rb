@@ -37,7 +37,7 @@ RSpec.describe Diverdown::Web::DefinitionToDot do
           definition = build_definition(
             sources: [
               {
-                source: 'a.rb',
+                source_name: 'a.rb',
               },
             ]
           )
@@ -55,10 +55,10 @@ RSpec.describe Diverdown::Web::DefinitionToDot do
           definition = build_definition(
             sources: [
               {
-                source: 'a.rb',
+                source_name: 'a.rb',
                 dependencies: [
                   {
-                    source: 'b.rb',
+                    source_name: 'b.rb',
                   },
                 ],
               },
@@ -79,12 +79,12 @@ RSpec.describe Diverdown::Web::DefinitionToDot do
           definition = build_definition(
             sources: [
               {
-                source: 'a.rb',
+                source_name: 'a.rb',
                 modules: [
                   {
-                    name: 'A',
+                    module_name: 'A',
                   }, {
-                    name: 'B',
+                    module_name: 'B',
                   },
                 ],
               },
