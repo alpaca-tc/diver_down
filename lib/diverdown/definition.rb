@@ -111,6 +111,7 @@ module Diverdown
     # @return [Boolean]
     def ==(other)
       other.is_a?(self.class) &&
+        title == other.title &&
         sources.sort == other.sources.sort &&
         parent == other.parent &&
         children == other.children

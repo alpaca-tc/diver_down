@@ -52,7 +52,7 @@ const renderDot = async (response) => {
 
 const drawDefinition = async (bitId) => {
   const response = await request(
-    path.definitions.show(bitId),
+    path.definitions.show(bitId.toString()),
     {
       method: "GET",
       headers: { 'Accept': 'application/json' },
@@ -68,27 +68,26 @@ const drawInitial = () => {
   document.querySelector("[data-target='definition-title']").innerText = ''
   document.querySelector("[data-target='definition-id']").innerText = ''
   document.querySelector("[data-target='definition-graph']").innerHTML = ''
+
+  renderSources([])
 }
 
 const drawCheckedDefinitions = async () => {
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']:checked")
-  const bitId = Array.from(checkboxes).map((el) => parseInt(el.getAttribute("data-id"), 10)).reduce((int, bitId) => int | bitId, 0)
+  const bitId = Array.from(checkboxes).map((el) => BigInt(el.getAttribute("data-id"))).reduce((int, bitId) => int | bitId, BigInt('0'))
 
-  if (bitId === 0) {
+  if (bitId === 0n) {
     drawInitial()
   } else {
     drawDefinition(bitId)
   }
 }
 
-const definitionToggleChildren = (parentId, checked) => {
-  const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
-  const ids = Array.from(checkboxes).map((el) => el.getAttribute("data-id"))
-  const filteredIds = ids.filter((id) => id.startsWith(parentId))
+const definitionToggleChildren = (parentBitId, checked) => {
+  const checkboxes = document.querySelectorAll(`[data-parent-id='${parentBitId}']`)
 
-  filteredIds.forEach((id) => {
-    const checkbox = document.querySelector(`[data-id='${id}']`)
-    checkbox.checked = checked
+  checkboxes.forEach((el) => {
+    el.checked = checked
   })
 }
 
@@ -119,15 +118,11 @@ const filterDefinitions = (value) => {
 }
 
 const renderFromHash = (bitId) => {
-  if (isNaN(bitId)) {
-    return
-  }
-
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
 
   checkboxes.forEach((checkbox) => {
-    const id = parseInt(checkbox.getAttribute('data-id'), 10)
-    if ((bitId & id) !== 0) {
+    const id = BigInt(checkbox.getAttribute('data-id'))
+    if ((bitId & id) !== 0n) {
       checkbox.checked = true
     }
   })
@@ -144,7 +139,7 @@ export const start = async () => {
     definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
 
     drawCheckedDefinitions()
-  }, 500))
+  }, 100))
 
   delegate(document, '[data-action="definitionCheckReset"]', 'click', () => {
     definitionCheckReset()
@@ -156,7 +151,9 @@ export const start = async () => {
 
   const hash = window.location.hash
   if (hash) {
-    const bitId = parseInt(hash.split("definition-")[1], 10)
-    renderFromHash(bitId)
+    try {
+      const bitId = BigInt(hash.split("definition-")[1])
+      renderFromHash(bitId)
+    } catch(e) {}
   }
 }

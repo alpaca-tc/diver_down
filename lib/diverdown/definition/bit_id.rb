@@ -7,13 +7,16 @@ module Diverdown
     class BitId
       def initialize
         @shift = 0
+        @mutex = Mutex.new
       end
 
       # @return [Integer] unique bit flag id
       def next_id
-        val = 1 << @shift
-        @shift += 1
-        val
+        @mutex.synchronize do
+          val = 1 << @shift
+          @shift += 1
+          val
+        end
       end
 
       # @param id [Integer]

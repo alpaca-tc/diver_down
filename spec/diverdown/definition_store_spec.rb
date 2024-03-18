@@ -16,6 +16,20 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
+    describe '#get_bit_id' do
+      it 'raises KeyError if key not found' do
+        store = described_class.new
+        expect { store.get(Diverdown::Definition.new) }.to raise_error(KeyError)
+      end
+
+      it 'returns bit_id if definition is found' do
+        store = described_class.new
+        definition = Diverdown::Definition.new
+        ids = store.set(definition)
+        expect(store.get_bit_id(definition)).to eq(ids[0])
+      end
+    end
+
     describe '#key?' do
       it 'raises KeyError if key not found' do
         store = described_class.new

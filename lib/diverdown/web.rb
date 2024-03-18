@@ -9,6 +9,7 @@ module Diverdown
 
     require 'diverdown/web/action'
     require 'diverdown/web/definition_to_dot'
+    require 'diverdown/web/concurrency_worker'
 
     # @param definition_dir [String]
     # @param store [Diverdown::DefinitionStore]
@@ -24,7 +25,7 @@ module Diverdown
       request = Rack::Request.new(env)
       action = Diverdown::Web::Action.new(store: @store, request:)
 
-      reload_store if @store.empty?
+      load_store if @store.empty?
 
       case [request.request_method, request.path]
       in ['GET', /\.(?:js|css)\z/]
@@ -44,33 +45,35 @@ module Diverdown
 
     private
 
-    def reload_store
-      @store.clear
+    def load_store
+      # TODO: Optimize load yaml
+      # TODO: How to implement packages and modules...
+      packages = Hash.new { |h, k| h[k] = [] }
+      yaml_files = Dir[File.join(@definition_dir, '**', '*.{yml,yaml}')].sort
 
-      Dir[File.join(@definition_dir, '**', '*.{yml,yaml}')].sort.each do
-        hash = YAML.safe_load(File.read(_1), permitted_classes: [Symbol], symbolize_names: true)
+      concurrency_worker = Diverdown::Web::ConcurrencyWorker.new(concurrency: 30)
+      concurrency_worker.run(yaml_files) do |path|
+        hash = YAML.safe_load(File.read(path), permitted_classes: [Symbol], symbolize_names: true)
         definition = Diverdown::Definition.from_hash(hash)
         @store.set(definition)
+        packages[hash[:package]].push(definition)
+        puts "#{yaml_files.index(path) / yaml_files.size.to_f * 100}%"
       end
 
-      # @store.each do |definition|
-      #   *parent_ids, _ = definition.id.split(':')
-      #   parent_id = parent_ids.join(':')
-      #
-      #   next if parent_id.empty?
-      #
-      #   unless @store.key?(parent_id)
-      #     @store.set(
-      #       Diverdown::Definition.new(
-      #         title: parent_id,
-      #         sources: []
-      #       )
-      #     )
-      #   end
-      #
-      #   parent_definition = @store.get(parent_id)
-      #   definition.parent = parent_definition
-      # end
+      packages.each do |package, definitions|
+        package_definition = Diverdown::Definition.new(
+          title: package,
+          sources: []
+        )
+
+        @store.set(package_definition)
+
+        definitions.each do |definition|
+          definition.parent = package_definition
+        end
+      end
+
+      puts 'store loaded!'
     end
   end
 end

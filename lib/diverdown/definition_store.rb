@@ -23,8 +23,16 @@ module Diverdown
       definitions.map do
         id = @bit_id.next_id
         @store[id] = _1
+        @invert_store[_1] = id
         id
       end
+    end
+
+    # @param definition [Diverdown::Definition]
+    # @raise [KeyError] if the definition is not found
+    # @return [Integer]
+    def get_bit_id(definition)
+      @invert_store.fetch(definition)
     end
 
     # @param id [Integer]
@@ -49,6 +57,7 @@ module Diverdown
     def clear
       # Hash{ Integer(unique bit flag) => Diverdown::Definition }
       @store = {}
+      @invert_store = {}
       @bit_id = Diverdown::Definition::BitId.new
     end
 
