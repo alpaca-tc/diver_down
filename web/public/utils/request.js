@@ -12,7 +12,3 @@ export const request = (url, options) => {
       }
     });
 }
-
-export const buildFormData = (obj) => {
-  return Object.keys(obj).reduce((o,key)=>(o.set(key, obj[key]), o), new FormData());
-}

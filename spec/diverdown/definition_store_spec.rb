@@ -11,8 +11,8 @@ RSpec.describe Diverdown::DefinitionStore do
       it 'returns definition if key is found' do
         store = described_class.new
         definition = Diverdown::Definition.new
-        store.set(definition)
-        expect(store.get(definition.id)).to eq(definition)
+        ids = store.set(definition)
+        expect(store.get(ids[0])).to eq(definition)
       end
     end
 
@@ -25,8 +25,8 @@ RSpec.describe Diverdown::DefinitionStore do
       it 'returns definition if key is found' do
         store = described_class.new
         definition = Diverdown::Definition.new
-        store.set(definition)
-        expect(store.key?(definition.id)).to be(true)
+        ids = store.set(definition)
+        expect(store.key?(ids[0])).to be(true)
       end
     end
 

@@ -24,10 +24,10 @@
         </header>
 
         <ul>
-          <% each_definition(store) do |definition| %>
+          <% each_definition(store) do |bit_id, definition| %>
             <li class="definition-indent-<%= definition.level %>" data-target="definition-li" data-title="<%= definition.title[0..200].tr(%(\n '"), '') %>">
               <label>
-                <input data-target="definition-checkbox" data-id="<%= definition.id %>" type="checkbox" />
+                <input data-target="definition-checkbox" data-id="<%= bit_id %>" type="checkbox" />
                 <%= definition.title[0..200].tr(%(\n '"), '') %>
               </label>
             </li>

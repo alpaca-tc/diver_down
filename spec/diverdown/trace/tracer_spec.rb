@@ -31,7 +31,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         tracer.trace(
-          id: 'id',
           title: 'title'
         ) do
           antipollution_environment.send(:run)
@@ -40,7 +39,6 @@ RSpec.describe Diverdown::Trace::Tracer do
 
       # fill default values
       def fill_default(hash)
-        hash[:id] ||= ''
         hash[:title] ||= ''
         hash[:sources] ||= []
         hash[:sources].each do |source|
@@ -72,7 +70,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -133,7 +130,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -197,7 +193,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -225,7 +220,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -316,7 +310,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -401,7 +394,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -493,7 +485,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -530,7 +521,6 @@ RSpec.describe Diverdown::Trace::Tracer do
         )
 
         expect(definition.to_h).to match(fill_default(
-          id: 'id',
           title: 'title',
           sources: [
             {
@@ -576,7 +566,6 @@ RSpec.describe Diverdown::Trace::Tracer do
       #     antipollution_environment = AntipollutionKlass.allocate
       #
       #     tracer = described_class.new(
-      #       id: 'id',
       #       title: 'title',
       #       module_set: [
       #         AntipollutionModule::A,
@@ -584,7 +573,7 @@ RSpec.describe Diverdown::Trace::Tracer do
       #       ]
       #     )
       #
-      #     tracer.trace(id: '', title: '') do
+      #     tracer.trace(title: '') do
       #       antipollution_environment.send(:run)
       #     end
       #   end

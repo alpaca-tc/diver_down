@@ -31,9 +31,9 @@ module Diverdown
         @files_server.call(env)
       in ['GET', '/']
         action.index
-      in ['POST', '/definitions/combine.json']
-        ids = request.params['ids'].to_s.split(Diverdown::DELIMITER)
-        action.combine_definitions(ids)
+      in ['GET', %r{\A/definitions/(?<bit_id>\d+)\.json\z}]
+        bit_id = Regexp.last_match[:bit_id].to_i
+        action.combine_definitions(bit_id)
       in ['GET', %r{\A/sources/(?<source>.+)\z}]
         source = Regexp.last_match[:source]
         action.source(source)
@@ -53,25 +53,24 @@ module Diverdown
         @store.set(definition)
       end
 
-      @store.each do |definition|
-        *parent_ids, _ = definition.id.split(':')
-        parent_id = parent_ids.join(':')
-
-        next if parent_id.empty?
-
-        unless @store.key?(parent_id)
-          @store.set(
-            Diverdown::Definition.new(
-              id: parent_id,
-              title: parent_id,
-              sources: []
-            )
-          )
-        end
-
-        parent_definition = @store.get(parent_id)
-        definition.parent = parent_definition
-      end
+      # @store.each do |definition|
+      #   *parent_ids, _ = definition.id.split(':')
+      #   parent_id = parent_ids.join(':')
+      #
+      #   next if parent_id.empty?
+      #
+      #   unless @store.key?(parent_id)
+      #     @store.set(
+      #       Diverdown::Definition.new(
+      #         title: parent_id,
+      #         sources: []
+      #       )
+      #     )
+      #   end
+      #
+      #   parent_definition = @store.get(parent_id)
+      #   definition.parent = parent_definition
+      # end
     end
   end
 end

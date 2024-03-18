@@ -76,7 +76,7 @@ RSpec.describe Diverdown::Definition do
           ]
         )
 
-        definition = described_class.combine(id: '1', title: '2', definitions: [definition_1, definition_2])
+        definition = described_class.combine(title: '2', definitions: [definition_1, definition_2])
 
         expect(definition.sources.length).to eq(2)
         expect(definition.sources[0].source_name).to eq('a.rb')
@@ -184,7 +184,6 @@ RSpec.describe Diverdown::Definition do
         )
 
         expect(definition.to_h).to eq(
-          id: definition.id,
           title: definition.title,
           sources: [
             {

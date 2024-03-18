@@ -9,11 +9,11 @@
     <main>
       <h1><%= source_name %></h1>
 
-      <h2>Related Definitions <a href="/#definition-<%= CGI.escape(related_definitions.map(&:id).join(Diverdown::DELIMITER)) %>">All</a></h2>
+      <h2>Related Definitions <a href="/#definition-<%= related_definitions.map(&:first).inject(0, &:|) %>">All</a></h2>
       <ul>
-        <% related_definitions.each do |definition| %>
+        <% related_definitions.each do |bit_id, definition| %>
           <li>
-            <a href="/#definition-<%= CGI.escape(definition.id) %>">
+            <a href="/#definition-<%= bit_id %>">
               <%= definition.title %>
             </a>
           </li>

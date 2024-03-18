@@ -4,7 +4,7 @@ import "d3-graphviz";
 
 import path from "utils/path"
 import { delegate } from "utils/delegate";
-import { request, buildFormData } from "utils/request";
+import { request } from "utils/request";
 import { debounse } from "utils/debounse";
 
 const renderSources = (sources) => {
@@ -26,9 +26,9 @@ const renderSources = (sources) => {
 
 const renderDot = async (response) => {
   document.querySelector("[data-target='definition-title']").innerText = response.title
-  document.querySelector("[data-target='definition-id']").innerText = response.id
+  document.querySelector("[data-target='definition-id']").innerText = response.bit_id
 
-  history.pushState(null, null, `#definition-${encodeURIComponent(response.id)}`)
+  history.pushState(null, null, `#definition-${response.bit_id}`)
 
   const graphEl = document.querySelector("[data-target='definition-graph']")
   const graphviz = d3
@@ -50,13 +50,12 @@ const renderDot = async (response) => {
   } catch(e) {}
 }
 
-const drawDefinitions = async (ids) => {
+const drawDefinition = async (bitId) => {
   const response = await request(
-    path.definitions.combine,
+    path.definitions.show(bitId),
     {
-      method: "POST",
+      method: "GET",
       headers: { 'Accept': 'application/json' },
-      body: buildFormData({ ids: ids.join(',') })
     }
   )
   await renderDot(response)
@@ -73,12 +72,12 @@ const drawInitial = () => {
 
 const drawCheckedDefinitions = async () => {
   const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']:checked")
-  const ids = Array.from(checkboxes).map((el) => el.getAttribute("data-id"))
+  const bitId = Array.from(checkboxes).map((el) => parseInt(el.getAttribute("data-id"), 10)).reduce((int, bitId) => int | bitId, 0)
 
-  if (ids.length === 0) {
+  if (bitId === 0) {
     drawInitial()
   } else {
-    drawDefinitions(ids)
+    drawDefinition(bitId)
   }
 }
 
@@ -119,6 +118,27 @@ const filterDefinitions = (value) => {
   })
 }
 
+const renderFromHash = (bitId) => {
+  if (isNaN(bitId)) {
+    return
+  }
+
+  const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
+
+  checkboxes.forEach((checkbox) => {
+    const id = parseInt(checkbox.getAttribute('data-id'), 10)
+    if ((bitId & id) !== 0) {
+      checkbox.checked = true
+    }
+  })
+
+  try {
+    drawDefinition(bitId)
+  } catch(e) {
+    console.error(e)
+  }
+}
+
 export const start = async () => {
   delegate(document, '[data-target="definition-checkbox"]', "change", debounse((event) => {
     definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
@@ -136,19 +156,7 @@ export const start = async () => {
 
   const hash = window.location.hash
   if (hash) {
-    const ids = String(decodeURIComponent(hash.split("definition-")[1])).split(",")
-    const checkboxes = document.querySelectorAll("[data-target='definition-checkbox']")
-
-    checkboxes.forEach((checkbox) => {
-      if (ids.includes(checkbox.getAttribute('data-id'))) {
-        checkbox.checked = true
-      }
-    })
-
-    try {
-      await drawDefinitions(ids)
-    } catch(e) {
-      console.error(e)
-    }
+    const bitId = parseInt(hash.split("definition-")[1], 10)
+    renderFromHash(bitId)
   }
 }

@@ -28,11 +28,13 @@ module Diverdown
         # @yield [Diverdown::Definition]
         # @return [Enumerator]
         def each_definition(store)
-          stack = store.select(&:top?)
+          stack = store.map.to_a
 
-          while (definition = stack.shift)
-            yield(definition)
-            stack.unshift(*definition.children)
+          until stack.empty?
+            bit_id, definition = stack.shift
+            yield(bit_id, definition)
+            # TODO
+            # stack.unshift(*definition.children)
           end
         end
       end
@@ -52,8 +54,10 @@ module Diverdown
         [200, { 'content-type' => 'text/html' }, [body]]
       end
 
-      # @param id [Array<String>]
-      def combine_definitions(ids)
+      # @param bit_id [Integer]
+      def combine_definitions(bit_id)
+        ids = @store.bit_id.separate_bit_id(bit_id)
+
         valid_ids = ids.select do
           @store.key?(_1)
         end
@@ -62,7 +66,7 @@ module Diverdown
 
         if definition
           json(
-            id: definition.id,
+            bit_id: valid_ids.inject(0, :|),
             title: definition.title,
             dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }
@@ -77,7 +81,7 @@ module Diverdown
         related_definitions = []
         reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
 
-        @store.each do |definition|
+        @store.each do |bit_id, definition|
           found_source = nil
 
           definition.sources.each do |definition_source|
@@ -94,7 +98,7 @@ module Diverdown
             end
           end
 
-          related_definitions << definition if found_source
+          related_definitions << [bit_id, definition] if found_source
         end
 
         if related_definitions.empty?
@@ -127,10 +131,7 @@ module Diverdown
 
       def combine_ids_definitions(ids)
         definitions = ids.map { @store.get(_1) }
-
-        definitions.inject(Diverdown::Definition.new(id: ids.sort.join(Diverdown::DELIMITER), title: 'combined')) do
-          _1.combine(_2)
-        end
+        Diverdown::Definition.combine(title: 'combined', definitions:)
       end
 
       def view_path(path)

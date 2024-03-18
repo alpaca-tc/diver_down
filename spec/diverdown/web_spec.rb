@@ -25,13 +25,12 @@ RSpec.describe Diverdown::Web do
 
   describe 'GET /definitions/:id.json' do
     it 'returns 404 if id is not found' do
-      post '/definitions/combine.json', ids: 'unknown'
+      get '/definitions/0.json'
       expect(last_response.status).to eq(404)
     end
 
     it 'returns definition if id is found' do
       definition = Diverdown::Definition.new(
-        id: SecureRandom.uuid,
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
@@ -39,9 +38,9 @@ RSpec.describe Diverdown::Web do
           ),
         ]
       )
-      store.set(definition)
+      bit_ids = store.set(definition)
 
-      post '/definitions/combine.json', ids: [definition.id].join(Diverdown::DELIMITER)
+      get "/definitions/#{bit_ids[0]}.json"
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
@@ -50,7 +49,6 @@ RSpec.describe Diverdown::Web do
 
     it 'returns combined definition' do
       definition_1 = Diverdown::Definition.new(
-        id: SecureRandom.uuid,
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
@@ -59,7 +57,6 @@ RSpec.describe Diverdown::Web do
         ]
       )
       definition_2 = Diverdown::Definition.new(
-        id: SecureRandom.uuid,
         title: 'second title',
         sources: [
           Diverdown::Definition::Source.new(
@@ -67,10 +64,9 @@ RSpec.describe Diverdown::Web do
           ),
         ]
       )
-      store.set(definition_1)
-      store.set(definition_2)
+      bit_ids = store.set(definition_1, definition_2)
 
-      post '/definitions/combine.json', ids: [definition_1.id, definition_2.id].join(Diverdown::DELIMITER)
+      get "/definitions/#{bit_ids.inject(0, &:|)}.json"
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
@@ -87,7 +83,6 @@ RSpec.describe Diverdown::Web do
 
     it 'returns response if source is found' do
       definition_1 = Diverdown::Definition.new(
-        id: SecureRandom.uuid,
         title: 'title',
         sources: [
           Diverdown::Definition::Source.new(
@@ -96,7 +91,6 @@ RSpec.describe Diverdown::Web do
         ]
       )
       definition_2 = Diverdown::Definition.new(
-        id: SecureRandom.uuid,
         title: 'second title',
         sources: [
           Diverdown::Definition::Source.new(

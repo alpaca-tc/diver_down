@@ -8,12 +8,12 @@ module Diverdown
     require 'diverdown/definition/dependency'
     require 'diverdown/definition/modulee'
     require 'diverdown/definition/method_id'
+    require 'diverdown/definition/bit_id'
 
     # @param hash [Hash]
     # @return [Diverdown::Definition]
     def self.from_hash(hash)
       new(
-        id: hash[:id] || SecureRandom.uuid,
         title: hash[:title] || '',
         sources: (hash[:sources] || []).map do |source_hash|
           Diverdown::Definition::Source.from_hash(source_hash)
@@ -21,10 +21,9 @@ module Diverdown
       )
     end
 
-    # @param id [String]
     # @param title [String]
     # @param definitions [Array<Diverdown::Definition>]
-    def self.combine(id:, title:, definitions: [])
+    def self.combine(title:, definitions: [])
       all_sources = definitions.flat_map(&:sources)
 
       sources = all_sources.group_by(&:source_name).map do |_, same_sources|
@@ -32,18 +31,16 @@ module Diverdown
       end
 
       new(
-        id:,
         title:,
         sources:
       )
     end
 
-    attr_reader :id, :title, :parent, :children
+    attr_reader :title, :parent, :children
 
     # @param title [String]
     # @param sources [Array<Diverdown::Definition::Source>]
-    def initialize(id: SecureRandom.hex, title: '', sources: [], parent: nil, children: [])
-      @id = id.gsub(/\s+/, '+')
+    def initialize(title: '', sources: [], parent: nil, children: [])
       @title = title
       @source_map = sources.map { [_1.source_name, _1] }.to_h
       @parent = parent
@@ -89,7 +86,6 @@ module Diverdown
     # @return [String]
     def to_h
       {
-        id:,
         title:,
         sources: sources.map(&:to_h),
       }
@@ -115,7 +111,6 @@ module Diverdown
     # @return [Boolean]
     def ==(other)
       other.is_a?(self.class) &&
-        id == other.id &&
         sources.sort == other.sources.sort &&
         parent == other.parent &&
         children == other.children
@@ -125,7 +120,7 @@ module Diverdown
 
     # @return [Integer]
     def hash
-      [self.class, id, sources].hash
+      [self.class, title, sources].hash
     end
   end
 end

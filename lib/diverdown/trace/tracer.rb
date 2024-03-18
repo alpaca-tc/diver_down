@@ -39,10 +39,9 @@ module Diverdown
       # Trace the call stack of the block and build the definition
       #
       # @return [Diverdown::Definition]
-      def trace(id:, title:, &)
+      def trace(title:, &)
         call_stack = Diverdown::Trace::CallStack.new
         definition = Diverdown::Definition.new(
-          id:,
           title:
         )
 
