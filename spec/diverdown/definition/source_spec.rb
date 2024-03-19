@@ -198,10 +198,10 @@ RSpec.describe Diverdown::Definition::Source do
       end
     end
 
-    describe '#build_modules' do
+    describe '#set_modules' do
       it 'adds non-duplicated dependencies' do
         source = described_class.new(source_name: '')
-        source.build_modules(['A', 'B'])
+        source.set_modules(['A', 'B'])
 
         expect(source.modules).to eq(
           [

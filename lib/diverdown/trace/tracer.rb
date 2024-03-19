@@ -58,7 +58,7 @@ module Diverdown
 
               # Determine module name from source
               module_names = @module_finder&.call(source)
-              source.build_modules(module_names) if module_names
+              source.set_modules(module_names) if module_names
 
               unless call_stack.empty?
                 # Add dependency to called source

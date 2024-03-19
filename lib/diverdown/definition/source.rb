@@ -65,10 +65,9 @@ module Diverdown
 
       # @param module_names [Array<String>]
       # @return [Diverdown::Definition::Modulee]
-      def build_modules(module_names)
-        module_names.each do
-          modulee = Diverdown::Definition::Modulee.new(module_name: _1)
-          @modules.push(modulee)
+      def set_modules(module_names)
+        @modules = module_names.map do
+          Diverdown::Definition::Modulee.new(module_name: _1)
         end
       end
 
