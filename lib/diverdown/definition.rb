@@ -36,16 +36,14 @@ module Diverdown
       )
     end
 
-    attr_reader :definition_group, :title, :parent, :children
+    attr_reader :definition_group, :title
 
     # @param title [String]
     # @param sources [Array<Diverdown::Definition::Source>]
-    def initialize(definition_group: nil, title: '', sources: [], parent: nil, children: [])
+    def initialize(definition_group: nil, title: '', sources: [])
       @definition_group = definition_group
       @title = title
       @source_map = sources.map { [_1.source_name, _1] }.to_h
-      @parent = parent
-      @children = children.to_set
     end
 
     # @param source_name [String]
@@ -63,25 +61,6 @@ module Diverdown
     # @return [Array<Diverdown::Definition::Source>]
     def sources
       @source_map.values.sort
-    end
-
-    # @param parent [Diverdown::Definition]
-    def parent=(parent)
-      @parent = parent
-      parent.children << self
-    end
-
-    # This definition is top level
-    # @return [Boolean]
-    def top?
-      parent.nil?
-    end
-
-    # @return [Integer]
-    def level
-      return 0 if top?
-
-      parent.level + 1
     end
 
     # @return [String]
@@ -103,9 +82,7 @@ module Diverdown
     def ==(other)
       other.is_a?(self.class) &&
         title == other.title &&
-        sources.sort == other.sources.sort &&
-        parent == other.parent &&
-        children == other.children
+        sources.sort == other.sources.sort
     end
     alias eq? ==
     alias eql? ==

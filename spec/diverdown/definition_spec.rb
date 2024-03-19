@@ -113,45 +113,6 @@ RSpec.describe Diverdown::Definition do
       end
     end
 
-    describe '#top?' do
-      it "set parent and add self to parent's children" do
-        parent = described_class.new
-        child = described_class.new
-
-        child.parent = parent
-
-        expect(parent.top?).to be(true)
-        expect(child.top?).to be(false)
-      end
-    end
-
-    describe '#level' do
-      it 'returns nested level' do
-        parent = described_class.new
-        child = described_class.new
-        nested_child = described_class.new
-
-        child.parent = parent
-        nested_child.parent = child
-
-        expect(parent.level).to eq(0)
-        expect(child.level).to eq(1)
-        expect(nested_child.level).to eq(2)
-      end
-    end
-
-    describe '#parent=' do
-      it "set parent and add self to parent's children" do
-        parent = described_class.new
-        child = described_class.new
-
-        child.parent = parent
-
-        expect(child.parent).to eq(parent)
-        expect(parent.children).to include(child)
-      end
-    end
-
     describe '#to_h' do
       it 'converts definition to hash' do
         definition = described_class.new(
