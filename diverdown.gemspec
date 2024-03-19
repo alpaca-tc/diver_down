@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.executables = []
   spec.require_paths = ['lib']
 
-  spec.add_dependency "rackup"
-  spec.add_dependency "activesupport"
+  spec.add_dependency 'activesupport'
+  spec.add_dependency 'msgpack'
+  spec.add_dependency 'rackup'
 end

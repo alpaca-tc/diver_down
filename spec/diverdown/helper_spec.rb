@@ -150,5 +150,23 @@ RSpec.describe Diverdown::Helper do
         expect(described_class.constantize('String')).to eq(String)
       end
     end
+
+    describe '.deep_symbolize_keys' do
+      it 'returns symbolized hash' do
+        hash = {
+          'a' => 1,
+          'b' => {
+            'c' => 2,
+          },
+        }
+
+        expect(described_class.deep_symbolize_keys(hash)).to eq(
+          a: 1,
+          b: {
+            c: 2,
+          }
+        )
+      end
+    end
   end
 end

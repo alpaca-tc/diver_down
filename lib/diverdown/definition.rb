@@ -94,6 +94,11 @@ module Diverdown
       }
     end
 
+    # @return [String]
+    def to_msgpack
+      MessagePack.pack(to_h)
+    end
+
     # Combine two definitions into one
     # @param other_definition [Diverdown::Definition]
     # @return [self]

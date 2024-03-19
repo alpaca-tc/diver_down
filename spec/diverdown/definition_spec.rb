@@ -216,5 +216,77 @@ RSpec.describe Diverdown::Definition do
         )
       end
     end
+
+    describe '#to_msgpack' do
+      it 'converts definition to message-pack' do
+        definition = described_class.new(
+          title: 'title',
+          package: 'x/y/z',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source_name: 'a.rb',
+              dependencies: [
+                Diverdown::Definition::Dependency.new(
+                  source_name: 'b.rb',
+                  method_ids: [
+                    Diverdown::Definition::MethodId.new(
+                      name: 'A',
+                      context: 'class',
+                      paths: ['a.rb']
+                    ),
+                  ]
+                ),
+                Diverdown::Definition::Dependency.new(
+                  source_name: 'c.rb'
+                ),
+              ],
+              modules: [
+                Diverdown::Definition::Modulee.new(
+                  module_name: 'A'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        expect(definition.to_msgpack).to eq(MessagePack.pack(definition.to_h))
+      end
+
+      it 'can be loaded' do
+        definition = described_class.new(
+          title: 'title',
+          package: 'x/y/z',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source_name: 'a.rb',
+              dependencies: [
+                Diverdown::Definition::Dependency.new(
+                  source_name: 'b.rb',
+                  method_ids: [
+                    Diverdown::Definition::MethodId.new(
+                      name: 'A',
+                      context: 'class',
+                      paths: ['a.rb']
+                    ),
+                  ]
+                ),
+                Diverdown::Definition::Dependency.new(
+                  source_name: 'c.rb'
+                ),
+              ],
+              modules: [
+                Diverdown::Definition::Modulee.new(
+                  module_name: 'A'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        msgpack = definition.to_msgpack
+        hash = Diverdown::Helper.deep_symbolize_keys(MessagePack.unpack(msgpack))
+        expect(described_class.from_hash(hash)).to eq(definition)
+      end
+    end
   end
 end
