@@ -1,0 +1,28 @@
+{
+  "name": "diverdown",
+  "version": "0.1.0",
+  "prettier": "prettier-config-smarthr",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": "20.11.1"
+  },
+  "packageManager": "pnpm@8.15.5",
+  "license": "MIT",
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "stylelint --fix"
+    ]
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alpaca-tc/diverdown.git"
+  },
+  "scripts": {
+  }
+}
