@@ -41,6 +41,7 @@ RSpec.describe Diverdown::Trace::Tracer do
       def fill_default(hash)
         hash[:title] ||= ''
         hash[:sources] ||= []
+        hash[:package] ||= nil
         hash[:sources].each do |source|
           source[:dependencies] ||= []
           source[:modules] ||= []

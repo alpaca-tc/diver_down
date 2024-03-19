@@ -15,6 +15,7 @@ module Diverdown
     def self.from_hash(hash)
       new(
         title: hash[:title] || '',
+        package: hash[:package],
         sources: (hash[:sources] || []).map do |source_hash|
           Diverdown::Definition::Source.from_hash(source_hash)
         end
@@ -36,12 +37,13 @@ module Diverdown
       )
     end
 
-    attr_reader :title, :parent, :children
+    attr_reader :title, :package, :parent, :children
 
     # @param title [String]
     # @param sources [Array<Diverdown::Definition::Source>]
-    def initialize(title: '', sources: [], parent: nil, children: [])
+    def initialize(title: '', package: nil, sources: [], parent: nil, children: [])
       @title = title
+      @package = package
       @source_map = sources.map { [_1.source_name, _1] }.to_h
       @parent = parent
       @children = children.to_set
@@ -87,6 +89,7 @@ module Diverdown
     def to_h
       {
         title:,
+        package:,
         sources: sources.map(&:to_h),
       }
     end
@@ -112,6 +115,7 @@ module Diverdown
     def ==(other)
       other.is_a?(self.class) &&
         title == other.title &&
+        package == other.package &&
         sources.sort == other.sources.sort &&
         parent == other.parent &&
         children == other.children
@@ -121,7 +125,7 @@ module Diverdown
 
     # @return [Integer]
     def hash
-      [self.class, title, sources].hash
+      [self.class, title, package, sources].hash
     end
   end
 end
