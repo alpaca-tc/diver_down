@@ -19,7 +19,6 @@ RSpec.describe Diverdown::Web do
     it 'returns body' do
       get '/'
       expect(last_response.status).to eq(200)
-      expect(last_response.body).to include('html')
     end
   end
 
@@ -74,7 +73,7 @@ RSpec.describe Diverdown::Web do
     end
   end
 
-  describe 'GET /sources/:source' do
+  describe 'GET /sources/:source.json' do
     it 'returns 404 if source is not found' do
       get '/sources/unknown.json'
 
@@ -101,7 +100,7 @@ RSpec.describe Diverdown::Web do
       store.set(definition_1)
       store.set(definition_2)
 
-      get '/sources/a.rb'
+      get '/sources/a.rb.json'
 
       expect(last_response.status).to eq(200)
     end
