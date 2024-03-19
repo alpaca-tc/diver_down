@@ -6,7 +6,6 @@ RSpec.describe Diverdown::Definition do
       it 'loads hash' do
         definition = described_class.new(
           title: 'title',
-          package: 'x/y/z',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',
@@ -157,7 +156,6 @@ RSpec.describe Diverdown::Definition do
       it 'converts definition to hash' do
         definition = described_class.new(
           title: 'title',
-          package: 'x/y/z',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',
@@ -187,7 +185,6 @@ RSpec.describe Diverdown::Definition do
 
         expect(definition.to_h).to eq(
           title: definition.title,
-          package: definition.package,
           sources: [
             {
               source_name: 'a.rb',
@@ -221,7 +218,6 @@ RSpec.describe Diverdown::Definition do
       it 'converts definition to message-pack' do
         definition = described_class.new(
           title: 'title',
-          package: 'x/y/z',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',
@@ -255,7 +251,6 @@ RSpec.describe Diverdown::Definition do
       it 'can be loaded' do
         definition = described_class.new(
           title: 'title',
-          package: 'x/y/z',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',
