@@ -22,9 +22,10 @@ module Diverdown
       )
     end
 
+    # @param definition_group [String, nil]
     # @param title [String]
     # @param definitions [Array<Diverdown::Definition>]
-    def self.combine(title:, definitions: [])
+    def self.combine(definition_group:, title:, definitions: [])
       all_sources = definitions.flat_map(&:sources)
 
       sources = all_sources.group_by(&:source_name).map do |_, same_sources|
@@ -32,6 +33,7 @@ module Diverdown
       end
 
       new(
+        definition_group:,
         title:,
         sources:
       )
