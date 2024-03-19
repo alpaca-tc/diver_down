@@ -122,9 +122,9 @@ RSpec.describe Diverdown::Trace::Tracer do
           module_finder: ->(source) {
             case source.source_name
             when 'AntipollutionModule::A'
-              'Module A'
+              ['A', 'B']
             when 'AntipollutionModule::B'
-              'Module B'
+              ['C']
             end
           }
         )
@@ -150,7 +150,9 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
               modules: [
                 {
-                  module_name: 'Module A',
+                  module_name: 'A',
+                }, {
+                  module_name: 'B',
                 },
               ],
             }, {
@@ -171,7 +173,7 @@ RSpec.describe Diverdown::Trace::Tracer do
               ],
               modules: [
                 {
-                  module_name: 'Module B',
+                  module_name: 'C',
                 },
               ],
             }, {

@@ -50,23 +50,23 @@ module Diverdown
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
             mod = Diverdown::Helper.resolve_module(tp.self)
-            module_name = Diverdown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            source_name = Diverdown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
             pushed = false
 
-            unless module_name.nil?
-              source = definition.find_or_build_source(module_name)
+            unless source_name.nil?
+              source = definition.find_or_build_source(source_name)
 
               # Determine module name from source
-              modulee_name = @module_finder&.call(source)
-              source.module(modulee_name) if modulee_name
+              module_names = @module_finder&.call(source)
+              source.build_modules(module_names) if module_names
 
               unless call_stack.empty?
                 # Add dependency to called source
                 called_stack_context = call_stack.stack[-1]
                 called_source = called_stack_context.source
-                dependency = called_source.find_or_build_dependency(module_name)
+                dependency = called_source.find_or_build_dependency(source_name)
 
-                # `dependency.nil?` means module_name equals to called_source.source.
+                # `dependency.nil?` means source_name equals to called_source.source.
                 # self-references are not tracked because it is not "dependency".
                 if dependency
                   context = Diverdown::Helper.module?(tp.self) ? 'class' : 'instance'

@@ -31,7 +31,7 @@ module Diverdown
         )
       end
 
-      attr_reader :source_name
+      attr_reader :source_name, :modules
 
       # @param source_name [String] filename of the source file
       # @param dependencies [Array<Diverdown::Definition::Dependency>]
@@ -39,7 +39,7 @@ module Diverdown
       def initialize(source_name:, dependencies: [], modules: [])
         @source_name = source_name
         @dependency_map = dependencies.map { [_1.source_name, _1] }.to_h
-        @module_map = modules.map { [_1.module_name, _1] }.to_h
+        @modules = modules
       end
 
       # @param source [String]
@@ -56,20 +56,18 @@ module Diverdown
         @dependency_map[dependency_source_name]
       end
 
-      # @param module_name [String]
+      # @param module_names [Array<String>]
       # @return [Diverdown::Definition::Modulee]
-      def module(module_name)
-        @module_map[module_name] ||= Diverdown::Definition::Modulee.new(module_name:)
+      def build_modules(module_names)
+        module_names.each do
+          modulee = Diverdown::Definition::Modulee.new(module_name: _1)
+          @modules.push(modulee)
+        end
       end
 
       # @return [Array<Diverdown::Definition::Dependency>]
       def dependencies
         @dependency_map.values.sort
-      end
-
-      # @return [Array<Diverdown::Definition::Modulee>]
-      def modules
-        @module_map.values.sort
       end
 
       # @return [Hash]
@@ -93,14 +91,14 @@ module Diverdown
         other.is_a?(self.class) &&
           source_name == other.source_name &&
           dependencies == other.dependencies &&
-          modules.sort == other.modules.sort
+          modules == other.modules
       end
       alias eq? ==
       alias eql? ==
 
       # @return [Integer]
       def hash
-        [self.class, source_name, dependencies, modules.sort].hash
+        [self.class, source_name, dependencies, modules].hash
       end
     end
   end
