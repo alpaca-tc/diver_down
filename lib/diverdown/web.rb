@@ -49,29 +49,13 @@ module Diverdown
       # TODO: Optimize load yaml
       # TODO: How to implement packages and modules...
       # TODO: Loading all yaml is slow. Need to filter to load only wanted yaml.
-      packages = Hash.new { |h, k| h[k] = [] }
-      yaml_files = Dir[File.join(@definition_dir, '**', '*.{yml,yaml}')].sort
+      files = Dir[File.join(@definition_dir, '**', '*.msgpack')].sort
 
       concurrency_worker = Diverdown::Web::ConcurrencyWorker.new(concurrency: 30)
-      concurrency_worker.run(yaml_files) do |path|
-        hash = YAML.safe_load(File.read(path), permitted_classes: [Symbol], symbolize_names: true)
+      concurrency_worker.run(files) do |path|
+        hash = Diverdown::Helper.deep_symbolize_keys(MessagePack.unpack(File.binread(path)))
         definition = Diverdown::Definition.from_hash(hash)
         @store.set(definition)
-        packages[hash[:package]].push(definition)
-        puts "#{yaml_files.index(path) / yaml_files.size.to_f * 100}%"
-      end
-
-      packages.each do |package, definitions|
-        package_definition = Diverdown::Definition.new(
-          title: package,
-          sources: []
-        )
-
-        @store.set(package_definition)
-
-        definitions.each do |definition|
-          definition.parent = package_definition
-        end
       end
 
       puts 'store loaded!'

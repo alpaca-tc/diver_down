@@ -96,22 +96,6 @@ module Diverdown
       MessagePack.pack(to_h)
     end
 
-    # Combine two definitions into one
-    # @param other_definition [Diverdown::Definition]
-    # @return [self]
-    def combine(other_definition)
-      new_sources = (sources + other_definition.sources).group_by(&:source_name).map do |_, same_sources|
-        last_source = same_sources.pop
-        same_sources.inject(last_source) do |source, other_source|
-          source.combine(other_source)
-        end
-      end
-
-      @source_map = new_sources.map { [_1.source_name, _1] }.to_h
-
-      self
-    end
-
     # @param other [Object, Diverdown::Definition::Source]
     # @return [Boolean]
     def ==(other)

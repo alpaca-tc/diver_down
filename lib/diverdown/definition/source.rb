@@ -19,15 +19,22 @@ module Diverdown
       def self.combine(*sources)
         raise ArgumentError, 'sources are empty' if sources.empty?
 
-        uniq_sources = sources.map(&:source_name).uniq
-        raise ArgumentError, "sources are unmatched. (#{uniq_sources})" unless uniq_sources.length == 1
+        unique_sources = sources.map(&:source_name).uniq
+        raise ArgumentError, "sources are unmatched. (#{unique_sources})" unless unique_sources.length == 1
+
+        unique_modules = sources.map(&:modules).uniq
+        unless unique_modules.length == 1
+          invalid_module_name_list = unique_modules.map { "[#{_1.map(&:module_name).map(&:inspect).join(', ')}]" }
+
+          raise ArgumentError, "modules are unmatched. (#{invalid_module_name_list.join(', ')})"
+        end
 
         all_dependencies = sources.flat_map(&:dependencies)
 
         new(
-          source_name: uniq_sources[0],
+          source_name: unique_sources[0],
           dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
-          modules: sources.flat_map(&:modules)
+          modules: unique_modules[0]
         )
       end
 
