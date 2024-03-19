@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { Layout } from "./components/Layout"
+import { Layout } from "./components/layout"
 import { path } from './constants/path';
 import { Show as DefinitionShow } from "./pages/Definitions"
 import { NotFound } from "./pages/Errors"

@@ -12,7 +12,7 @@ export default defineConfig({
     alias: [
       {
         find: '@/',
-        replacement: join(__dirname, 'src/'),
+        replacement: join(__dirname, 'frontend/'),
       },
     ],
   },

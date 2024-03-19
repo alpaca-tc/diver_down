@@ -18,12 +18,12 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./frontend/*"]
     },
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "next-env.d.ts",
+    "vite-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],

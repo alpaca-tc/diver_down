@@ -35,6 +35,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
+    "smarthr-normalize-css": "^1.1.0",
     "smarthr-ui": "^44.0.0",
     "styled-components": "^6.1.8",
     "swr": "^2.2.5"
