@@ -83,8 +83,8 @@ const drawCheckedDefinitions = async () => {
   }
 }
 
-const definitionToggleChildren = (parentBitId, checked) => {
-  const checkboxes = document.querySelectorAll(`[data-parent-id='${parentBitId}']`)
+const toggleDefinitionGroup = (definitionGroup, checked) => {
+  const checkboxes = document.querySelectorAll(`input[data-target="definition-checkbox"][data-type="definition"][data-definition-group="${definitionGroup}"]`)
 
   checkboxes.forEach((el) => {
     el.checked = checked
@@ -135,11 +135,15 @@ const renderFromHash = (bitId) => {
 }
 
 export const start = async () => {
-  delegate(document, '[data-target="definition-checkbox"]', "change", debounse((event) => {
-    definitionToggleChildren(event.target.getAttribute("data-id"), event.target.checked)
+  delegate(document, '[data-target="definition-checkbox"][data-type="definition_group"]', "change", (event) => {
+    toggleDefinitionGroup(event.target.getAttribute("data-definition-group"), event.target.checked)
 
     drawCheckedDefinitions()
-  }, 100))
+  }, 100)
+
+  delegate(document, '[data-target="definition-checkbox"][data-type="definition"]', "change", (event) => {
+    drawCheckedDefinitions()
+  }, 100)
 
   delegate(document, '[data-action="definitionCheckReset"]', 'click', () => {
     definitionCheckReset()

@@ -16,6 +16,19 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
+    describe '#definition_groups' do
+      it 'returns definition_groups' do
+        store = described_class.new
+        definition_1 = Diverdown::Definition.new
+        definition_2 = Diverdown::Definition.new(definition_group: 'b')
+        definition_3 = Diverdown::Definition.new(definition_group: 'c')
+        definition_4 = Diverdown::Definition.new(definition_group: 'c')
+        store.set(definition_1, definition_2, definition_3, definition_4)
+
+        expect(store.definition_groups).to eq(['b', 'c', nil])
+      end
+    end
+
     describe '#filter_by_definition_group' do
       it 'returns definitions' do
         store = described_class.new

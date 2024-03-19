@@ -15,6 +15,7 @@ module Diverdown
     def self.from_hash(hash)
       new(
         title: hash[:title] || '',
+        definition_group: hash[:definition_group],
         sources: (hash[:sources] || []).map do |source_hash|
           Diverdown::Definition::Source.from_hash(source_hash)
         end
@@ -81,6 +82,7 @@ module Diverdown
     # @return [Boolean]
     def ==(other)
       other.is_a?(self.class) &&
+        definition_group == other.definition_group &&
         title == other.title &&
         sources.sort == other.sources.sort
     end

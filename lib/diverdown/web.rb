@@ -10,6 +10,7 @@ module Diverdown
     require 'diverdown/web/action'
     require 'diverdown/web/definition_to_dot'
     require 'diverdown/web/concurrency_worker'
+    require 'diverdown/web/definition_enumerator'
 
     # @param definition_dir [String]
     # @param store [Diverdown::DefinitionStore]

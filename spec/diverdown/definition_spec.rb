@@ -6,6 +6,7 @@ RSpec.describe Diverdown::Definition do
       it 'loads hash' do
         definition = described_class.new(
           title: 'title',
+          definition_group: 'x',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',

@@ -28,24 +28,8 @@ module Diverdown
         # @yield [Diverdown::Definition]
         # @return [Enumerator]
         def each_definition(store)
-          # NOTE: store may be running #load_store in other thread, so #dup it without changing it directly.
-          stack = store.select { _2.parent.nil? }.map { [nil, *_1] }
-
-          until stack.empty?
-            parent_bit_id, bit_id, definition = stack.shift
-
-            # TODO: support actual package, modules
-            unless definition.children.empty?
-              bit_ids = definition.children.map { store.get_bit_id(_1) }
-              bit_id = bit_ids.inject(0, :|)
-            end
-
-            yield(parent_bit_id, bit_id, definition)
-
-            definition.children.each do |child_definition|
-              child_bit_id = store.get_bit_id(child_definition)
-              stack.unshift([bit_id, child_bit_id, child_definition])
-            end
+          Diverdown::Web::DefinitionEnumerator.new(store).each do
+            yield(_1)
           end
         end
       end

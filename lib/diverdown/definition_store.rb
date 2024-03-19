@@ -29,6 +29,17 @@ module Diverdown
       end
     end
 
+    # @return [Array<String, nil>]
+    def definition_groups
+      keys = @definition_group_store.keys
+      with_nil = keys.include?(nil)
+      keys.delete(nil) if with_nil
+
+      keys.sort!
+      keys.push(nil) if with_nil
+      keys
+    end
+
     # @param definition_group [String, nil]
     # @return [Array<Diverdown::Definition>]
     def filter_by_definition_group(definition_group)
