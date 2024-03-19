@@ -89,6 +89,7 @@ module Diverdown
 
       # @param source_name [String]
       def source(source_name)
+        found_sources = []
         related_definitions = []
         reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
 
@@ -109,13 +110,18 @@ module Diverdown
             end
           end
 
-          related_definitions << [bit_id, definition] if found_source
+          if found_source
+            found_sources << found_source
+            related_definitions << [bit_id, definition]
+          end
         end
+
+        modules = Diverdown::Definition::Source.combine(*found_sources).modules
 
         if related_definitions.empty?
           not_found
         else
-          body = erb(:source, locals: { source_name:, related_definitions:, reverse_dependencies: })
+          body = erb(:source, locals: { source_name:, modules:, related_definitions:, reverse_dependencies: })
           [200, { 'content-type' => 'text/html' }, [body]]
         end
       end

@@ -9,6 +9,15 @@
     <main>
       <h1><%= source_name %></h1>
 
+      <h2>Modules</h2>
+      <ul>
+        <% modules.each do |modulee| %>
+          <li>
+            <%= modulee.module_name %>
+          </li>
+        <% end %>
+      </ul>
+
       <h2>Related Definitions <a href="/#definition-<%= related_definitions.map(&:first).inject(0, &:|) %>">All</a></h2>
       <ul>
         <% related_definitions.each do |bit_id, definition| %>
