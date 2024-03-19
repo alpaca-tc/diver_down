@@ -21,8 +21,8 @@ module Diverdown
           yield(
             Row.new(
               type: 'definition_group',
-              definition_group: definition_group.to_s,
-              label: definition_group.to_s,
+              definition_group:,
+              label: definition_group,
               bit_id: nil
             )
           )
@@ -31,7 +31,7 @@ module Diverdown
           definitions.each do |definition|
             row = Row.new(
               type: 'definition',
-              definition_group: definition_group.to_s,
+              definition_group:,
               label: definition.title,
               bit_id: @store.get_bit_id(definition)
             )

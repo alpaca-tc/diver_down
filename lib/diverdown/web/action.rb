@@ -100,7 +100,11 @@ module Diverdown
           end
         end
 
-        modules = Diverdown::Definition::Source.combine(*found_sources).modules
+        modules = if found_sources.empty?
+                    []
+                  else
+                    Diverdown::Definition::Source.combine(*found_sources).modules
+                  end
 
         if related_definitions.empty?
           not_found
@@ -132,7 +136,7 @@ module Diverdown
 
       def combine_ids_definitions(ids)
         definitions = ids.map { @store.get(_1) }
-        Diverdown::Definition.combine(title: 'combined', definitions:)
+        Diverdown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
       end
 
       def view_path(path)

@@ -77,7 +77,7 @@ module Diverdown
       @store = {}
       @invert_store = {}
       @bit_id = Diverdown::Definition::BitId.new
-      @definition_group_store = Hash.new { |h,k| h[k] = [] }
+      @definition_group_store = Hash.new { |h, k| h[k] = [] }
     end
 
     # @yield [Diverdown::Definition]

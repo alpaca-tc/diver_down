@@ -25,10 +25,10 @@
 
         <ul>
           <% each_definition(store) do |row| %>
-            <li class="definition-indent-<%= row.type == 'definition_group' ? 0 : 1 %>" data-target="definition-li" data-title="<%= row.label[0..300].tr(%(\n '"), '') %>">
+            <li class="definition-indent-<%= row.type == 'definition_group' ? 0 : 1 %>" data-target="definition-li" data-title="<%= row.label.to_s[0..300].tr(%(\n '"), '') %>">
               <label>
                 <input data-target="definition-checkbox" data-id="<%= row.bit_id %>" data-type="<%= row.type %>" data-definition-group="<%= row.definition_group %>" type="checkbox" />
-                <%= row.label[0..200].tr(%(\n '"), '') %>
+                <%= row.label.to_s[0..200].tr(%(\n '"), '') %>
               </label>
             </li>
           <% end %>

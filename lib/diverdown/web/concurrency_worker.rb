@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'thread'
-
 module Diverdown
   class Web
     class ConcurrencyWorker
