@@ -16,6 +16,21 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
+    describe '#filter_by_definition_group' do
+      it 'returns definitions' do
+        store = described_class.new
+        definition_1 = Diverdown::Definition.new
+        definition_2 = Diverdown::Definition.new(definition_group: 'b')
+        definition_3 = Diverdown::Definition.new(definition_group: 'c')
+        definition_4 = Diverdown::Definition.new(definition_group: 'c')
+        store.set(definition_1, definition_2, definition_3, definition_4)
+
+        expect(store.filter_by_definition_group(nil)).to eq([definition_1])
+        expect(store.filter_by_definition_group('b')).to eq([definition_2])
+        expect(store.filter_by_definition_group('c')).to eq([definition_3, definition_4])
+      end
+    end
+
     describe '#get_bit_id' do
       it 'raises KeyError if key not found' do
         store = described_class.new

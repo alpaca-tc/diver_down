@@ -24,8 +24,15 @@ module Diverdown
         id = @bit_id.next_id
         @store[id] = _1
         @invert_store[_1] = id
+        @definition_group_store[_1.definition_group] << _1
         id
       end
+    end
+
+    # @param definition_group [String, nil]
+    # @return [Array<Diverdown::Definition>]
+    def filter_by_definition_group(definition_group)
+      @definition_group_store.fetch(definition_group, [])
     end
 
     # @param definition [Diverdown::Definition]
@@ -59,6 +66,7 @@ module Diverdown
       @store = {}
       @invert_store = {}
       @bit_id = Diverdown::Definition::BitId.new
+      @definition_group_store = Hash.new { |h,k| h[k] = [] }
     end
 
     # @yield [Diverdown::Definition]

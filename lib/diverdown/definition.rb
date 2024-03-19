@@ -36,11 +36,12 @@ module Diverdown
       )
     end
 
-    attr_reader :title, :parent, :children
+    attr_reader :definition_group, :title, :parent, :children
 
     # @param title [String]
     # @param sources [Array<Diverdown::Definition::Source>]
-    def initialize(title: '', sources: [], parent: nil, children: [])
+    def initialize(definition_group: nil, title: '', sources: [], parent: nil, children: [])
+      @definition_group = definition_group
       @title = title
       @source_map = sources.map { [_1.source_name, _1] }.to_h
       @parent = parent
@@ -86,6 +87,7 @@ module Diverdown
     # @return [String]
     def to_h
       {
+        definition_group:,
         title:,
         sources: sources.map(&:to_h),
       }
@@ -110,7 +112,7 @@ module Diverdown
 
     # @return [Integer]
     def hash
-      [self.class, title, sources].hash
+      [self.class, definition_group, title, sources].hash
     end
   end
 end

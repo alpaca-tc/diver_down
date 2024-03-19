@@ -156,6 +156,7 @@ RSpec.describe Diverdown::Definition do
       it 'converts definition to hash' do
         definition = described_class.new(
           title: 'title',
+          definition_group: 'xxx',
           sources: [
             Diverdown::Definition::Source.new(
               source_name: 'a.rb',
@@ -185,6 +186,7 @@ RSpec.describe Diverdown::Definition do
 
         expect(definition.to_h).to eq(
           title: definition.title,
+          definition_group: 'xxx',
           sources: [
             {
               source_name: 'a.rb',
