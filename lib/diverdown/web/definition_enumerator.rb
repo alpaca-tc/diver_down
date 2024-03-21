@@ -18,14 +18,16 @@ module Diverdown
 
         definition_groups = @store.definition_groups
         definition_groups.each do |definition_group|
-          yield(
-            Row.new(
-              type: 'definition_group',
-              definition_group:,
-              label: definition_group,
-              bit_id: nil
+          unless definition_group.nil?
+            yield(
+              Row.new(
+                type: 'definition_group',
+                definition_group:,
+                label: definition_group,
+                bit_id: nil
+              )
             )
-          )
+          end
 
           definitions = @store.filter_by_definition_group(definition_group)
           definitions.each do |definition|
@@ -40,6 +42,12 @@ module Diverdown
           end
         end
       end
+
+      # @return [Integer] size of definitions + size of definition_group
+      def length
+        @store.length + @store.definition_groups.reject(&:nil?).size
+      end
+      alias size length
     end
   end
 end

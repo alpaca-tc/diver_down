@@ -30,9 +30,11 @@ module Diverdown
       load_store if @store.empty?
 
       case [request.request_method, request.path]
-      # in ['GET', %r{\A/definitions\.json\z}]
-      #   page = request.params['page']&.to_i || 1
-      #   action.definitions(page)
+      in ['GET', %r{\A/api/definition_list\.json\z}]
+        action.definition_list(
+          page: request.params['page']&.to_i || 1,
+          per: request.params['per']&.to_i || 100
+        )
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         action.combine_definitions(bit_id)

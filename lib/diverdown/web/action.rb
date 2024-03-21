@@ -5,6 +5,13 @@ require 'json'
 module Diverdown
   class Web
     class Action
+      Pagination = Data.define(
+        :current_page,
+        :total_pages,
+        :total_count,
+        :per
+      )
+
       # @param store [Diverdown::Definition::Store]
       # @param request [Rack::Request]
       def initialize(store:, request:)
@@ -12,7 +19,26 @@ module Diverdown
         @request = request
       end
 
-      # GET /definitions/:bit_id.json
+      # @param page [Integer]
+      # @param per [Integer]
+      def definition_list(page:, per:)
+        definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store)
+        items, pagination = paginate(definition_enumerator, page, per)
+
+        json(
+          definition_list: items.map do |row|
+            {
+              bit_id: row.bit_id,
+              type: row.type,
+              definition_group: row.definition_group,
+              label: row.label,
+            }
+          end,
+          pagination: pagination.to_h
+        )
+      end
+
+      # GET /api/definitions/:bit_id.json
       #
       # @param bit_id [Integer]
       def combine_definitions(bit_id)
@@ -36,7 +62,31 @@ module Diverdown
         end
       end
 
-      # GET /sources/:source_name.json
+      # GET /api/definitions/:bit_id.json
+      #
+      # @param bit_id [Integer]
+      def combine_definitions(bit_id)
+        ids = Diverdown::Web::BitId.bit_id_to_ids(bit_id)
+
+        valid_ids = ids.select do
+          @store.key?(_1)
+        end
+
+        definition = fetch_definition(valid_ids)
+
+        if definition
+          json(
+            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids),
+            title: definition.title,
+            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
+            sources: definition.sources.map { { source_name: _1.source_name } }
+          )
+        else
+          not_found
+        end
+      end
+
+      # GET /api/sources/:source_name.json
       #
       # @param source_name [String]
       def source(source_name)
@@ -101,6 +151,31 @@ module Diverdown
       private
 
       attr_reader :request, :store
+
+      def paginate(enumerator, page, per)
+        start_index = (page - 1) * per
+        end_index = start_index + per
+
+        items = []
+        enumerator.each_with_index do |item, index|
+          next if index < start_index
+          break if index > end_index
+
+          items.push(item)
+        end
+
+        total_count = enumerator.size
+
+        [
+          items,
+          Pagination.new(
+            current_page: page,
+            total_pages: [(total_count.to_f / per).ceil, 1].max,
+            total_count:,
+            per:
+          ),
+        ]
+      end
 
       def fetch_definition(ids)
         case ids.length
