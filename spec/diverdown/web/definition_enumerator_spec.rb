@@ -15,16 +15,16 @@ RSpec.describe Diverdown::Web::DefinitionEnumerator do
           [
             # definition_group b
             described_class::Row.new(type: 'definition_group', definition_group: 'b', label: 'b', bit_id: nil),
-            described_class::Row.new(type: 'definition', definition_group: 'b', label: definition_2.title, bit_id: store.get_bit_id(definition_2)),
+            described_class::Row.new(type: 'definition', definition_group: 'b', label: definition_2.title, bit_id: store.get_id(definition_2)),
 
             # definition_group c
             described_class::Row.new(type: 'definition_group', definition_group: 'c', label: 'c', bit_id: nil),
-            described_class::Row.new(type: 'definition', definition_group: 'c', label: definition_3.title, bit_id: store.get_bit_id(definition_3)),
-            described_class::Row.new(type: 'definition', definition_group: 'c', label: definition_4.title, bit_id: store.get_bit_id(definition_4)),
+            described_class::Row.new(type: 'definition', definition_group: 'c', label: definition_3.title, bit_id: store.get_id(definition_3)),
+            described_class::Row.new(type: 'definition', definition_group: 'c', label: definition_4.title, bit_id: store.get_id(definition_4)),
 
             # definition_group nil
             described_class::Row.new(type: 'definition_group', definition_group: nil, label: nil, bit_id: nil),
-            described_class::Row.new(type: 'definition', definition_group: nil, label: definition_1.title, bit_id: store.get_bit_id(definition_1)),
+            described_class::Row.new(type: 'definition', definition_group: nil, label: definition_1.title, bit_id: store.get_id(definition_1)),
           ]
         )
       end

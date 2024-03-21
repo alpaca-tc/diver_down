@@ -16,7 +16,7 @@ module Diverdown
       #
       # @param bit_id [Integer]
       def combine_definitions(bit_id)
-        ids = @store.bit_id.separate_bit_id(bit_id)
+        ids = Diverdown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
           @store.key?(_1)
@@ -26,7 +26,7 @@ module Diverdown
 
         if definition
           json(
-            bit_id: valid_ids.inject(0, :|),
+            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids),
             title: definition.title,
             dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }

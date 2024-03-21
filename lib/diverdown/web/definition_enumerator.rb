@@ -33,7 +33,7 @@ module Diverdown
               type: 'definition',
               definition_group:,
               label: definition.title,
-              bit_id: @store.get_bit_id(definition)
+              bit_id: @store.get_id(definition)
             )
 
             yield(row)

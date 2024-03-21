@@ -8,7 +8,6 @@ module Diverdown
     require 'diverdown/definition/dependency'
     require 'diverdown/definition/modulee'
     require 'diverdown/definition/method_id'
-    require 'diverdown/definition/bit_id'
 
     # @param hash [Hash]
     # @return [Diverdown::Definition]
