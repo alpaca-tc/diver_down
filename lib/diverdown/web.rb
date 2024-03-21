@@ -30,20 +30,19 @@ module Diverdown
       load_store if @store.empty?
 
       case [request.request_method, request.path]
-      in ['GET', %r{\A/definitions/(?<bit_id>\d+)\.json\z}]
+      # in ['GET', %r{\A/definitions\.json\z}]
+      #   page = request.params['page']&.to_i || 1
+      #   action.definitions(page)
+      in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         action.combine_definitions(bit_id)
-      in ['GET', %r{\A/sources/(?<source>.+)\.json\z}]
+      in ['GET', %r{\A/api/sources/(?<source>.+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
       in ['GET', '/']
         serve_file_or_dev_server(env.merge('PATH_INFO' => '/index.html'))
       else
         serve_file_or_dev_server(env)
-        # TODO: definitions.json?page=x
-        # in ['GET', %r{\A/definitions\.json\z}]
-        #   page = request.params['page']&.to_i || 1
-        #   action.definitions(page)
       end
     end
 

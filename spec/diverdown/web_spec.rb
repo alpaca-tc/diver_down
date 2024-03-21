@@ -22,7 +22,7 @@ RSpec.describe Diverdown::Web do
     end
   end
 
-  describe 'GET /definitions/:id.json' do
+  describe 'GET /api/definitions/:id.json' do
     it 'returns 404 if id is not found' do
       get '/definitions/0.json'
       expect(last_response.status).to eq(404)
@@ -39,7 +39,7 @@ RSpec.describe Diverdown::Web do
       )
       bit_ids = store.set(definition)
 
-      get "/definitions/#{bit_ids[0]}.json"
+      get "/api/definitions/#{bit_ids[0]}.json"
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
@@ -65,7 +65,7 @@ RSpec.describe Diverdown::Web do
       )
       bit_ids = store.set(definition_1, definition_2)
 
-      get "/definitions/#{bit_ids.inject(0, &:|)}.json"
+      get "/api/definitions/#{bit_ids.inject(0, &:|)}.json"
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
@@ -73,9 +73,9 @@ RSpec.describe Diverdown::Web do
     end
   end
 
-  describe 'GET /sources/:source.json' do
+  describe 'GET /api/sources/:source.json' do
     it 'returns 404 if source is not found' do
-      get '/sources/unknown.json'
+      get '/api/sources/unknown.json'
 
       expect(last_response.status).to eq(404)
     end
@@ -100,7 +100,7 @@ RSpec.describe Diverdown::Web do
       store.set(definition_1)
       store.set(definition_2)
 
-      get '/sources/a.rb.json'
+      get '/api/sources/a.rb.json'
 
       expect(last_response.status).to eq(200)
     end
