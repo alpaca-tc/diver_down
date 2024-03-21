@@ -6,5 +6,9 @@ export const path = {
   sources: {
     show: (sourceName: string) => `/sources/${sourceName}`
   },
-  api: {},
+  api: {
+    definitions: {
+      index: () => '/api/definitions',
+    }
+  },
 }

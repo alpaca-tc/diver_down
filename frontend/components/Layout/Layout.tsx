@@ -29,5 +29,6 @@ export const Layout: FC<Props> = ({ isLoading }) => {
 }
 
 const Wrapper = styled.div`
-  padding: ${spacing.XS};
+  padding-top: ${spacing.XS};
+  height: 100%;
 `

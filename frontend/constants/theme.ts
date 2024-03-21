@@ -1,5 +1,5 @@
-import { createGlobalStyle, css } from 'styled-components'
 import normalizeCss from 'smarthr-normalize-css'
+import { createGlobalStyle } from 'styled-components'
 
 import {
   FONT_FAMILY,
@@ -28,6 +28,10 @@ export const spacing = defaultSpacing
 
 export const GlobalStyle = createGlobalStyle`
   ${normalizeCss};
+
+  html, body, #root {
+    height: 100%;
+  }
 
   body {
     background-color: ${color.BACKGROUND};

@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
 
   const buttons: ComponentProps<typeof AppNavi>['buttons'] = [
     {
-      children: 'Home',
+      children: 'Definition List',
       current: pathname === '/',
       onClick: () => navigate('/'),
     },
