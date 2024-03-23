@@ -24,11 +24,11 @@ RSpec.describe Diverdown::Web do
 
   describe 'GET /api/definitions.json' do
     it 'returns [] if store is blank' do
-      get '/api/definition_list.json'
+      get '/api/definitions.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'definition_list' => [],
+        'definitions' => [],
         'pagination' => {
           'current_page' => 1,
           'total_pages' => 1,
@@ -49,16 +49,15 @@ RSpec.describe Diverdown::Web do
       )
       store.set(definition)
 
-      get '/api/definition_list.json'
+      get '/api/definitions.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'definition_list' => [
+        'definitions' => [
           {
-            'bit_id' => 1,
+            'id' => 1,
             'label' => 'title',
             'definition_group' => nil,
-            'type' => 'definition',
           },
         ],
         'pagination' => {

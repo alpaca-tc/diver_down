@@ -3,9 +3,9 @@ import styled from 'styled-components'
 
 import { Loader } from '@/components/ui'
 
-export const Loading: FC = () => (
+export const Loading: FC<{ text: string, alt: string }> = ({ text, alt }) => (
   <LoaderWrapper>
-    <Loader text="Loading..." size="m" alt="Loading" />
+    <Loader text={text} size="m" alt={alt} />
   </LoaderWrapper>
 )
 

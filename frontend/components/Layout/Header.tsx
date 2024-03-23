@@ -43,5 +43,5 @@ export const Header: React.FC = () => {
 }
 
 const StyledAppNavi = styled(AppNavi)`
-  min-height: 40px;
+  height: 40px;
 `

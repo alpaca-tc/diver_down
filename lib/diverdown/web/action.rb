@@ -32,7 +32,7 @@ module Diverdown
             {
               id:,
               definition_group: definition.definition_group,
-              label: definition.title,
+              title: definition.title,
             }
           end,
           pagination: pagination.to_h

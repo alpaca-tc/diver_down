@@ -30,7 +30,7 @@ export const Layout: FC<Props> = ({ isLoading }) => {
             <GlobalStyle />
 
             {isLoading ? (
-              <Loading />
+              <Loading text="Loading..." alt="Loading" />
             ) : (
               <>
                 <Header />
@@ -48,5 +48,5 @@ export const Layout: FC<Props> = ({ isLoading }) => {
 
 const Wrapper = styled.div`
   padding-top: ${spacing.XS};
-  height: 100%;
+  height: calc(100% - 40px - ${spacing.XS}); // 40px is the height of the header
 `

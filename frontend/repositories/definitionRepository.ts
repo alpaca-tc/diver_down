@@ -1,38 +1,52 @@
-import useSWR from 'swr'
+import { useCallback } from 'react'
+import useSWRInfinite from 'swr/infinite'
 
 import { path } from '@/constants/path'
-import { DefinitionList } from '@/models/definitionList'
+import { Definition } from '@/models/definition'
 import { stringify } from '@/utils/queryString'
 
 import { get } from './httpRequest'
 import { PaginationResponse } from './pagination'
 
+type DefinitionReponse = {
+  id: number
+  definition_group: string | null
+  title: string
+}
+
 type DefinitionsResponse = {
-  definitions: Array<{
-    bit_id: bigint
-    type: 'definition' | 'definition_group'
-    definition_group: string
-    label: string
-  }>
+  definitions: DefinitionReponse[]
   pagination: PaginationResponse
 }
 
-const fetchDefinitions = async (requestPath: string): Promise<DefinitionList> => {
-  const response = await get<DefinitionsResponse>(requestPath)
-
-  return res.definitions.map(())
-  .then((res) => res.definitions)
-}
+const PER = 100
 
 export const useDefinitionList = (
-  per: number,
-  page: number,
   keepPreviousData: boolean = false
 ) => {
-  const params = { per, page }
-  const requestPath = `${path.api.definitions.index()}?${stringify(params)}`
+  const getKey = (pageIndex: number, previousPageData: DefinitionsResponse | null) => {
+    if (previousPageData && previousPageData.definitions.length === 0) {
+      return null
+    }
+    const params = {
+      per: PER,
+      page: pageIndex + 1
+    }
 
-  const { data, isLoading } = useSWR(requestPath, fetchDefinitions, { keepPreviousData })
+    return `${path.api.definitions.index()}?${stringify(params)}`
+  }
 
-  return { data, isLoading }
+  const fetcher = useCallback(async (url: string): Promise<Definition[]> => {
+    const response = await get<DefinitionsResponse>(url)
+
+    return response.definitions.map((definition) => ({
+      id: definition.id,
+      definitionGroup: definition.definition_group,
+      title: definition.title,
+    }))
+  }, [])
+
+  const { data, isLoading, size, setSize } = useSWRInfinite(getKey, fetcher, { keepPreviousData })
+
+  return { data, isLoading, size, setSize }
 }

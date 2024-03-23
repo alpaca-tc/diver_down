@@ -8,7 +8,7 @@ export const path = {
   },
   api: {
     definitions: {
-      index: () => '/api/definitions',
+      index: () => '/api/definitions.json',
     }
   },
 }
