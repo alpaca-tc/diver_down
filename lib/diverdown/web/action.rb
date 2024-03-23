@@ -19,19 +19,20 @@ module Diverdown
         @request = request
       end
 
+      # GET /api/definitions.json
+      #
       # @param page [Integer]
       # @param per [Integer]
-      def definition_list(page:, per:)
+      def definitions(page:, per:)
         definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store)
-        items, pagination = paginate(definition_enumerator, page, per)
+        definitions, pagination = paginate(definition_enumerator, page, per)
 
         json(
-          definition_list: items.map do |row|
+          definitions: definitions.map do |(id, definition)|
             {
-              bit_id: row.bit_id,
-              type: row.type,
-              definition_group: row.definition_group,
-              label: row.label,
+              id:,
+              definition_group: definition.definition_group,
+              label: definition.title,
             }
           end,
           pagination: pagination.to_h

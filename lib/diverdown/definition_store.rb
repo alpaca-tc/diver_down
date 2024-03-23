@@ -62,7 +62,7 @@ module Diverdown
     # @param id [Integer]
     # @return [Boolean]
     def key?(id)
-      0 < id && id <= @definitions.size
+      id.positive? && id <= @definitions.size
     end
 
     # @return [Integer]
@@ -87,6 +87,8 @@ module Diverdown
 
     # @yield [Diverdown::Definition]
     def each
+      return enum_for(__method__) unless block_given?
+
       # NOTE: To allow values to be rewritten during #each, duplicate the value through #to_a.
       @definitions.each.with_index(1) do |definition, id|
         yield(id, definition)

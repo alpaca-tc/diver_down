@@ -30,8 +30,8 @@ module Diverdown
       load_store if @store.empty?
 
       case [request.request_method, request.path]
-      in ['GET', %r{\A/api/definition_list\.json\z}]
-        action.definition_list(
+      in ['GET', %r{\A/api/definitions\.json\z}]
+        action.definitions(
           page: request.params['page']&.to_i || 1,
           per: request.params['per']&.to_i || 100
         )
