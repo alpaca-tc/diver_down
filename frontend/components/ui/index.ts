@@ -13,6 +13,7 @@ export {
   SideNav,
   Sidebar,
   Stack,
+  UnstyledButton,
   createTheme,
   defaultBorder,
   defaultBreakpoint,
@@ -22,4 +23,8 @@ export {
   defaultLeading,
   defaultRadius,
   defaultSpacing,
+  useTheme,
 } from 'smarthr-ui'
+
+export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'
+export { isTouchDevice } from "smarthr-ui/lib/libs/ua"

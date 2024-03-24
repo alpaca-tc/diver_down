@@ -1,9 +1,8 @@
-import React, { ReactNode, VFC } from 'react'
-import styled, { css } from 'styled-components'
+import React, { FC, ReactNode } from 'react'
+import styled from 'styled-components'
 
-import { Theme, useTheme } from '../../hooks/useTheme'
-import { isTouchDevice } from '../../libs/ua'
-import { UnstyledButton } from '../Button'
+import { UnstyledButton, isTouchDevice } from '@/components/ui'
+import { color, fontSize, interaction, theme } from '@/constants/theme'
 
 import { useClassNames } from './useClassNames'
 
@@ -25,7 +24,7 @@ type Props = {
   onClick?: OnClick
 }
 
-export const SideNavItemButton: VFC<Props> = ({
+export const InfiniteSideNavItemButton: FC<Props> = ({
   id,
   title,
   prefix,
@@ -33,7 +32,6 @@ export const SideNavItemButton: VFC<Props> = ({
   size,
   onClick,
 }) => {
-  const theme = useTheme()
   const classNames = useClassNames()
   const handleClick = onClick
     ? (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onClick(e, id)
@@ -41,78 +39,64 @@ export const SideNavItemButton: VFC<Props> = ({
 
   const itemClassName = `${isSelected ? 'selected' : ''} ${classNames.item}`
   return (
-    <Wrapper className={itemClassName} themes={theme}>
-      <Button className={size} $themes={theme} onClick={handleClick}>
-        {prefix && <PrefixWrapper themes={theme}>{prefix}</PrefixWrapper>}
+    <Wrapper className={itemClassName}>
+      <Button className={size} onClick={handleClick}>
+        {prefix && <PrefixWrapper >{prefix}</PrefixWrapper>}
         <span className={classNames.itemTitle}>{title}</span>
       </Button>
     </Wrapper>
   )
 }
 
-const Wrapper = styled.li<{ themes: Theme }>`
-  ${({ themes }) => {
-    const { color, interaction } = themes
+const Wrapper = styled.li`
+  color: ${color.TEXT_BLACK};
+  transition: ${isTouchDevice
+    ? 'none'
+    : `background-color ${interaction.hover.animation}, color ${interaction.hover.animation}`};
 
-    return css`
-      color: ${color.TEXT_BLACK};
-      transition: ${isTouchDevice
-        ? 'none'
-        : `background-color ${interaction.hover.animation}, color ${interaction.hover.animation}`};
+  &:hover {
+    background-color: ${theme.color.hoverColor(color.COLUMN)};
+  }
 
-      &:hover {
-        background-color: ${color.hoverColor(color.COLUMN)};
-      }
+  &.selected {
+    background-color: ${color.MAIN};
+    color: ${color.TEXT_WHITE};
+    position: relative;
 
-      &.selected {
-        background-color: ${color.MAIN};
-        color: ${color.TEXT_WHITE};
-        position: relative;
-
-        &::after {
-          position: absolute;
-          top: 50%;
-          right: -4px;
-          transform: translate(0, -50%);
-          border-style: solid;
-          border-width: 4px 0 4px 4px;
-          border-color: transparent transparent transparent ${color.MAIN};
-          content: '';
-        }
-      }
-    `
-  }}
+    &::after {
+      position: absolute;
+      top: 50%;
+      right: -4px;
+      transform: translate(0, -50%);
+      border-style: solid;
+      border-width: 4px 0 4px 4px;
+      border-color: transparent transparent transparent ${color.MAIN};
+      content: '';
+    }
+  }
 `
 
-const Button = styled(UnstyledButton)<{ $themes: Theme }>`
-  ${({ $themes }) => {
-    const { fontSize, shadow, spacingByChar } = $themes
+const Button = styled(UnstyledButton)`
+  outline: none;
+  width: 100%;
+  line-height: 1;
+  box-sizing: border-box;
+  cursor: pointer;
 
-    return css`
-      outline: none;
-      width: 100%;
-      line-height: 1;
-      box-sizing: border-box;
-      cursor: pointer;
+  &.default {
+    padding: ${theme.spacingByChar(1)};
+    font-size: ${fontSize.M};
+  }
 
-      &.default {
-        padding: ${spacingByChar(1)};
-        font-size: ${fontSize.M};
-      }
+  &.s {
+    padding: ${theme.spacingByChar(0.5)} ${theme.spacingByChar(1)};
+    font-size: ${fontSize.S};
+  }
 
-      &.s {
-        padding: ${spacingByChar(0.5)} ${spacingByChar(1)};
-        font-size: ${fontSize.S};
-      }
-
-      &:focus-visible {
-        ${shadow.focusIndicatorStyles}
-      }
-    `
-  }}
+  &:focus-visible {
+    ${theme.shadow.focusIndicatorStyles}
+  }
 `
-const PrefixWrapper = styled.span<{ themes: Theme }>`
-  ${({ themes: { spacingByChar } }) => css`
-    margin-right: ${spacingByChar(0.5)};
-  `}
+const PrefixWrapper = styled.span`
+  margin-right: ${theme.spacingByChar(0.5)};
 `

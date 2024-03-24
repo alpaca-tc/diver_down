@@ -1,12 +1,12 @@
-import React, { ComponentProps, HTMLAttributes, VFC } from 'react'
-import styled, { css } from 'styled-components'
+import React, { ComponentProps, FC, HTMLAttributes } from 'react'
+import styled from 'styled-components'
 
-import { Theme, useTheme } from '../../hooks/useTheme'
+import { color } from '@/constants/theme'
 
-import { OnClick, SideNavItemButton, SideNavSizeType } from './SideNavItemButton'
+import { InfiniteSideNavItemButton, OnClick, SideNavSizeType } from './InfiniteSideNavItemButton'
 import { useClassNames } from './useClassNames'
 
-type SideNavItemButtonProps = Omit<ComponentProps<typeof SideNavItemButton>, 'size' | 'onClick'>
+type SideNavItemButtonProps = Omit<ComponentProps<typeof InfiniteSideNavItemButton>, 'size' | 'onClick'>
 
 type Props = {
   /** 各アイテムのデータの配列 */
@@ -20,20 +20,19 @@ type Props = {
 }
 type ElementProps = Omit<HTMLAttributes<HTMLUListElement>, keyof Props>
 
-export const SideNav: VFC<Props & ElementProps> = ({
+export const InfiniteSideNav: FC<Props & ElementProps> = ({
   items,
   size = 'default',
   onClick,
   className = '',
   ...props
 }) => {
-  const theme = useTheme()
   const classNames = useClassNames()
 
   return (
-    <Wrapper {...props} themes={theme} className={`${className} ${classNames.wrapper}`}>
+    <Wrapper {...props} className={`${className} ${classNames.wrapper}`}>
       {items.map((item) => (
-        <SideNavItemButton
+        <InfiniteSideNavItemButton
           id={item.id}
           title={item.title}
           prefix={item.prefix}
@@ -47,14 +46,8 @@ export const SideNav: VFC<Props & ElementProps> = ({
   )
 }
 
-const Wrapper = styled.ul<{ themes: Theme }>`
-  ${({ themes }) => {
-    const { color } = themes
-
-    return css`
-      background-color: ${color.COLUMN};
-      list-style: none;
-      padding: 0;
-    `
-  }}
+const Wrapper = styled.ul`
+  background-color: ${color.COLUMN};
+  list-style: none;
+  padding: 0;
 `
