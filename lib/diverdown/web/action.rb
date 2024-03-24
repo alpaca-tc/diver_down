@@ -155,7 +155,7 @@ module Diverdown
 
       def paginate(enumerator, page, per)
         start_index = (page - 1) * per
-        end_index = start_index + per
+        end_index = start_index + per - 1
 
         items = []
         enumerator.each_with_index do |item, index|

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react'
+import React, { ReactNode, forwardRef } from 'react'
 import styled from 'styled-components'
 
 import { UnstyledButton, isTouchDevice } from '@/components/ui'
@@ -7,11 +7,9 @@ import { color, fontSize, interaction, theme } from '@/constants/theme'
 import { useClassNames } from './useClassNames'
 
 export type SideNavSizeType = 'default' | 's'
-export type OnClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => void
+export type OnClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 
 type Props = {
-  /** アイテムの識別子 */
-  id: string
   /** アイテムのタイトル */
   title: ReactNode
   /** タイトルのプレフィックスの内容。通常、StatusLabel の配置に用います。 */
@@ -24,29 +22,31 @@ type Props = {
   onClick?: OnClick
 }
 
-export const InfiniteSideNavItemButton: FC<Props> = ({
-  id,
-  title,
-  prefix,
-  isSelected = false,
-  size,
-  onClick,
-}) => {
+export const InfiniteSideNavItemButton = forwardRef<HTMLLIElement, Props>((props, ref) => {
+  const {
+    title,
+    prefix,
+    isSelected = false,
+    size,
+    onClick,
+  } = props
+
   const classNames = useClassNames()
   const handleClick = onClick
-    ? (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onClick(e, id)
+    ? (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onClick(e)
     : undefined
 
   const itemClassName = `${isSelected ? 'selected' : ''} ${classNames.item}`
+
   return (
-    <Wrapper className={itemClassName}>
+    <Wrapper ref={ref} className={itemClassName}>
       <Button className={size} onClick={handleClick}>
         {prefix && <PrefixWrapper >{prefix}</PrefixWrapper>}
         <span className={classNames.itemTitle}>{title}</span>
       </Button>
     </Wrapper>
   )
-}
+})
 
 const Wrapper = styled.li`
   color: ${color.TEXT_BLACK};

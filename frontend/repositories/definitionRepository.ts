@@ -19,13 +19,13 @@ type DefinitionsResponse = {
   pagination: PaginationResponse
 }
 
-const PER = 100
+export const PER = 5
 
 export const useDefinitionList = (
   keepPreviousData: boolean = false
 ) => {
-  const getKey = (pageIndex: number, previousPageData: DefinitionsResponse | null) => {
-    if (previousPageData && previousPageData.definitions.length === 0) {
+  const getKey = (pageIndex: number, previousPageData: DefinitionReponse[] | null) => {
+    if (previousPageData && previousPageData.length === 0) {
       return null
     }
     const params = {
@@ -46,7 +46,10 @@ export const useDefinitionList = (
     }))
   }, [])
 
-  const { data, isLoading, size, setSize } = useSWRInfinite(getKey, fetcher, { keepPreviousData })
+  const { data, isLoading, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, { keepPreviousData })
+  const isReachingEnd = data?.[0]?.length === 0 || (data && data?.[data?.length - 1]?.length < PER)
 
-  return { data, isLoading, size, setSize }
+  const definitions = (data ?? []).flat()
+
+  return { definitions, isLoading, size, setSize, isValidating, isReachingEnd }
 }

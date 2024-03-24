@@ -28,3 +28,4 @@ export {
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'
 export { isTouchDevice } from "smarthr-ui/lib/libs/ua"
+export { useClassNameGenerator } from "smarthr-ui/lib/hooks/useClassNameGenerator"

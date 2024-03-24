@@ -3,18 +3,19 @@ import styled from 'styled-components'
 
 import { color } from '@/constants/theme'
 
-import { InfiniteSideNavItemButton, OnClick, SideNavSizeType } from './InfiniteSideNavItemButton'
+import { InfiniteSideNavItemButton, SideNavSizeType } from './InfiniteSideNavItemButton'
 import { useClassNames } from './useClassNames'
 
-type SideNavItemButtonProps = Omit<ComponentProps<typeof InfiniteSideNavItemButton>, 'size' | 'onClick'>
+type InfiniteSideNavItemButtonProps = Omit<ComponentProps<typeof InfiniteSideNavItemButton>, 'size'> & {
+  ref?: React.Ref<HTMLLIElement>
+  key: string
+}
 
 type Props = {
   /** 各アイテムのデータの配列 */
-  items: SideNavItemButtonProps[]
+  items: InfiniteSideNavItemButtonProps[]
   /** 各アイテムの大きさ */
   size?: SideNavSizeType
-  /** アイテムを押下したときに発火するコールバック関数 */
-  onClick?: OnClick
   /** コンポーネントに適用するクラス名 */
   className?: string
 }
@@ -23,7 +24,6 @@ type ElementProps = Omit<HTMLAttributes<HTMLUListElement>, keyof Props>
 export const InfiniteSideNav: FC<Props & ElementProps> = ({
   items,
   size = 'default',
-  onClick,
   className = '',
   ...props
 }) => {
@@ -33,13 +33,13 @@ export const InfiniteSideNav: FC<Props & ElementProps> = ({
     <Wrapper {...props} className={`${className} ${classNames.wrapper}`}>
       {items.map((item) => (
         <InfiniteSideNavItemButton
-          id={item.id}
+          ref={item.ref}
           title={item.title}
           prefix={item.prefix}
           isSelected={item.isSelected}
+          onClick={item.onClick}
           size={size}
-          key={item.id}
-          onClick={onClick}
+          key={item.key}
         />
       ))}
     </Wrapper>
