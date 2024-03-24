@@ -10,6 +10,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'arrow-body-style': 'error',
     'smarthr/require-barrel-import': 'error',
+    'smarthr/a11y-input-has-name-attribute': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
