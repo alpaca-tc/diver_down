@@ -6,8 +6,10 @@ module Diverdown
       include Enumerable
 
       # @param store [Diverdown::Definition::Store]
-      def initialize(store)
+      # @param query [String]
+      def initialize(store, query: '')
         @store = store
+        @query = query
       end
 
       # @yield [parent_bit_id, bit_id, definition]
@@ -18,6 +20,8 @@ module Diverdown
         definition_groups.each do |definition_group|
           definitions = @store.filter_by_definition_group(definition_group)
           definitions.each do
+            next unless match_definition?(_1)
+
             id = @store.get_id(_1)
             yield(id, _1)
           end
@@ -29,6 +33,15 @@ module Diverdown
         @store.size
       end
       alias length size
+
+      private
+
+      def match_definition?(definition)
+        return true if @query.empty?
+
+        definition.title.include?(@query) ||
+          definition.sources.any? { _1.source_name.include?(@query) }
+      end
     end
   end
 end

@@ -42,7 +42,8 @@ module Diverdown
       in ['GET', %r{\A/api/definitions\.json\z}]
         action.definitions(
           page: request.params['page']&.to_i || 1,
-          per: request.params['per']&.to_i || 100
+          per: request.params['per']&.to_i || 100,
+          query: request.params['query'] || ''
         )
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
@@ -51,7 +52,7 @@ module Diverdown
         source = Regexp.last_match[:source]
         action.source(source)
       in ['GET', '/']
-        @files_server.call(env)
+        @files_server.call(env.merge('PATH_INFO' => '/index.html'))
       else
         @files_server.call(env)
       end
