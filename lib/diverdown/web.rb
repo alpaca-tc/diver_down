@@ -13,6 +13,9 @@ module Diverdown
     require 'diverdown/web/definition_enumerator'
     require 'diverdown/web/bit_id'
 
+    # For development
+    autoload :DevServerMiddleware, 'diverdown/web/dev_server_middleware'
+
     M = Mutex.new
 
     # @param definition_dir [String]
@@ -48,48 +51,13 @@ module Diverdown
         source = Regexp.last_match[:source]
         action.source(source)
       in ['GET', '/']
-        serve_file_or_dev_server(env.merge('PATH_INFO' => '/index.html'))
-      else
-        serve_file_or_dev_server(env)
-      end
-    end
-
-    private
-
-    def serve_file_or_dev_server(env)
-      if ENV['DIVERDOWN_DEV']
-        proxy_dev_server(env)
+        @files_server.call(env)
       else
         @files_server.call(env)
       end
     end
 
-    def proxy_dev_server(env)
-      require 'net/http'
-
-      request = Net::HTTP::Get.new(env['PATH_INFO'])
-
-      env.each do |key, value|
-        next unless key.start_with?('HTTP_')
-
-        formatted_key = key.sub(/^HTTP_/, '').split('_').map(&:downcase).join('-')
-        request[formatted_key] = value
-      end
-
-      request['host'] = 'localhost'
-
-      # Request to vite(`pnpm run vite`)
-      response = Net::HTTP.start(request['host'], ENV.fetch('DIVERDOWN_PORT', 5173).to_i) do |http|
-        http.request(Net::HTTP::Get.new(env['PATH_INFO']))
-      end
-
-      response_headers = {}
-      response.each_header do |key, value|
-        response_headers[key] = value
-      end
-
-      [response.code.to_i, response_headers, [response.body]]
-    end
+    private
 
     def load_store
       # TODO: Optimize load yaml

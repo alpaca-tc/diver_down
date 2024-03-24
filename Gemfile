@@ -8,6 +8,8 @@ gemspec
 gem "rake", "~> 13.0"
 gem "rspec", "~> 3.0"
 gem "rubocop", "~> 1.21"
-gem "rackup"
 gem "rack-test"
-gem 'activesupport'
+gem 'rack-proxy'
+gem 'websocket-driver'
+gem 'eventmachine'
+gem 'puma'
