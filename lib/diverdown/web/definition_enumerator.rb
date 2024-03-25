@@ -7,9 +7,10 @@ module Diverdown
 
       # @param store [Diverdown::Definition::Store]
       # @param query [String]
-      def initialize(store, query: '')
+      def initialize(store, title: '', source: '')
         @store = store
-        @query = query
+        @title = title
+        @source = source
       end
 
       # @yield [parent_bit_id, bit_id, definition]
@@ -37,10 +38,17 @@ module Diverdown
       private
 
       def match_definition?(definition)
-        return true if @query.empty?
+        matched = true
 
-        definition.title.include?(@query) ||
-          definition.sources.any? { _1.source_name.include?(@query) }
+        unless @title.empty?
+          matched &&= definition.title.include?(@title)
+        end
+
+        unless @source.empty?
+          matched &&= definition.sources.any? { _1.source_name.include?(@source) }
+        end
+
+        matched
       end
     end
   end

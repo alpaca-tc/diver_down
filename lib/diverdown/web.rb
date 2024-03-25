@@ -43,7 +43,8 @@ module Diverdown
         action.definitions(
           page: request.params['page']&.to_i || 1,
           per: request.params['per']&.to_i || 100,
-          query: request.params['query'] || ''
+          title: request.params['title'] || '',
+          source: request.params['source'] || ''
         )
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i

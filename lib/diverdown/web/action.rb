@@ -23,9 +23,10 @@ module Diverdown
       #
       # @param page [Integer]
       # @param per [Integer]
-      # @param query [String]
-      def definitions(page:, per:, query:)
-        definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store, query:)
+      # @param title [String]
+      # @param source [String]
+      def definitions(page:, per:, title:, source:)
+        definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store, title:, source:)
         definitions, pagination = paginate(definition_enumerator, page, per)
 
         json(
