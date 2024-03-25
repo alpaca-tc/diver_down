@@ -10,7 +10,7 @@ import {
 } from '@/components/ui'
 import { color, spacing } from '@/constants/theme'
 
-import { DefinitionList } from './parts/DefinitionList'
+import { DefinitionList } from './components/DefinitionList'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useState<number[]>([])

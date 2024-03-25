@@ -11,6 +11,7 @@ module.exports = {
     'arrow-body-style': 'error',
     'smarthr/require-barrel-import': 'error',
     'smarthr/a11y-input-has-name-attribute': 'off',
+    'smarthr/a11y-input-in-form-control': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

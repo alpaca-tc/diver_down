@@ -1,11 +1,14 @@
 export {
+  ActionDialog,
   AppNavi,
   Aside,
   Button,
   CheckBox,
   Cluster,
   FONT_FAMILY,
+  FormControl,
   Heading,
+  Input,
   Loader,
   NotificationBar,
   PageHeading,
@@ -24,6 +27,7 @@ export {
   defaultRadius,
   defaultSpacing,
   useTheme,
+  FaCogIcon,
 } from 'smarthr-ui'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'
