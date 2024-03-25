@@ -11,6 +11,7 @@ import {
 import { color, spacing } from '@/constants/theme'
 
 import { DefinitionList } from './components/DefinitionList'
+import { DefinitionView } from './components/DefinitionView'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useState<number[]>([])
@@ -24,7 +25,7 @@ export const Show: React.FC = () => {
             <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
           </StyledAside>
           <StyledSection>
-            <Heading>メインコンテンツ</Heading>
+            <DefinitionView definitionIds={selectedDefinitionIds} />
           </StyledSection>
         </StyledSidebar>
       </Wrapper>

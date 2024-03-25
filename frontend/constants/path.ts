@@ -1,3 +1,5 @@
+import { idsToBitId } from "@/utils/bitId";
+
 export const path = {
   home: () => '/',
   definitions: {
@@ -9,6 +11,7 @@ export const path = {
   api: {
     definitions: {
       index: () => '/api/definitions.json',
+      show: (ids: number[]) => `/api/definitions/${idsToBitId(ids)}.json`
     }
   },
 }

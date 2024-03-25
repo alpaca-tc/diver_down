@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { Loading } from '@/components/Loading'
 import { Button, Cluster, FaGearIcon, Section } from '@/components/ui'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { useDefinitionList } from '@/repositories/definitionRepository'
+import { useDefinitionList } from '@/repositories/definitionListRepository'
 
 import { ConfigureSearchOptionsDialog, SearchDefinitionsOptions } from './ConfigureSearchOptionsDialog'
 import { List } from './List'

@@ -55,7 +55,7 @@ module Diverdown
 
         if definition
           json(
-            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids),
+            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
             title: definition.title,
             dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }
