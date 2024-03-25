@@ -4,10 +4,14 @@ import reactRefresh from "@vitejs/plugin-react-refresh";
 import reactSwc from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
+/// <reference types="vitest" />
 // https://vitejs.dev/config/
 export default defineConfig({
   root: 'frontend',
   plugins: [reactSwc(), reactRefresh()],
+  test: {
+    include: ['**/__tests__/*.test.{ts,tsx}']
+  },
   resolve: {
     alias: [
       {
