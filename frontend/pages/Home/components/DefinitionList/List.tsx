@@ -12,6 +12,7 @@ import { groupBy } from '@/utils/groupBy'
 const NULL_DEFINITION_GROUP = '_____null_____'
 
 type Props = {
+  folding: boolean
   loadNextPage: () => void
   inView: boolean
   definitions: Definition[]
@@ -20,7 +21,7 @@ type Props = {
 }
 
 export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
-  const { definitions, inView, loadNextPage, selectedDefinitionIds, setSelectedDefinitionIds } = props
+  const { definitions, inView, loadNextPage, selectedDefinitionIds, setSelectedDefinitionIds, folding } = props
 
   useEffect(() => {
     if (inView) {
@@ -64,34 +65,36 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
         })
       }
 
-      filteredDefinitions.forEach((definition) => {
-        const onClickDefinition = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement>) => {
-          event.stopPropagation()
+      if (!folding || definitionGroup === NULL_DEFINITION_GROUP) {
+        filteredDefinitions.forEach((definition) => {
+          const onClickDefinition = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement>) => {
+            event.stopPropagation()
 
-          setSelectedDefinitionIds((prev) => {
-            if (prev.includes(definition.id)) {
-              return prev.filter((prevId) => prevId !== definition.id)
-            } else {
-              return [...prev, definition.id]
-            }
+            setSelectedDefinitionIds((prev) => {
+              if (prev.includes(definition.id)) {
+                return prev.filter((prevId) => prevId !== definition.id)
+              } else {
+                return [...prev, definition.id]
+              }
+            })
+          }
+
+          const isSelected = selectedDefinitionIds.includes(definition.id)
+
+          items.push({
+            key: `definition-${definition.id}`,
+            title: definition.title,
+            isSelected,
+            onClick: onClickDefinition,
+            prefix: (
+              <>
+                {definitionGroup === NULL_DEFINITION_GROUP ? null : <InfiniteSideNavIndent className="side-nav-indent" />}
+                <CheckBox checked={isSelected} onClick={onClickDefinition} />
+              </>
+            )
           })
-        }
-
-        const isSelected = selectedDefinitionIds.includes(definition.id)
-
-        items.push({
-          key: `definition-${definition.id}`,
-          title: definition.title,
-          isSelected,
-          onClick: onClickDefinition,
-          prefix: (
-            <>
-              {definitionGroup === NULL_DEFINITION_GROUP ? null : <InfiniteSideNavIndent className="side-nav-indent" />}
-              <CheckBox checked={isSelected} onClick={onClickDefinition} />
-            </>
-          )
         })
-      })
+      }
     })
 
     if (items.length > 0) {
@@ -99,7 +102,7 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
     }
 
     return items
-  }, [definitions, selectedDefinitionIds, ref, setSelectedDefinitionIds])
+  }, [definitions, selectedDefinitionIds, ref, setSelectedDefinitionIds, folding])
 
   return (
     <StyledInfiniteSideNav size="s" items={sideNavItems} />

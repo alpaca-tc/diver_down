@@ -69,21 +69,21 @@ RSpec.describe Diverdown::Web do
       })
     end
 
-    describe 'query' do
-      def assert_query(query, expected_ids)
-        get "/api/definitions.json?query=#{query}"
+    describe 'title' do
+      def assert_title(title, expected_ids)
+        get "/api/definitions.json?title=#{title}"
 
         definitions = JSON.parse(last_response.body)['definitions']
         ids = definitions.map { _1['id'] }
 
         expect(ids).to match_array(expected_ids), -> {
-          "query: #{query.inspect}\n" \
+          "title: #{title.inspect}\n" \
           "expected_ids: #{expected_ids.inspect}\n" \
           "actual_ids: #{ids.inspect}"
         }
       end
 
-      it 'filters definitions by query=value' do
+      it 'filters definitions by title=value' do
         definition_1 = Diverdown::Definition.new(
           title: '01234',
           sources: [
@@ -103,20 +103,65 @@ RSpec.describe Diverdown::Web do
 
         definition_1_id, definition_2_id = store.set(definition_1, definition_2)
 
-        assert_query 'unknown', []
+        assert_title 'unknown', []
 
         # Strict match
-        assert_query '01234', [definition_1_id]
-        assert_query '56789', [definition_2_id]
-        assert_query 'a.rb', [definition_1_id]
-        assert_query 'b.rb', [definition_2_id]
+        assert_title '01234', [definition_1_id]
+        assert_title '56789', [definition_2_id]
+        assert_title 'a.rb', []
 
         # like match
-        assert_query '0', [definition_1_id]
-        assert_query '1', [definition_1_id]
-        assert_query '4', [definition_1_id]
-        assert_query 'a', [definition_1_id]
-        assert_query 'b.', [definition_2_id]
+        assert_title '0', [definition_1_id]
+        assert_title '1', [definition_1_id]
+        assert_title 'a', []
+      end
+    end
+
+    describe 'source' do
+      def assert_source(source, expected_ids)
+        get "/api/definitions.json?source=#{source}"
+
+        definitions = JSON.parse(last_response.body)['definitions']
+        ids = definitions.map { _1['id'] }
+
+        expect(ids).to match_array(expected_ids), -> {
+          "source: #{source.inspect}\n" \
+          "expected_ids: #{expected_ids.inspect}\n" \
+          "actual_ids: #{ids.inspect}"
+        }
+      end
+
+      it 'filters definitions by source=value' do
+        definition_1 = Diverdown::Definition.new(
+          title: '01234',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source_name: 'a.rb'
+            ),
+          ]
+        )
+        definition_2 = Diverdown::Definition.new(
+          title: '56789',
+          sources: [
+            Diverdown::Definition::Source.new(
+              source_name: 'b.rb'
+            ),
+          ]
+        )
+
+        definition_1_id, definition_2_id = store.set(definition_1, definition_2)
+
+        assert_source 'unknown', []
+
+        # Strict match
+        assert_source '01234', []
+        assert_source 'a.rb', [definition_1_id]
+        assert_source 'b.rb', [definition_2_id]
+
+        # like match
+        assert_source '0', []
+        assert_source 'a', [definition_1_id]
+        assert_source 'b.', [definition_2_id]
       end
     end
   end

@@ -27,7 +27,7 @@ export {
   defaultRadius,
   defaultSpacing,
   useTheme,
-  FaCogIcon,
+  FaGearIcon,
 } from 'smarthr-ui'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'
