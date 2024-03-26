@@ -19,7 +19,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
   const response = await get<CombinedDefinitionReponse>(requestPath)
 
   return {
-    ids: bitIdToIds(response.bit_id),
+    ids: bitIdToIds(BigInt(response.bit_id)),
     title: response.title,
     dot: response.dot,
     sources: response.sources.map((source) => ({

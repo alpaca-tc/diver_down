@@ -65,30 +65,6 @@ module Diverdown
         end
       end
 
-      # GET /api/definitions/:bit_id.json
-      #
-      # @param bit_id [Integer]
-      def combine_definitions(bit_id)
-        ids = Diverdown::Web::BitId.bit_id_to_ids(bit_id)
-
-        valid_ids = ids.select do
-          @store.key?(_1)
-        end
-
-        definition = fetch_definition(valid_ids)
-
-        if definition
-          json(
-            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids),
-            title: definition.title,
-            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
-            sources: definition.sources.map { { source_name: _1.source_name } }
-          )
-        else
-          not_found
-        end
-      end
-
       # GET /api/sources/:source_name.json
       #
       # @param source_name [String]
