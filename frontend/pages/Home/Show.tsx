@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import {
   Aside,
-  Heading,
   PageHeading,
   Section,
   Sidebar,
 } from '@/components/ui'
 import { color, spacing } from '@/constants/theme'
+import { useBitIdHash } from '@/hooks/useBitIdHash'
 
 import { DefinitionList } from './components/DefinitionList'
 import { DefinitionView } from './components/DefinitionView'
 
 export const Show: React.FC = () => {
-  const [selectedDefinitionIds, setSelectedDefinitionIds] = useState<number[]>([])
+  const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
 
   return (
     <>
@@ -37,6 +37,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: calc(100% - ${spacing.XS} - ${spacing.XS} - ${spacing.XS}); // 100% - padding-top of layout - height of StyledPageHeading
+  width: 100vw;
 `
 
 const StyledSidebar = styled(Sidebar)`
@@ -51,11 +52,10 @@ const StyledPageHeading = styled(PageHeading)`
 
 const StyledSection = styled(Section)`
   box-sizing: border-box;
-  padding: ${spacing.XXS} ${spacing.S};
 `
 
 const StyledAside = styled(Aside)`
-  width: 300px;
+  width: 200px;
   box-sizing: border-box;
   border-top: 1px solid ${color.BORDER};
   border-right: 1px solid ${color.BORDER};
@@ -63,11 +63,6 @@ const StyledAside = styled(Aside)`
   height: inherit;
 
   &:hover {
-    width: 100%;
-
-    & + * {
-      // Hide main content
-      display: none;
-    }
+    width: 80%;
   }
 `

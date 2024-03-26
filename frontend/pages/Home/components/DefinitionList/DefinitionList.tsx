@@ -39,22 +39,27 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
     setVisibleDialog(null)
   }, [setVisibleDialog])
 
+  const onClickReset = useCallback(() => {
+    setSelectedDefinitionIds([])
+  }, [setSelectedDefinitionIds])
+
   return (
     isLoading ?
       (<Loading text="Loading..." alt="Loading" />) :
       (
         <StyledSection>
-          <ConfigureSearchOptionsDialog isOpen={visibleDialog === 'configureSearchOptionsDiaglog'} onClickClose={onClickCloseDialog} searchDefinitionsOptions={searchDefinitionsOptions} setSearchDefinitionsOptions={setSearchDefinitionsOptions} />
           <Cluster align="center">
             <Cluster gap={0.5}>
               <Button size="s" square onClick={() => setVisibleDialog('configureSearchOptionsDiaglog')} prefix={<FaGearIcon alt="Open Options" />}>
                 Open Options
               </Button>
+              <Button size="s" onClick={onClickReset}>Clear</Button>
             </Cluster>
           </Cluster>
+          <ConfigureSearchOptionsDialog isOpen={visibleDialog === 'configureSearchOptionsDiaglog'} onClickClose={onClickCloseDialog} searchDefinitionsOptions={searchDefinitionsOptions} setSearchDefinitionsOptions={setSearchDefinitionsOptions} />
           <InView>
             {({ inView, ref }) => (
-              <List ref={ref} definitions={definitions} setSelectedDefinitionIds={setSelectedDefinitionIds} selectedDefinitionIds={selectedDefinitionIds} loadNextPage={loadNextPage} inView={inView} folding={searchDefinitionsOptions.folding} />
+              <List ref={ref} definitions={definitions} setSelectedDefinitionIds={setSelectedDefinitionIds} selectedDefinitionIds={selectedDefinitionIds} loadNextPage={loadNextPage} inView={inView} folding={searchDefinitionsOptions.folding} isReachingEnd={isReachingEnd} />
             )}
           </InView>
         </StyledSection>
@@ -63,5 +68,5 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
 }
 
 const StyledSection = styled(Section)`
-  height: inherit;
+  height: 70vh;
 `

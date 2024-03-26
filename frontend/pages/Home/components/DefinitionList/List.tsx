@@ -18,10 +18,11 @@ type Props = {
   definitions: Definition[]
   selectedDefinitionIds: number[]
   setSelectedDefinitionIds: React.Dispatch<React.SetStateAction<number[]>>
+  isReachingEnd: boolean
 }
 
 export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
-  const { definitions, inView, loadNextPage, selectedDefinitionIds, setSelectedDefinitionIds, folding } = props
+  const { definitions, inView, loadNextPage, selectedDefinitionIds, setSelectedDefinitionIds, folding, isReachingEnd } = props
 
   useEffect(() => {
     if (inView) {
@@ -101,8 +102,17 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
       items[items.length - 1].ref = ref
     }
 
+    if (isReachingEnd) {
+      items.push({
+        key: `definition-reaching-end`,
+        title: '--- Reached the end ---',
+        isSelected: false,
+        onClick: () => {},
+      })
+    }
+
     return items
-  }, [definitions, selectedDefinitionIds, ref, setSelectedDefinitionIds, folding])
+  }, [definitions, selectedDefinitionIds, ref, setSelectedDefinitionIds, folding, isReachingEnd])
 
   return (
     <StyledInfiniteSideNav size="s" items={sideNavItems} />

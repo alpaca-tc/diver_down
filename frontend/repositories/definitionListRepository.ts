@@ -19,7 +19,7 @@ type DefinitionsResponse = {
   pagination: PaginationResponse
 }
 
-export const PER = 5
+export const PER = 100
 
 export const useDefinitionList = (
   query: { title: string, source: string },
@@ -49,7 +49,7 @@ export const useDefinitionList = (
   }, [])
 
   const { data, isLoading, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, { keepPreviousData })
-  const isReachingEnd = data?.[0]?.length === 0 || (data && data?.[data?.length - 1]?.length < PER)
+  const isReachingEnd = !!(data?.[0]?.length === 0 || (data && data?.[data?.length - 1]?.length < PER))
 
   const definitions = (data ?? []).flat()
 
