@@ -52,6 +52,7 @@ const StyledPageHeading = styled(PageHeading)`
 
 const StyledSection = styled(Section)`
   box-sizing: border-box;
+  height: inherit;
 `
 
 const StyledAside = styled(Aside)`

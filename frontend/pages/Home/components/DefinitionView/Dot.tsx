@@ -1,6 +1,7 @@
-import { Graphviz } from '@hpcc-js/wasm/graphviz'
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import styled from 'styled-components'
+
+import { renderDot } from "@/utils/renderDot"
 
 type Props = {
   dot: string
@@ -8,30 +9,37 @@ type Props = {
 
 export const Dot: FC<Props> = ({ dot }) => {
   const [svg, setSvg] = useState<string>('');
-  const widthRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (dot && widthRef.current) {
+    if (dot) {
       const loadSvg = async () => {
         if (dot) {
-          const graphviz = await Graphviz.load();
-          setSvg(graphviz.dot(dot));
+          setSvg(await renderDot(dot));
         } else {
           setSvg('');
         }
       }
 
       loadSvg()
+    } else {
+      setSvg('');
     }
   }, [dot, setSvg])
 
   if (!dot || !svg) return null;
 
   return (
-    <Wrapper dangerouslySetInnerHTML={{ __html: svg }} />
+    <Wrapper>
+      <Svg dangerouslySetInnerHTML={{ __html: svg }} />
+    </Wrapper>
   )
 }
 
 const Wrapper = styled.div`
-  width: 80px;
+  height: inherit;
+  width: 100%;
+  overflow: scroll;
+`
+
+const Svg = styled.div`
 `

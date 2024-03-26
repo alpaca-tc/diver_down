@@ -12,8 +12,6 @@ type Props = {
 
 export const Content: FC<Props> = ({ combinedDefinition }) => (
     <StyledSection>
-      {combinedDefinition.ids}
-      {combinedDefinition.title}
       <Dot dot={combinedDefinition.dot} />
     </StyledSection>
   )
@@ -21,5 +19,4 @@ export const Content: FC<Props> = ({ combinedDefinition }) => (
 
 const StyledSection = styled(Section)`
   height: inherit;
-  overflow: scroll;
 `
