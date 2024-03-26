@@ -1,5 +1,4 @@
-export const bitIdToIds = (stringBitId: string): number[] => {
-  let bitId = BigInt(stringBitId)
+export const bitIdToIds = (bitId: bigint): number[] => {
   const ids: number[] = []
   let shift = 0
 
@@ -17,4 +16,7 @@ export const bitIdToIds = (stringBitId: string): number[] => {
 
 const idToBitId = (id: number): bigint => 1n << BigInt(id - 1)
 
-export const idsToBitId = (ids: number[]): string => String(ids.reduce((current, id) => current | idToBitId(id), 0n))
+export const idsToBitId = (ids: number[]): bigint => {
+  const bitId = ids.reduce((current, id) => current | idToBitId(id), 0n)
+  return bitId
+}

@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from "react"
 import { useSearchParams } from "react-router-dom";
 
-import { bitIdToIds, idsToBitId } from "@/utils/bitId"
+import {
+  bitIdToIds,
+  encode as bitIdToString,
+  idsToBitId,
+  decode as stringToBitId,
+} from "@/utils/bitId"
 
 const KEY = 'bit_id'
 
 const encode = (ids: number[]): string => {
   const bitId = idsToBitId(ids)
-  return btoa(bitId)
+  return bitIdToString(bitId)
 }
 
 const decode = (bitId64: string): number[] => {
-  const bitId = atob(bitId64)
+  const bitId = stringToBitId(bitId64)
   return bitIdToIds(bitId)
 }
 
