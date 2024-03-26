@@ -122,8 +122,6 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
 const StyledInfiniteSideNav = styled(InfiniteSideNav)`
   background-color: ${color.WHITE};
   text-wrap: nowrap;
-  height: inherit;
-  overflow: scroll;
 
   li:not(.selected) {
     background-color: ${color.WHITE};

@@ -68,5 +68,6 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
 }
 
 const StyledSection = styled(Section)`
-  height: 70vh;
+  height: inherit;
+  overflow: scroll;
 `
