@@ -2,7 +2,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { Loading } from "@/components/Loading"
-import { Heading, Section, Stack } from "@/components/ui"
+import { Section } from "@/components/ui"
 import { spacing } from "@/constants/theme"
 import { useCombinedDefinition } from "@/repositories/combinedDefinitionRepository"
 
@@ -23,9 +23,7 @@ export const DefinitionView: FC<Props> = ({ definitionIds }) => {
         ) : !combinedDefinition ? (
           <p>No data</p>
         ) : (
-          <Stack>
-            <Content combinedDefinition={combinedDefinition} />
-          </Stack>
+          <Content combinedDefinition={combinedDefinition} />
         )}
       </Padding>
     </StyledSection>
@@ -39,4 +37,5 @@ const StyledSection = styled(Section)`
 
 const Padding = styled.div`
   padding: ${spacing.XXS} ${spacing.S};
+  height: calc(100% - ${spacing.XXS} - ${spacing.XXS});
 `
