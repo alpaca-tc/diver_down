@@ -15,6 +15,7 @@ import { useCombinedDefinition } from "@/repositories/combinedDefinitionReposito
 
 import { DefinitionGraph } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'
+import { DefinitionSources } from './components/DefinitionSources'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
@@ -29,15 +30,18 @@ export const Show: React.FC = () => {
             <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
           </StyledAside>
           <StyledSection>
-            <Stack>
+            <StyledStack>
               {isLoading ? (
                 <Loading text="Loading..." alt="Loading" />
               ) : !combinedDefinition ? (
                 <p>No data</p>
               ) : (
-                <DefinitionGraph combinedDefinition={combinedDefinition} />
+                <>
+                  <StyledDefinitionGraph combinedDefinition={combinedDefinition} />
+                  <StyledDefinitionSources combinedDefinition={combinedDefinition} />
+                </>
               )}
-            </Stack>
+            </StyledStack>
           </StyledSection>
         </StyledSidebar>
       </Wrapper>
@@ -62,15 +66,29 @@ const StyledPageHeading = styled(PageHeading)`
   margin-bottom: ${spacing.XS};
 `
 
-const StyledSection = styled(Section)`
-  box-sizing: border-box;
-  height: inherit;
-`
-
 const StyledAside = styled(Aside)`
   box-sizing: border-box;
   border-top: 1px solid ${color.BORDER};
   border-right: 1px solid ${color.BORDER};
   background-color: ${color.WHITE};
   height: inherit;
+`
+
+const StyledSection = styled(Section)`
+  box-sizing: border-box;
+  height: inherit;
+`
+
+const StyledStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  height: inherit;
+`
+
+const StyledDefinitionGraph = styled(DefinitionGraph)`
+  height: inherit;
+`
+
+const StyledDefinitionSources = styled(DefinitionSources)`
+  flex: 1;
 `

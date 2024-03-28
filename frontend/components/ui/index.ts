@@ -2,10 +2,13 @@ export {
   ActionDialog,
   AppNavi,
   Aside,
+  Base,
   Button,
   CheckBox,
   Cluster,
+  EmptyTableBody,
   FONT_FAMILY,
+  FaGearIcon,
   FormControl,
   Heading,
   Input,
@@ -16,6 +19,10 @@ export {
   SideNav,
   Sidebar,
   Stack,
+  Table,
+  Td,
+  Text,
+  Th,
   UnstyledButton,
   createTheme,
   defaultBorder,
@@ -27,7 +34,6 @@ export {
   defaultRadius,
   defaultSpacing,
   useTheme,
-  FaGearIcon,
 } from 'smarthr-ui'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'

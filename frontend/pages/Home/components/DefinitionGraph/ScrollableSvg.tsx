@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from "react"
+import React, { FC, useState } from "react"
 import { ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom';
 import { ReactSvgPanZoomLoader} from 'react-svg-pan-zoom-loader'
 import styled from "styled-components";
@@ -27,6 +27,7 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
   if (!svg) return null
 
   const svgSize = extractSvgSize(svg)
+  console.log(size)
 
   return (
     <Wrapper ref={observeRef}>
