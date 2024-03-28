@@ -4,12 +4,11 @@ import styled from 'styled-components'
 import { Loading } from '@/components/Loading'
 import {
   Aside,
-  PageHeading,
   Section,
   Sidebar,
   Stack,
 } from '@/components/ui'
-import { color, spacing } from '@/constants/theme'
+import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
 import { useCombinedDefinition } from "@/repositories/combinedDefinitionRepository"
 

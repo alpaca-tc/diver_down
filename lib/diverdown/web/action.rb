@@ -92,7 +92,7 @@ module Diverdown
       def source(source_name)
         found_sources = []
         related_definitions = []
-        reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
+        reverse_dependencies = Hash.new { |h, dependency_source_name| h[dependency_source_name] = Diverdown::Definition::Dependency.new(source_name: dependency_source_name) }
 
         @store.each do |id, definition|
           found_source = nil
@@ -100,14 +100,17 @@ module Diverdown
           definition.sources.each do |definition_source|
             found_source = definition_source if definition_source.source_name == source_name
 
-            dependencies = definition_source.dependencies.select do |dependency|
+            found_reverse_dependencies = definition_source.dependencies.select do |dependency|
               dependency.source_name == source_name
             end
 
-            method_ids = dependencies.flat_map(&:method_ids).uniq.sort
+            found_reverse_dependencies.each do |dependency|
+              reverse_dependency = reverse_dependencies[dependency.source_name]
 
-            method_ids.each do |method_id|
-              reverse_dependencies[definition_source.source_name].add(method_id)
+              dependency.method_ids.each do |method_id|
+                reverse_method_id = reverse_dependency.find_or_build_method_id(name: method_id.name, context: method_id.context)
+                reverse_method_id.paths.merge(method_id.paths)
+              end
             end
           end
 
@@ -134,10 +137,16 @@ module Diverdown
               title: definition.title,
             }
           end,
-          reverse_dependencies: reverse_dependencies.map { |dependency_source_name, method_ids|
+          reverse_dependencies: reverse_dependencies.values.map { |reverse_dependency|
             {
-              source_name: dependency_source_name,
-              method_ids: method_ids.map(&:to_h),
+              source_name: reverse_dependency.source_name,
+              method_ids: reverse_dependency.method_ids.sort.map do |method_id|
+                {
+                  context: method_id.context,
+                  name: method_id.name,
+                  paths: method_id.paths.sort,
+                }
+              end,
             }
           }
         )
@@ -151,6 +160,10 @@ module Diverdown
       private
 
       attr_reader :request, :store
+
+      def build_method_id_key(dependency, method_id)
+        "#{dependency.source_name}-#{method_id.context}-#{method_id.name}"
+      end
 
       def paginate(enumerator, page, per)
         start_index = (page - 1) * per

@@ -44,7 +44,7 @@ export const useSource = (sourceName: string) => {
   const { data, isLoading } = useSWR(
     path.api.sources.show(sourceName),
     async (): Promise<SpecificSource> => {
-      const response = await get<SpecificSourceResponse>(path.api.sources.index())
+      const response = await get<SpecificSourceResponse>(path.api.sources.show(sourceName))
 
       return {
         sourceName: response.source_name,
@@ -62,5 +62,5 @@ export const useSource = (sourceName: string) => {
     }
   )
 
-  return { data, isLoading }
+  return { specificSource: data, isLoading }
 }

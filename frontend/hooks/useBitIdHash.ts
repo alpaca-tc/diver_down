@@ -8,7 +8,7 @@ import {
   decode as stringToBitId,
 } from "@/utils/bitId"
 
-const KEY = 'bit_id'
+export const KEY = 'bit_id'
 
 const encode = (ids: number[]): string => {
   const bitId = idsToBitId(ids)

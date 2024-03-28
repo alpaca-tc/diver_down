@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<Layout isLoading={false} />}>
           <Route path={path.home()} element={<Home />} />
           <Route path={path.sources.index()} element={<SourceIndex />} />
-          <Route path={path.sources.show(':source_name')} element={<SourceShow />} />
+          <Route path={path.sources.show(':sourceName')} element={<SourceShow />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

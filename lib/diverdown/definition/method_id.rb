@@ -8,7 +8,7 @@ module Diverdown
 
       include Comparable
 
-      attr_reader :name, :context
+      attr_reader :name, :context, :paths
 
       # @param name [String, Symbol]
       # @param context ['instance', 'class']
@@ -28,11 +28,6 @@ module Diverdown
         end
       end
 
-      # @return [Array<String>]
-      def paths
-        @paths.sort
-      end
-
       # @return [String]
       def human_method_name
         prefix = context == 'instance' ? '#' : '.'
@@ -44,7 +39,7 @@ module Diverdown
         {
           name:,
           context:,
-          paths:,
+          paths: @paths.sort,
         }
       end
 
