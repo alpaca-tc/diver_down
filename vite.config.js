@@ -6,9 +6,11 @@ import { defineConfig } from 'vite';
 
 /// <reference types="vitest" />
 // https://vitejs.dev/config/
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   root: 'frontend',
   plugins: [reactSwc(), reactRefresh()],
+
   test: {
     include: ['**/__tests__/*.test.{ts,tsx}']
   },
@@ -36,6 +38,16 @@ export default defineConfig({
       },
       output: {
         entryFileNames: `assets/[name]/bundle.js`,
+        assetFileNames: (assetInfo) => {
+          const { name } = assetInfo
+
+          if (name === '.css') {
+            // FIXME: Hotfix for a bug that somehow the extension disappears from the output of smarthr-ui/smarthr-ui.css.
+            return `assets/[hash][extname][name]`
+          } else {
+            return `assets/[name][hash][extname]`
+          }
+        },
       },
     },
   },
