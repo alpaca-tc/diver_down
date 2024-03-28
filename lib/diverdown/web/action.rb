@@ -5,36 +5,12 @@ require 'json'
 module Diverdown
   class Web
     class Action
-      IMPORTMAP_JSON = File.join(WEB_DIR, 'importmap.json')
-      private_constant :IMPORTMAP_JSON
-
-      module Helpers
-        # @param path [String]
-        # @return [String]
-        def asset_path(path)
-          File.join(WEB_DIR, 'assets', path)
-        end
-
-        # @return [String]
-        def javascript_importmap_tags
-          <<~EOS
-            <script type="importmap">
-              #{File.read(IMPORTMAP_JSON)}
-            </script>
-          EOS
-        end
-
-        # @param store [Diverdown::Definition::Store]
-        # @yield [Diverdown::Definition]
-        # @return [Enumerator]
-        def each_definition(store)
-          Diverdown::Web::DefinitionEnumerator.new(store).each do
-            yield(_1)
-          end
-        end
-      end
-
-      private_constant :Helpers
+      Pagination = Data.define(
+        :current_page,
+        :total_pages,
+        :total_count,
+        :per
+      )
 
       # @param store [Diverdown::Definition::Store]
       # @param request [Rack::Request]
@@ -43,15 +19,54 @@ module Diverdown
         @request = request
       end
 
-      # @return [Array[Integer, Hash, Array]]
-      def index
-        body = erb(:index, locals: { store: @store })
-        [200, { 'content-type' => 'text/html' }, [body]]
+      # GET /api/sources.json
+      def sources
+        source_names = Set.new
+
+        # rubocop:disable Style/HashEachMethods
+        @store.each do |_, definition|
+          definition.sources.each do |source|
+            source_names.add(source.source_name)
+          end
+        end
+        # rubocop:enable Style/HashEachMethods
+
+        json(
+          sources: source_names.sort.map do |source_name|
+            {
+              source_name:,
+            }
+          end
+        )
       end
 
+      # GET /api/definitions.json
+      #
+      # @param page [Integer]
+      # @param per [Integer]
+      # @param title [String]
+      # @param source [String]
+      def definitions(page:, per:, title:, source:)
+        definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store, title:, source:)
+        definitions, pagination = paginate(definition_enumerator, page, per)
+
+        json(
+          definitions: definitions.map do |(id, definition)|
+            {
+              id:,
+              definition_group: definition.definition_group,
+              title: definition.title,
+            }
+          end,
+          pagination: pagination.to_h
+        )
+      end
+
+      # GET /api/definitions/:bit_id.json
+      #
       # @param bit_id [Integer]
       def combine_definitions(bit_id)
-        ids = @store.bit_id.separate_bit_id(bit_id)
+        ids = Diverdown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
           @store.key?(_1)
@@ -61,7 +76,7 @@ module Diverdown
 
         if definition
           json(
-            bit_id: valid_ids.inject(0, :|),
+            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
             title: definition.title,
             dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }
@@ -71,34 +86,41 @@ module Diverdown
         end
       end
 
+      # GET /api/sources/:source_name.json
+      #
       # @param source_name [String]
       def source(source_name)
         found_sources = []
         related_definitions = []
-        reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
+        reverse_dependencies = Hash.new { |h, dependency_source_name| h[dependency_source_name] = Diverdown::Definition::Dependency.new(source_name: dependency_source_name) }
 
-        @store.each do |bit_id, definition|
+        @store.each do |id, definition|
           found_source = nil
 
           definition.sources.each do |definition_source|
             found_source = definition_source if definition_source.source_name == source_name
 
-            dependencies = definition_source.dependencies.select do |dependency|
+            found_reverse_dependencies = definition_source.dependencies.select do |dependency|
               dependency.source_name == source_name
             end
 
-            method_ids = dependencies.flat_map(&:method_ids).uniq.sort
+            found_reverse_dependencies.each do |dependency|
+              reverse_dependency = reverse_dependencies[dependency.source_name]
 
-            method_ids.each do |method_id|
-              reverse_dependencies[definition_source.source_name].add(method_id)
+              dependency.method_ids.each do |method_id|
+                reverse_method_id = reverse_dependency.find_or_build_method_id(name: method_id.name, context: method_id.context)
+                reverse_method_id.paths.merge(method_id.paths)
+              end
             end
           end
 
           if found_source
             found_sources << found_source
-            related_definitions << [bit_id, definition]
+            related_definitions << [id, definition]
           end
         end
+
+        return not_found if related_definitions.empty?
 
         modules = if found_sources.empty?
                     []
@@ -106,12 +128,28 @@ module Diverdown
                     Diverdown::Definition::Source.combine(*found_sources).modules
                   end
 
-        if related_definitions.empty?
-          not_found
-        else
-          body = erb(:source, locals: { source_name:, modules:, related_definitions:, reverse_dependencies: })
-          [200, { 'content-type' => 'text/html' }, [body]]
-        end
+        json(
+          source_name:,
+          modules: modules.map(&:to_h),
+          related_definitions: related_definitions.map do |id, definition|
+            {
+              id:,
+              title: definition.title,
+            }
+          end,
+          reverse_dependencies: reverse_dependencies.values.map { |reverse_dependency|
+            {
+              source_name: reverse_dependency.source_name,
+              method_ids: reverse_dependency.method_ids.sort.map do |method_id|
+                {
+                  context: method_id.context,
+                  name: method_id.name,
+                  paths: method_id.paths.sort,
+                }
+              end,
+            }
+          }
+        )
       end
 
       # @return [Array[Integer, Hash, Array]]
@@ -122,6 +160,35 @@ module Diverdown
       private
 
       attr_reader :request, :store
+
+      def build_method_id_key(dependency, method_id)
+        "#{dependency.source_name}-#{method_id.context}-#{method_id.name}"
+      end
+
+      def paginate(enumerator, page, per)
+        start_index = (page - 1) * per
+        end_index = start_index + per - 1
+
+        items = []
+        enumerator.each_with_index do |item, index|
+          next if index < start_index
+          break if index > end_index
+
+          items.push(item)
+        end
+
+        total_count = enumerator.size
+
+        [
+          items,
+          Pagination.new(
+            current_page: page,
+            total_pages: [(total_count.to_f / per).ceil, 1].max,
+            total_count:,
+            per:
+          ),
+        ]
+      end
 
       def fetch_definition(ids)
         case ids.length
@@ -139,24 +206,8 @@ module Diverdown
         Diverdown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
       end
 
-      def view_path(path)
-        File.join(WEB_DIR, path)
-      end
-
       def json(data)
         [200, { 'content-type' => 'application/json' }, [data.to_json]]
-      end
-
-      def erb(template, locals: { _: nil })
-        path = view_path("#{template}.erb")
-        content = File.read(path)
-
-        isolated_environment = Data.define(*locals.keys) do
-          include Helpers
-        end.new(**locals)
-
-        b = isolated_environment.instance_eval { binding }
-        ERB.new(content).result(b)
       end
     end
   end

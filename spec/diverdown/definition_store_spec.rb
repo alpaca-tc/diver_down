@@ -5,7 +5,11 @@ RSpec.describe Diverdown::DefinitionStore do
     describe '#get' do
       it 'raises KeyError if key not found' do
         store = described_class.new
-        expect { store.get('unknown') }.to raise_error(KeyError)
+        definition = Diverdown::Definition.new
+        store.set(definition)
+
+        expect { store.get(0) }.to raise_error(KeyError)
+        expect { store.get(2) }.to raise_error(KeyError)
       end
 
       it 'returns definition if key is found' do
@@ -16,13 +20,32 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
+    describe '#set' do
+      it 'set definitions' do
+        store = described_class.new
+        definition_1 = Diverdown::Definition.new(title: 'a')
+        definition_2 = Diverdown::Definition.new(title: 'b')
+        definition_3 = Diverdown::Definition.new(title: 'c')
+        ids = store.set(definition_1, definition_2, definition_3)
+        expect(ids).to eq([1, 2, 3])
+      end
+
+      it 'raises exception if definition already set' do
+        store = described_class.new
+        definition = Diverdown::Definition.new(title: 'a')
+        store.set(definition)
+
+        expect { store.set(definition) }.to raise_error(ArgumentError, /Definition already set/)
+      end
+    end
+
     describe '#definition_groups' do
       it 'returns definition_groups' do
         store = described_class.new
         definition_1 = Diverdown::Definition.new
         definition_2 = Diverdown::Definition.new(definition_group: 'b')
-        definition_3 = Diverdown::Definition.new(definition_group: 'c')
-        definition_4 = Diverdown::Definition.new(definition_group: 'c')
+        definition_3 = Diverdown::Definition.new(definition_group: 'c', title: '1')
+        definition_4 = Diverdown::Definition.new(definition_group: 'c', title: '2')
         store.set(definition_1, definition_2, definition_3, definition_4)
 
         expect(store.definition_groups).to eq(['b', 'c', nil])
@@ -34,8 +57,8 @@ RSpec.describe Diverdown::DefinitionStore do
         store = described_class.new
         definition_1 = Diverdown::Definition.new
         definition_2 = Diverdown::Definition.new(definition_group: 'b')
-        definition_3 = Diverdown::Definition.new(definition_group: 'c')
-        definition_4 = Diverdown::Definition.new(definition_group: 'c')
+        definition_3 = Diverdown::Definition.new(definition_group: 'c', title: '1')
+        definition_4 = Diverdown::Definition.new(definition_group: 'c', title: '2')
         store.set(definition_1, definition_2, definition_3, definition_4)
 
         expect(store.filter_by_definition_group(nil)).to eq([definition_1])
@@ -44,24 +67,24 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
-    describe '#get_bit_id' do
+    describe '#get_id' do
       it 'raises KeyError if key not found' do
         store = described_class.new
-        expect { store.get(Diverdown::Definition.new) }.to raise_error(KeyError)
+        expect { store.get_id(Diverdown::Definition.new) }.to raise_error(KeyError)
       end
 
       it 'returns bit_id if definition is found' do
         store = described_class.new
         definition = Diverdown::Definition.new
         ids = store.set(definition)
-        expect(store.get_bit_id(definition)).to eq(ids[0])
+        expect(store.get_id(definition)).to eq(ids[0])
       end
     end
 
     describe '#key?' do
       it 'raises KeyError if key not found' do
         store = described_class.new
-        expect(store.key?('unknown')).to be(false)
+        expect(store.key?(0)).to be(false)
       end
 
       it 'returns definition if key is found' do

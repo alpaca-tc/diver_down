@@ -1,0 +1,6 @@
+{
+  "extends": ["stylelint-config-smarthr"],
+  "rules": {
+    "media-query-no-invalid": null
+  }
+}

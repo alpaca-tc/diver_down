@@ -14,17 +14,24 @@ module Diverdown
     # @raise [KeyError] if the id is not found
     # @return [Diverdown::Definition]
     def get(id)
-      @store.fetch(id)
+      index = id - 1
+
+      raise(KeyError, "id not found: #{id}") if id <= 0 || @definitions.size < id
+
+      @definitions.fetch(index)
     end
 
     # @param definitions [Array<Diverdown::Definition>]
     # @return [Array<Integer>] ids of the definitions
     def set(*definitions)
       definitions.map do
-        id = @bit_id.next_id
-        @store[id] = _1
-        @invert_store[_1] = id
+        raise ArgumentError, "Definition already set #{_1.to_h}" if @invert_id.key?(_1)
+
+        id = @definitions.size + 1
+        @definitions.push(_1)
+        @invert_id[_1] = id
         @definition_group_store[_1.definition_group] << _1
+
         id
       end
     end
@@ -49,41 +56,42 @@ module Diverdown
     # @param definition [Diverdown::Definition]
     # @raise [KeyError] if the definition is not found
     # @return [Integer]
-    def get_bit_id(definition)
-      @invert_store.fetch(definition)
+    def get_id(definition)
+      @invert_id.fetch(definition)
     end
 
     # @param id [Integer]
     # @return [Boolean]
     def key?(id)
-      @store.key?(id)
+      id.positive? && id <= @definitions.size
     end
 
     # @return [Integer]
     def length
-      @store.length
+      @definitions.length
     end
     alias size length
 
     # @return [Boolean]
     def empty?
-      @store.empty?
+      @definitions.empty?
     end
 
     # Clear the store
     # @return [void]
     def clear
       # Hash{ Integer(unique bit flag) => Diverdown::Definition }
-      @store = {}
-      @invert_store = {}
-      @bit_id = Diverdown::Definition::BitId.new
+      @definitions = []
+      @invert_id = {}
       @definition_group_store = Hash.new { |h, k| h[k] = [] }
     end
 
     # @yield [Diverdown::Definition]
     def each
+      return enum_for(__method__) unless block_given?
+
       # NOTE: To allow values to be rewritten during #each, duplicate the value through #to_a.
-      @store.to_a.each do |(id, definition)|
+      @definitions.each.with_index(1) do |definition, id|
         yield(id, definition)
       end
     end

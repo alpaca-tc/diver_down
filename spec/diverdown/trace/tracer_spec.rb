@@ -352,7 +352,7 @@ RSpec.describe Diverdown::Trace::Tracer do
           }
         )
 
-        paths = definition.sources.flat_map(&:dependencies).flat_map(&:method_ids).flat_map(&:paths)
+        paths = definition.sources.flat_map(&:dependencies).flat_map(&:method_ids).flat_map { _1.paths.to_a }
         expect(paths).to all(match(/^tracer_class\.rb:\d+/))
       end
 
