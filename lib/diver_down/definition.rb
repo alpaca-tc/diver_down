@@ -2,33 +2,33 @@
 
 require 'securerandom'
 
-module Diverdown
+module DiverDown
   class Definition
-    require 'diverdown/definition/source'
-    require 'diverdown/definition/dependency'
-    require 'diverdown/definition/modulee'
-    require 'diverdown/definition/method_id'
+    require 'diver_down/definition/source'
+    require 'diver_down/definition/dependency'
+    require 'diver_down/definition/modulee'
+    require 'diver_down/definition/method_id'
 
     # @param hash [Hash]
-    # @return [Diverdown::Definition]
+    # @return [DiverDown::Definition]
     def self.from_hash(hash)
       new(
         title: hash[:title] || '',
         definition_group: hash[:definition_group],
         sources: (hash[:sources] || []).map do |source_hash|
-          Diverdown::Definition::Source.from_hash(source_hash)
+          DiverDown::Definition::Source.from_hash(source_hash)
         end
       )
     end
 
     # @param definition_group [String, nil]
     # @param title [String]
-    # @param definitions [Array<Diverdown::Definition>]
+    # @param definitions [Array<DiverDown::Definition>]
     def self.combine(definition_group:, title:, definitions: [])
       all_sources = definitions.flat_map(&:sources)
 
       sources = all_sources.group_by(&:source_name).map do |_, same_sources|
-        Diverdown::Definition::Source.combine(*same_sources)
+        DiverDown::Definition::Source.combine(*same_sources)
       end
 
       new(
@@ -41,7 +41,7 @@ module Diverdown
     attr_reader :definition_group, :title
 
     # @param title [String]
-    # @param sources [Array<Diverdown::Definition::Source>]
+    # @param sources [Array<DiverDown::Definition::Source>]
     def initialize(definition_group: nil, title: '', sources: [])
       @definition_group = definition_group
       @title = title
@@ -49,18 +49,18 @@ module Diverdown
     end
 
     # @param source_name [String]
-    # @return [Diverdown::Definition::Source]
+    # @return [DiverDown::Definition::Source]
     def find_or_build_source(source_name)
-      @source_map[source_name] ||= Diverdown::Definition::Source.new(source_name:)
+      @source_map[source_name] ||= DiverDown::Definition::Source.new(source_name:)
     end
 
     # @param source_name [String]
-    # @return [Diverdown::Definition::Source, nil]
+    # @return [DiverDown::Definition::Source, nil]
     def source(source_name)
       @source_map[source_name]
     end
 
-    # @return [Array<Diverdown::Definition::Source>]
+    # @return [Array<DiverDown::Definition::Source>]
     def sources
       @source_map.values.sort
     end
@@ -79,7 +79,7 @@ module Diverdown
       MessagePack.pack(to_h)
     end
 
-    # @param other [Object, Diverdown::Definition::Source]
+    # @param other [Object, DiverDown::Definition::Source]
     # @return [Boolean]
     def ==(other)
       other.is_a?(self.class) &&

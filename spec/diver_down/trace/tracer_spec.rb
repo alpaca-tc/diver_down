@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Trace::Tracer do
+RSpec.describe DiverDown::Trace::Tracer do
   describe '#initialize' do
     describe 'with relative path target_files' do
       it 'raises ArgumentError' do
@@ -16,7 +16,7 @@ RSpec.describe Diverdown::Trace::Tracer do
   describe '#trace' do
     describe 'when tracing script' do
       # @param path [String]
-      # @return [Diverdown::Definition]
+      # @return [DiverDown::Definition]
       def trace_fixture(path, module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil, definition_group: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)

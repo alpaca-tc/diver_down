@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition::Dependency do
+RSpec.describe DiverDown::Definition::Dependency do
   describe 'ClassMethods' do
     describe '.from_hash' do
       it 'loads hash' do
         dependency = described_class.new(
           source_name: 'a.rb',
           method_ids: [
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'A',
               context: 'class',
               paths: ['a.rb']
@@ -24,7 +24,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         dependency_a = described_class.new(
           source_name: 'b.rb',
           method_ids: [
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'to_s',
               context: 'class',
               paths: ['a.rb']
@@ -35,17 +35,17 @@ RSpec.describe Diverdown::Definition::Dependency do
         dependency_b = described_class.new(
           source_name: 'b.rb',
           method_ids: [
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'to_s',
               context: 'class',
               paths: ['b.rb']
             ),
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'to_i',
               context: 'class',
               paths: ['b.rb']
             ),
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'to_i',
               context: 'instance',
               paths: ['c.rb']
@@ -56,7 +56,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         dependency_c = described_class.new(
           source_name: 'c.rb',
           method_ids: [
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'to_z',
               context: 'class',
               paths: ['c.rb']
@@ -69,17 +69,17 @@ RSpec.describe Diverdown::Definition::Dependency do
             described_class.new(
               source_name: 'b.rb',
               method_ids: [
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'to_s',
                   context: 'class',
                   paths: ['a.rb', 'b.rb']
                 ),
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'to_i',
                   context: 'class',
                   paths: ['b.rb']
                 ),
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'to_i',
                   context: 'instance',
                   paths: ['c.rb']
@@ -89,7 +89,7 @@ RSpec.describe Diverdown::Definition::Dependency do
             described_class.new(
               source_name: 'c.rb',
               method_ids: [
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'to_z',
                   context: 'class',
                   paths: ['c.rb']
@@ -113,7 +113,7 @@ RSpec.describe Diverdown::Definition::Dependency do
           described_class.new(
             source_name: 'a.rb',
             method_ids: [
-              Diverdown::Definition::MethodId.new(
+              DiverDown::Definition::MethodId.new(
                 name: 'A',
                 context: 'class'
               ),
@@ -125,12 +125,12 @@ RSpec.describe Diverdown::Definition::Dependency do
 
     describe '#find_or_build_method_id' do
       it 'returns existing method_id if method_id exists' do
-        class_method_id = Diverdown::Definition::MethodId.new(
+        class_method_id = DiverDown::Definition::MethodId.new(
           name: 'to_s',
           context: 'class',
           paths: ['a.rb']
         )
-        instance_method_id = Diverdown::Definition::MethodId.new(
+        instance_method_id = DiverDown::Definition::MethodId.new(
           name: 'to_s',
           context: 'instance',
           paths: ['a.rb']
@@ -145,7 +145,7 @@ RSpec.describe Diverdown::Definition::Dependency do
       end
 
       it "returns new method_id if method_id doesn't exist" do
-        method_id = Diverdown::Definition::MethodId.new(
+        method_id = DiverDown::Definition::MethodId.new(
           name: 'to_s',
           context: 'class',
           paths: ['a.rb']
@@ -156,7 +156,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         )
 
         expect(dependency.find_or_build_method_id(name: 'to_i', context: 'class')).to eq(
-          Diverdown::Definition::MethodId.new(
+          DiverDown::Definition::MethodId.new(
             context: 'class',
             name: 'to_i'
           )
@@ -166,12 +166,12 @@ RSpec.describe Diverdown::Definition::Dependency do
 
     describe '#method_id' do
       it 'returns existing method_id if method_id exists' do
-        class_method_id = Diverdown::Definition::MethodId.new(
+        class_method_id = DiverDown::Definition::MethodId.new(
           name: 'to_s',
           context: 'class',
           paths: ['a.rb']
         )
-        instance_method_id = Diverdown::Definition::MethodId.new(
+        instance_method_id = DiverDown::Definition::MethodId.new(
           name: 'to_s',
           context: 'instance',
           paths: ['a.rb']
@@ -193,7 +193,7 @@ RSpec.describe Diverdown::Definition::Dependency do
         dependency = described_class.new(
           source_name: 'a.rb',
           method_ids: [
-            Diverdown::Definition::MethodId.new(
+            DiverDown::Definition::MethodId.new(
               name: 'A',
               context: 'class',
               paths: ['a.rb']

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Web
     class ConcurrencyWorker
       # @param concurrency [Integer]

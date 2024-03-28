@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   module Helper
     CLASS_NAME_QUERY = Module.method(:name).unbind.freeze
 

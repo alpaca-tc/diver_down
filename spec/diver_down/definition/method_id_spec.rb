@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition::MethodId do
+RSpec.describe DiverDown::Definition::MethodId do
   describe 'InstanceMethods' do
     describe '#human_method_name' do
       it 'returns a string' do

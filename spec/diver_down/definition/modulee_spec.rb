@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition::Modulee do
+RSpec.describe DiverDown::Definition::Modulee do
   describe 'InstanceMethods' do
     describe '#hash' do
       it 'returns a hash' do
@@ -13,13 +13,13 @@ RSpec.describe Diverdown::Definition::Modulee do
     describe '#<=>' do
       it 'compares with other' do
         array = [
-          Diverdown::Definition::Modulee.new(
+          DiverDown::Definition::Modulee.new(
             module_name: 'a'
           ),
-          Diverdown::Definition::Modulee.new(
+          DiverDown::Definition::Modulee.new(
             module_name: 'b'
           ),
-          Diverdown::Definition::Modulee.new(
+          DiverDown::Definition::Modulee.new(
             module_name: 'c'
           ),
         ].shuffle
@@ -40,7 +40,7 @@ RSpec.describe Diverdown::Definition::Modulee do
 
     describe '#to_h' do
       it 'returns a hash' do
-        modulee = Diverdown::Definition::Modulee.new(
+        modulee = DiverDown::Definition::Modulee.new(
           module_name: 'A'
         )
 

@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Web::DefinitionToDot do
+RSpec.describe DiverDown::Web::DefinitionToDot do
   describe 'InstanceMethods' do
     describe '#to_s' do
       def build_definition(title: 'title', sources: [])
         definition_sources = sources.map do |source|
           dependencies = (source[:dependencies] || []).map do |dependency|
-            Diverdown::Definition::Dependency.new(**dependency)
+            DiverDown::Definition::Dependency.new(**dependency)
           end
 
           modules = (source[:modules] || []).map do |mod|
-            Diverdown::Definition::Modulee.new(**mod)
+            DiverDown::Definition::Modulee.new(**mod)
           end
 
-          Diverdown::Definition::Source.new(**source, dependencies:, modules:)
+          DiverDown::Definition::Source.new(**source, dependencies:, modules:)
         end
 
-        Diverdown::Definition.new(title:, sources: definition_sources)
+        DiverDown::Definition.new(title:, sources: definition_sources)
       end
 
       context 'when definition is blank' do

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'diverdown'
-require 'diverdown-web'
-require 'diverdown-trace'
+require 'diver_down'
+require 'diver_down-web'
+require 'diver_down-trace'
 
 Dir['./spec/support/**/*.rb'].each { require(_1) }
 

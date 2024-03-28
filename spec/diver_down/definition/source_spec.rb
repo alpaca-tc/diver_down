@@ -1,28 +1,28 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition::Source do
+RSpec.describe DiverDown::Definition::Source do
   describe 'ClassMethods' do
     describe '.from_hash' do
       it 'loads hash' do
-        source = Diverdown::Definition::Source.new(
+        source = DiverDown::Definition::Source.new(
           source_name: 'a.rb',
           dependencies: [
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'b.rb',
               method_ids: [
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'A',
                   context: 'class',
                   paths: ['a.rb']
                 ),
               ]
             ),
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'c.rb'
             ),
           ],
           modules: [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'A'
             ),
           ]
@@ -69,10 +69,10 @@ RSpec.describe Diverdown::Definition::Source do
         source_a = described_class.new(
           source_name: 'a.rb',
           dependencies: [
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'b.rb'
             ),
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'c.rb'
             ),
           ]
@@ -81,17 +81,17 @@ RSpec.describe Diverdown::Definition::Source do
         source_b = described_class.new(
           source_name: 'a.rb',
           dependencies: [
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'b.rb',
               method_ids: [
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'to_s',
                   context: 'class',
                   paths: ['a.rb']
                 ),
               ]
             ),
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'd.rb'
             ),
           ]
@@ -101,20 +101,20 @@ RSpec.describe Diverdown::Definition::Source do
           described_class.new(
             source_name: 'a.rb',
             dependencies: [
-              Diverdown::Definition::Dependency.new(
+              DiverDown::Definition::Dependency.new(
                 source_name: 'b.rb',
                 method_ids: [
-                  Diverdown::Definition::MethodId.new(
+                  DiverDown::Definition::MethodId.new(
                     name: 'to_s',
                     context: 'class',
                     paths: ['a.rb']
                   ),
                 ]
               ),
-              Diverdown::Definition::Dependency.new(
+              DiverDown::Definition::Dependency.new(
                 source_name: 'c.rb'
               ),
-              Diverdown::Definition::Dependency.new(
+              DiverDown::Definition::Dependency.new(
                 source_name: 'd.rb'
               ),
             ]
@@ -126,10 +126,10 @@ RSpec.describe Diverdown::Definition::Source do
         source_a = described_class.new(
           source_name: 'a.rb',
           modules: [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'A'
             ),
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'B'
             ),
           ]
@@ -138,10 +138,10 @@ RSpec.describe Diverdown::Definition::Source do
         source_b = described_class.new(
           source_name: 'a.rb',
           modules: [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'A'
             ),
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'B'
             ),
           ]
@@ -150,7 +150,7 @@ RSpec.describe Diverdown::Definition::Source do
         source_c = described_class.new(
           source_name: 'a.rb',
           modules: [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'C'
             ),
           ]
@@ -171,7 +171,7 @@ RSpec.describe Diverdown::Definition::Source do
 
         expect(source.dependencies).to eq(
           [
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'b.rb'
             ),
           ]
@@ -205,10 +205,10 @@ RSpec.describe Diverdown::Definition::Source do
 
         expect(source.modules).to eq(
           [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'A'
             ),
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'B'
             ),
           ]
@@ -241,10 +241,10 @@ RSpec.describe Diverdown::Definition::Source do
         source = described_class.new(
           source_name: 'a.rb',
           dependencies: [
-            Diverdown::Definition::Dependency.new(
+            DiverDown::Definition::Dependency.new(
               source_name: 'b.rb',
               method_ids: [
-                Diverdown::Definition::MethodId.new(
+                DiverDown::Definition::MethodId.new(
                   name: 'A',
                   context: 'class',
                   paths: ['a.rb']
@@ -253,7 +253,7 @@ RSpec.describe Diverdown::Definition::Source do
             ),
           ],
           modules: [
-            Diverdown::Definition::Modulee.new(
+            DiverDown::Definition::Modulee.new(
               module_name: 'A'
             ),
           ]

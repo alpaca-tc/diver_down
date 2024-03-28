@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Trace::ModuleSet do
+RSpec.describe DiverDown::Trace::ModuleSet do
   describe 'InstanceMethods' do
     describe '#include?' do
       it 'checks module or module name' do

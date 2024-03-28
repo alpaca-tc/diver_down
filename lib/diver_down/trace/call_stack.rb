@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   module Trace
     # To handle call stacks obtained by TracePoint more efficiently.
     # TracePoint also acquires calls that are not trace targets, but for dependency extraction, we want to acquire only a list of targets.

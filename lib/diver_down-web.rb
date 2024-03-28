@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require 'diverdown/web'
+require 'diver_down/web'

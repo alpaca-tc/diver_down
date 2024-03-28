@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Helper do
+RSpec.describe DiverDown::Helper do
   describe 'ClassMethods' do
     describe '.normalize_module_name' do
       it 'returns string given module' do

@@ -1,5 +1,5 @@
 {
-  "name": "diverdown",
+  "name": "diver_down",
   "version": "0.1.0",
   "prettier": "prettier-config-smarthr",
   "engines": {
@@ -17,7 +17,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/alpaca-tc/diverdown.git"
+    "url": "git://github.com/alpaca-tc/diver_down.git"
   },
   "scripts": {
     "dev": "vite",

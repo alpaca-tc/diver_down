@@ -1,4 +1,4 @@
-# Diverdown
+# DiverDown
 
 `divertdown` is a tool that dynamically analyzes application dependencies and creates a dependency map.
 This tool was created to analyze Ruby applications for use in large-scale refactoring such as moduler monolith.
@@ -10,7 +10,7 @@ The results of the analysis can be viewed in a browser, allowing you to deepen y
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'diverdown'
+gem 'diver_down'
 ```
 
 And then execute:
@@ -24,11 +24,11 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-tracer = Diverdown::Trace::Tracer.new(
+tracer = DiverDown::Trace::Tracer.new(
   # @param target_files [Array<String>, Set<String>, nil] If nil, all files are targeted but slow.
   # List of target files to be analyzed. Usually, gem and other files are excluded and specified.
   target_files: Dir["app/**/*.rb"],
-  # @param module_set [Array<String>, Diverdown::Trace::ModuleSet] List of modules to be analyzed.
+  # @param module_set [Array<String>, DiverDown::Trace::ModuleSet] List of modules to be analyzed.
   # When analyzing a your Rails application, set all classes/modules under app/.
   module_set: [
     'User',
@@ -38,7 +38,7 @@ tracer = Diverdown::Trace::Tracer.new(
   ],
   # @param filter_method_id_path [#call, nil] The analysis result outputs the absolute path of the caller. To convert to a relative path, define the conversion logic manually.
   filter_method_id_path: -> (path) { path.remove(Rails.root.to_s) },
-  # @param module_finder [#call, nil] Specify the logic to determine which module the source found. diverdown promote moduler monolithization, so such an option exists.
+  # @param module_finder [#call, nil] Specify the logic to determine which module the source found. diver_down promote moduler monolithization, so such an option exists.
   module_finder: -> (source) { 'OrderSystem' if source.source == 'Order' },
 )
 ```
@@ -47,7 +47,7 @@ tracer = Diverdown::Trace::Tracer.new(
 
 After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests.
 
-### Development Diverdown::Web
+### Development DiverDown::Web
 
 ```
 # Start vite
@@ -61,7 +61,7 @@ $ DIVERDOWN_DIR=/path/to/definitions_dir bundle exec puma
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/alpaca-tc/diverdown. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/alpaca-tc/diverdown/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/alpaca-tc/diver_down. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/alpaca-tc/diver_down/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -69,4 +69,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Diverdown project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/alpaca-tc/diverdown/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the DiverDown project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/alpaca-tc/diver_down/blob/main/CODE_OF_CONDUCT.md).

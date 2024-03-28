@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Web
     # Use bitflag for a lightweight representation of a list of bound definitions on a URL.
     # Each definition is related with a unique bitflag, and when merging, the bitflag is calculated with `OR` to represent the merged definitions in a lightweight and fast.

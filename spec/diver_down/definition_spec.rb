@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Definition do
+RSpec.describe DiverDown::Definition do
   describe 'ClassMethods' do
     describe '.from_hash' do
       it 'loads hash' do
@@ -8,18 +8,18 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           definition_group: 'x',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'a.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'b.rb'
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'A'
                 ),
               ]
@@ -36,18 +36,18 @@ RSpec.describe Diverdown::Definition do
         definition_1 = described_class.new(
           title: 'title',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'a.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'b.rb'
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'A'
                 ),
               ]
@@ -58,18 +58,18 @@ RSpec.describe Diverdown::Definition do
         definition_2 = described_class.new(
           title: 'title',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'd.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'e.rb'
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'f.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'B'
                 ),
               ]
@@ -126,25 +126,25 @@ RSpec.describe Diverdown::Definition do
           title: 'title',
           definition_group: 'xxx',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'a.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'b.rb',
                   method_ids: [
-                    Diverdown::Definition::MethodId.new(
+                    DiverDown::Definition::MethodId.new(
                       name: 'A',
                       context: 'class',
                       paths: ['a.rb']
                     ),
                   ]
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'A'
                 ),
               ]
@@ -189,25 +189,25 @@ RSpec.describe Diverdown::Definition do
         definition = described_class.new(
           title: 'title',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'a.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'b.rb',
                   method_ids: [
-                    Diverdown::Definition::MethodId.new(
+                    DiverDown::Definition::MethodId.new(
                       name: 'A',
                       context: 'class',
                       paths: ['a.rb']
                     ),
                   ]
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'A'
                 ),
               ]
@@ -222,25 +222,25 @@ RSpec.describe Diverdown::Definition do
         definition = described_class.new(
           title: 'title',
           sources: [
-            Diverdown::Definition::Source.new(
+            DiverDown::Definition::Source.new(
               source_name: 'a.rb',
               dependencies: [
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'b.rb',
                   method_ids: [
-                    Diverdown::Definition::MethodId.new(
+                    DiverDown::Definition::MethodId.new(
                       name: 'A',
                       context: 'class',
                       paths: ['a.rb']
                     ),
                   ]
                 ),
-                Diverdown::Definition::Dependency.new(
+                DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
               ],
               modules: [
-                Diverdown::Definition::Modulee.new(
+                DiverDown::Definition::Modulee.new(
                   module_name: 'A'
                 ),
               ]
@@ -249,7 +249,7 @@ RSpec.describe Diverdown::Definition do
         )
 
         msgpack = definition.to_msgpack
-        hash = Diverdown::Helper.deep_symbolize_keys(MessagePack.unpack(msgpack))
+        hash = DiverDown::Helper.deep_symbolize_keys(MessagePack.unpack(msgpack))
         expect(described_class.from_hash(hash)).to eq(definition)
       end
     end

@@ -3,7 +3,7 @@
 require 'stringio'
 require 'forwardable'
 
-module Diverdown
+module DiverDown
   class IndentedStringIo
     extend ::Forwardable
 

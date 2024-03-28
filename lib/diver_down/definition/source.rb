@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Definition
     class Source
       include Comparable
@@ -9,13 +9,13 @@ module Diverdown
       def self.from_hash(hash)
         new(
           source_name: hash[:source_name],
-          dependencies: (hash[:dependencies] || []).map { Diverdown::Definition::Dependency.from_hash(_1) },
-          modules: (hash[:modules] || []).map { Diverdown::Definition::Modulee.new(**_1) }
+          dependencies: (hash[:dependencies] || []).map { DiverDown::Definition::Dependency.from_hash(_1) },
+          modules: (hash[:modules] || []).map { DiverDown::Definition::Modulee.new(**_1) }
         )
       end
 
-      # @param sources [Array<Diverdown::Definition::Source>]
-      # @return [Diverdown::Definition::Source]
+      # @param sources [Array<DiverDown::Definition::Source>]
+      # @return [DiverDown::Definition::Source]
       def self.combine(*sources)
         raise ArgumentError, 'sources are empty' if sources.empty?
 
@@ -33,7 +33,7 @@ module Diverdown
 
         new(
           source_name: unique_sources[0],
-          dependencies: Diverdown::Definition::Dependency.combine(*all_dependencies),
+          dependencies: DiverDown::Definition::Dependency.combine(*all_dependencies),
           modules: unique_modules[0]
         )
       end
@@ -41,8 +41,8 @@ module Diverdown
       attr_reader :source_name, :modules
 
       # @param source_name [String] filename of the source file
-      # @param dependencies [Array<Diverdown::Definition::Dependency>]
-      # @param modules [Array<Diverdown::Definition::Modulee>]
+      # @param dependencies [Array<DiverDown::Definition::Dependency>]
+      # @param modules [Array<DiverDown::Definition::Modulee>]
       def initialize(source_name:, dependencies: [], modules: [])
         @source_name = source_name
         @dependency_map = dependencies.map { [_1.source_name, _1] }.to_h
@@ -50,28 +50,28 @@ module Diverdown
       end
 
       # @param source [String]
-      # @return [Diverdown::Definition::Dependency, nil] return nil if source is self.source
+      # @return [DiverDown::Definition::Dependency, nil] return nil if source is self.source
       def find_or_build_dependency(dependency_source_name)
         return if source_name == dependency_source_name
 
-        @dependency_map[dependency_source_name] ||= Diverdown::Definition::Dependency.new(source_name: dependency_source_name)
+        @dependency_map[dependency_source_name] ||= DiverDown::Definition::Dependency.new(source_name: dependency_source_name)
       end
 
       # @param dependency_source_name [String]
-      # @return [Diverdown::Definition::Dependency, nil]
+      # @return [DiverDown::Definition::Dependency, nil]
       def dependency(dependency_source_name)
         @dependency_map[dependency_source_name]
       end
 
       # @param module_names [Array<String>]
-      # @return [Diverdown::Definition::Modulee]
+      # @return [DiverDown::Definition::Modulee]
       def set_modules(module_names)
         @modules = module_names.map do
-          Diverdown::Definition::Modulee.new(module_name: _1)
+          DiverDown::Definition::Modulee.new(module_name: _1)
         end
       end
 
-      # @return [Array<Diverdown::Definition::Dependency>]
+      # @return [Array<DiverDown::Definition::Dependency>]
       def dependencies
         @dependency_map.values.sort
       end
@@ -85,13 +85,13 @@ module Diverdown
         }
       end
 
-      # @param other [Diverdown::Definition::Source]
+      # @param other [DiverDown::Definition::Source]
       # @return [Integer]
       def <=>(other)
         source_name <=> other.source_name
       end
 
-      # @param other [Object, Diverdown::Definition::Source]
+      # @param other [Object, DiverDown::Definition::Source]
       # @return [Boolean]
       def ==(other)
         other.is_a?(self.class) &&

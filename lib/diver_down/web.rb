@@ -3,24 +3,24 @@
 require 'rack'
 require 'yaml'
 
-module Diverdown
+module DiverDown
   class Web
     WEB_DIR = File.expand_path('../../web', __dir__)
 
-    require 'diverdown/web/action'
-    require 'diverdown/web/definition_to_dot'
-    require 'diverdown/web/concurrency_worker'
-    require 'diverdown/web/definition_enumerator'
-    require 'diverdown/web/bit_id'
+    require 'diver_down/web/action'
+    require 'diver_down/web/definition_to_dot'
+    require 'diver_down/web/concurrency_worker'
+    require 'diver_down/web/definition_enumerator'
+    require 'diver_down/web/bit_id'
 
     # For development
-    autoload :DevServerMiddleware, 'diverdown/web/dev_server_middleware'
+    autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
 
     M = Mutex.new
 
     # @param definition_dir [String]
-    # @param store [Diverdown::DefinitionStore]
-    def initialize(definition_dir:, store: Diverdown::DefinitionStore.new)
+    # @param store [DiverDown::DefinitionStore]
+    def initialize(definition_dir:, store: DiverDown::DefinitionStore.new)
       @definition_dir = definition_dir
       @store = store
       @files_server = Rack::Files.new(File.join(WEB_DIR))
@@ -30,7 +30,7 @@ module Diverdown
     # @return [Array[Integer, Hash, Array]]
     def call(env)
       request = Rack::Request.new(env)
-      action = Diverdown::Web::Action.new(store: @store, request:)
+      action = DiverDown::Web::Action.new(store: @store, request:)
 
       if @store.empty?
         M.synchronize do
@@ -71,10 +71,10 @@ module Diverdown
       # TODO: Loading all yaml is slow. Need to filter to load only wanted yaml.
       files = Dir[File.join(@definition_dir, '**', '*.msgpack')].sort.first(1000)
 
-      concurrency_worker = Diverdown::Web::ConcurrencyWorker.new(concurrency: 30)
+      concurrency_worker = DiverDown::Web::ConcurrencyWorker.new(concurrency: 30)
       concurrency_worker.run(files) do |path|
-        hash = Diverdown::Helper.deep_symbolize_keys(MessagePack.unpack(File.binread(path)))
-        definition = Diverdown::Definition.from_hash(hash)
+        hash = DiverDown::Helper.deep_symbolize_keys(MessagePack.unpack(File.binread(path)))
+        definition = DiverDown::Definition.from_hash(hash)
         @store.set(definition)
       end
 

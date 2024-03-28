@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::IndentedStringIo do
+RSpec.describe DiverDown::IndentedStringIo do
   describe 'InstanceMethods' do
     describe '#write' do
       it 'writes string' do

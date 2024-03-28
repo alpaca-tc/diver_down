@@ -4,7 +4,7 @@ require 'rack/proxy'
 require 'websocket/driver'
 require 'eventmachine'
 
-module Diverdown
+module DiverDown
   class Web
     # For vite
     class DevServerMiddleware

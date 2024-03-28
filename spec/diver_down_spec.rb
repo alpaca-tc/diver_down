@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown do
+RSpec.describe DiverDown do
 end

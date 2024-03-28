@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require_relative 'lib/diverdown/version'
+require_relative 'lib/diver_down/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'diverdown'
-  spec.version = Diverdown::VERSION
+  spec.name = 'diver_down'
+  spec.version = DiverDown::VERSION
   spec.authors = ['alpaca-tc']
   spec.email = ['alpaca-tc@alpaca.tc']
 
   spec.summary = 'Tool to dynamically analyze applications and create dependency maps'
   spec.description = ''
-  spec.homepage = 'https://github.com/alpaca-tc/diverdown'
+  spec.homepage = 'https://github.com/alpaca-tc/diver_down'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.2.0'
 

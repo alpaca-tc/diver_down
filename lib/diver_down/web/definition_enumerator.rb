@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Web
     class DefinitionEnumerator
       include Enumerable
 
-      # @param store [Diverdown::Definition::Store]
+      # @param store [DiverDown::Definition::Store]
       # @param query [String]
       def initialize(store, title: '', source: '')
         @store = store

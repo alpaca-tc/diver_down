@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in diverdown.gemspec
+# Specify your gem's dependencies in diver_down.gemspec
 gemspec
 
 gem "rake", "~> 13.0"

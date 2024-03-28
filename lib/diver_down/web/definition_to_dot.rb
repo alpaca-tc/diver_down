@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Web
     class DefinitionToDot
       class SourceDecorator < BasicObject
         attr_reader :dependencies
 
-        # @param source [Diverdown::Definition::Source]
+        # @param source [DiverDown::Definition::Source]
         def initialize(source)
           @source = source
           @dependencies = source.dependencies.map { DependencyDecorator.new(_1) }
@@ -43,7 +43,7 @@ module Diverdown
       end
 
       class DependencyDecorator < BasicObject
-        # @param dependency [Diverdown::Definition::dependency]
+        # @param dependency [DiverDown::Definition::dependency]
         def initialize(dependency)
           @dependency = dependency
         end
@@ -78,10 +78,10 @@ module Diverdown
         end
       end
 
-      # @param definition [Diverdown::Definition]
+      # @param definition [DiverDown::Definition]
       def initialize(definition)
         @definition = definition
-        @io = Diverdown::IndentedStringIo.new
+        @io = DiverDown::IndentedStringIo.new
         @indent = 0
       end
 

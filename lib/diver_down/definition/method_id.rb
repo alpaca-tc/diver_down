@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Definition
     class MethodId
       VALID_CONTEXT = %w[instance class].freeze
@@ -48,13 +48,13 @@ module Diverdown
         [self.class, name, context, paths].hash
       end
 
-      # @param other [Diverdown::Definition::MethodId]
+      # @param other [DiverDown::Definition::MethodId]
       # @return [Integer]
       def <=>(other)
         [name, context] <=> [other.name, other.context]
       end
 
-      # @param other [Object, Diverdown::Definition::Source]
+      # @param other [Object, DiverDown::Definition::Source]
       # @return [Boolean]
       def ==(other)
         other.is_a?(self.class) &&

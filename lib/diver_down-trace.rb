@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-require 'diverdown'
-require 'diverdown/trace'
+require 'diver_down'
+require 'diver_down/trace'

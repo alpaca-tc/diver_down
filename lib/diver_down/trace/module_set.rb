@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   module Trace
     # A class to quickly determine if a TracePoint is a module to be traced.
     class ModuleSet
@@ -59,7 +59,7 @@ module Diverdown
       def add(mod_or_module_name, value)
         @set[mod_or_module_name] = value
 
-        if Diverdown::Helper.module?(mod_or_module_name)
+        if DiverDown::Helper.module?(mod_or_module_name)
           @set[normalize_module_name(mod_or_module_name)] = value
         else
           @set[constantize(mod_or_module_name)] = value
@@ -69,13 +69,13 @@ module Diverdown
       # @param [String] module_name
       # @return [Module]
       def constantize(module_name)
-        @constantized_cache[module_name] ||= Diverdown::Helper.constantize(module_name)
+        @constantized_cache[module_name] ||= DiverDown::Helper.constantize(module_name)
       end
 
       # @param [Module] mod
       # @return [String]
       def normalize_module_name(mod)
-        @normalized_module_name_cache[mod] ||= Diverdown::Helper.normalize_module_name(mod)
+        @normalized_module_name_cache[mod] ||= DiverDown::Helper.normalize_module_name(mod)
       end
     end
   end

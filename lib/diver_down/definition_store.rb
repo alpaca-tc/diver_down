@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class DefinitionStore
     include Enumerable
 
@@ -12,7 +12,7 @@ module Diverdown
 
     # @param id [Integer]
     # @raise [KeyError] if the id is not found
-    # @return [Diverdown::Definition]
+    # @return [DiverDown::Definition]
     def get(id)
       index = id - 1
 
@@ -21,7 +21,7 @@ module Diverdown
       @definitions.fetch(index)
     end
 
-    # @param definitions [Array<Diverdown::Definition>]
+    # @param definitions [Array<DiverDown::Definition>]
     # @return [Array<Integer>] ids of the definitions
     def set(*definitions)
       definitions.map do
@@ -48,12 +48,12 @@ module Diverdown
     end
 
     # @param definition_group [String, nil]
-    # @return [Array<Diverdown::Definition>]
+    # @return [Array<DiverDown::Definition>]
     def filter_by_definition_group(definition_group)
       @definition_group_store.fetch(definition_group, [])
     end
 
-    # @param definition [Diverdown::Definition]
+    # @param definition [DiverDown::Definition]
     # @raise [KeyError] if the definition is not found
     # @return [Integer]
     def get_id(definition)
@@ -80,13 +80,13 @@ module Diverdown
     # Clear the store
     # @return [void]
     def clear
-      # Hash{ Integer(unique bit flag) => Diverdown::Definition }
+      # Hash{ Integer(unique bit flag) => DiverDown::Definition }
       @definitions = []
       @invert_id = {}
       @definition_group_store = Hash.new { |h, k| h[k] = [] }
     end
 
-    # @yield [Diverdown::Definition]
+    # @yield [DiverDown::Definition]
     def each
       return enum_for(__method__) unless block_given?
 

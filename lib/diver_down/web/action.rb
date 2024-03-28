@@ -2,7 +2,7 @@
 
 require 'json'
 
-module Diverdown
+module DiverDown
   class Web
     class Action
       Pagination = Data.define(
@@ -12,7 +12,7 @@ module Diverdown
         :per
       )
 
-      # @param store [Diverdown::Definition::Store]
+      # @param store [DiverDown::Definition::Store]
       # @param request [Rack::Request]
       def initialize(store:, request:)
         @store = store
@@ -47,7 +47,7 @@ module Diverdown
       # @param title [String]
       # @param source [String]
       def definitions(page:, per:, title:, source:)
-        definition_enumerator = Diverdown::Web::DefinitionEnumerator.new(@store, title:, source:)
+        definition_enumerator = DiverDown::Web::DefinitionEnumerator.new(@store, title:, source:)
         definitions, pagination = paginate(definition_enumerator, page, per)
 
         json(
@@ -66,7 +66,7 @@ module Diverdown
       #
       # @param bit_id [Integer]
       def combine_definitions(bit_id)
-        ids = Diverdown::Web::BitId.bit_id_to_ids(bit_id)
+        ids = DiverDown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
           @store.key?(_1)
@@ -76,9 +76,9 @@ module Diverdown
 
         if definition
           json(
-            bit_id: Diverdown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
+            bit_id: DiverDown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
             title: definition.title,
-            dot: Diverdown::Web::DefinitionToDot.new(definition).to_s,
+            dot: DiverDown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }
           )
         else
@@ -92,7 +92,7 @@ module Diverdown
       def source(source_name)
         found_sources = []
         related_definitions = []
-        reverse_dependencies = Hash.new { |h, dependency_source_name| h[dependency_source_name] = Diverdown::Definition::Dependency.new(source_name: dependency_source_name) }
+        reverse_dependencies = Hash.new { |h, dependency_source_name| h[dependency_source_name] = DiverDown::Definition::Dependency.new(source_name: dependency_source_name) }
 
         @store.each do |id, definition|
           found_source = nil
@@ -125,7 +125,7 @@ module Diverdown
         modules = if found_sources.empty?
                     []
                   else
-                    Diverdown::Definition::Source.combine(*found_sources).modules
+                    DiverDown::Definition::Source.combine(*found_sources).modules
                   end
 
         json(
@@ -203,7 +203,7 @@ module Diverdown
 
       def combine_ids_definitions(ids)
         definitions = ids.map { @store.get(_1) }
-        Diverdown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
+        DiverDown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
       end
 
       def json(data)

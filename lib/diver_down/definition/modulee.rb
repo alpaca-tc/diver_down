@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   class Definition
     # not typo. like "klass"
     class Modulee
@@ -25,7 +25,7 @@ module Diverdown
         module_name <=> other.module_name
       end
 
-      # @param other [Object, Diverdown::Definition::Source]
+      # @param other [Object, DiverDown::Definition::Source]
       # @return [Boolean]
       def ==(other)
         other.is_a?(self.class) &&

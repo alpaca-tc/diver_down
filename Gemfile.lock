@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    diverdown (0.1.0)
+    diver_down (0.1.0)
       activesupport
       msgpack
       rackup
@@ -94,7 +94,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  diverdown!
+  diver_down!
   eventmachine
   puma
   rack-proxy

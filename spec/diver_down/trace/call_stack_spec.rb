@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Trace::CallStack do
+RSpec.describe DiverDown::Trace::CallStack do
   describe 'InstanceMethods' do
     describe '#pop' do
       it 'raises error if stack is empty' do

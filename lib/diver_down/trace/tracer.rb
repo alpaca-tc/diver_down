@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   module Trace
     class Tracer
       StackContext = Data.define(:source, :method_id, :caller_location)
@@ -15,20 +15,20 @@ module Diverdown
         attr_writer :trace_events
       end
 
-      # @param module_set [Diverdown::Trace::ModuleSet, Array<Module, String>]
+      # @param module_set [DiverDown::Trace::ModuleSet, Array<Module, String>]
       # @param target_files [Array<String>, nil] if nil, trace all files
       # @param filter_method_id_path [#call, nil] filter method_id.path
-      # @param module_set [Diverdown::Trace::ModuleSet, nil] for optimization
+      # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
       # @param module_finder [#call] find module from source
       def initialize(module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
         if target_files && !target_files.all? { Pathname.new(_1).absolute? }
           raise ArgumentError, "target_files must be absolute path(#{target_files})"
         end
 
-        @module_set = if module_set.is_a?(Diverdown::Trace::ModuleSet)
+        @module_set = if module_set.is_a?(DiverDown::Trace::ModuleSet)
                         module_set
                       else
-                        Diverdown::Trace::ModuleSet.new(module_set)
+                        DiverDown::Trace::ModuleSet.new(module_set)
                       end
 
         @target_file_set = target_files&.to_set
@@ -41,10 +41,10 @@ module Diverdown
       # @param title [String]
       # @param definition_group [String, nil]
       #
-      # @return [Diverdown::Definition]
+      # @return [DiverDown::Definition]
       def trace(title:, definition_group: nil, &)
-        call_stack = Diverdown::Trace::CallStack.new
-        definition = Diverdown::Definition.new(
+        call_stack = DiverDown::Trace::CallStack.new
+        definition = DiverDown::Definition.new(
           definition_group:,
           title:
         )
@@ -53,8 +53,8 @@ module Diverdown
           case tp.event
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
-            mod = Diverdown::Helper.resolve_module(tp.self)
-            source_name = Diverdown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            mod = DiverDown::Helper.resolve_module(tp.self)
+            source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
             pushed = false
 
             unless source_name.nil?
@@ -73,7 +73,7 @@ module Diverdown
                 # `dependency.nil?` means source_name equals to called_source.source.
                 # self-references are not tracked because it is not "dependency".
                 if dependency
-                  context = Diverdown::Helper.module?(tp.self) ? 'class' : 'instance'
+                  context = DiverDown::Helper.module?(tp.self) ? 'class' : 'instance'
                   method_id = dependency.find_or_build_method_id(name: tp.method_id, context:)
                   method_id_path = "#{called_stack_context.caller_location.path}:#{called_stack_context.caller_location.lineno}"
                   method_id_path = @filter_method_id_path.call(method_id_path) if @filter_method_id_path

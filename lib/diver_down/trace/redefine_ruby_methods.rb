@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Diverdown
+module DiverDown
   module Trace
     # Tracepoint traces only ruby-lang calls because tracing c-lang calls is very slow.
     # In this case, methods such as new will not be traceable under normal circumstances, so at a minimum, redefine them in ruby and hack them so that they can be traced.

@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 require 'msgpack'
-require_relative 'diverdown/version'
+require_relative 'diver_down/version'
 
-module Diverdown
+module DiverDown
   class Error < StandardError; end
 
   DELIMITER = ','
 
-  require 'diverdown/definition'
-  require 'diverdown/definition_store'
-  require 'diverdown/indented_string_io'
-  require 'diverdown/helper'
+  require 'diver_down/definition'
+  require 'diver_down/definition_store'
+  require 'diver_down/indented_string_io'
+  require 'diver_down/helper'
 end

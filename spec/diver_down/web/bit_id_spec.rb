@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Web::BitId do
+RSpec.describe DiverDown::Web::BitId do
   describe 'ClassMethods' do
     describe '.ids_to_bit_id' do
       it 'returns bit_id' do

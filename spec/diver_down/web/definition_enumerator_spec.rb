@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-RSpec.describe Diverdown::Web::DefinitionEnumerator do
+RSpec.describe DiverDown::Web::DefinitionEnumerator do
   describe 'InstanceMethods' do
     describe '#each' do
       it 'returns definitions sorted by definition_group' do
-        store = Diverdown::DefinitionStore.new
-        definition_1 = Diverdown::Definition.new
-        definition_2 = Diverdown::Definition.new(definition_group: 'b', title: 'definition_2')
-        definition_3 = Diverdown::Definition.new(definition_group: 'c', title: 'definition_3')
-        definition_4 = Diverdown::Definition.new(definition_group: 'c', title: 'definition_4')
+        store = DiverDown::DefinitionStore.new
+        definition_1 = DiverDown::Definition.new
+        definition_2 = DiverDown::Definition.new(definition_group: 'b', title: 'definition_2')
+        definition_3 = DiverDown::Definition.new(definition_group: 'c', title: 'definition_3')
+        definition_4 = DiverDown::Definition.new(definition_group: 'c', title: 'definition_4')
         ids = store.set(definition_1, definition_2, definition_3, definition_4)
 
         expect(described_class.new(store).each.to_a).to eq(
@@ -37,20 +37,20 @@ RSpec.describe Diverdown::Web::DefinitionEnumerator do
         end
 
         it 'filters by title' do
-          store = Diverdown::DefinitionStore.new
+          store = DiverDown::DefinitionStore.new
 
-          definition_1 = Diverdown::Definition.new(
+          definition_1 = DiverDown::Definition.new(
             title: '01234',
             sources: [
-              Diverdown::Definition::Source.new(
+              DiverDown::Definition::Source.new(
                 source_name: 'a.rb'
               ),
             ]
           )
-          definition_2 = Diverdown::Definition.new(
+          definition_2 = DiverDown::Definition.new(
             title: '56789',
             sources: [
-              Diverdown::Definition::Source.new(
+              DiverDown::Definition::Source.new(
                 source_name: 'b.rb'
               ),
             ]
@@ -83,20 +83,20 @@ RSpec.describe Diverdown::Web::DefinitionEnumerator do
         end
 
         it 'filters by source' do
-          store = Diverdown::DefinitionStore.new
+          store = DiverDown::DefinitionStore.new
 
-          definition_1 = Diverdown::Definition.new(
+          definition_1 = DiverDown::Definition.new(
             title: '01234',
             sources: [
-              Diverdown::Definition::Source.new(
+              DiverDown::Definition::Source.new(
                 source_name: 'a.rb'
               ),
             ]
           )
-          definition_2 = Diverdown::Definition.new(
+          definition_2 = DiverDown::Definition.new(
             title: '56789',
             sources: [
-              Diverdown::Definition::Source.new(
+              DiverDown::Definition::Source.new(
                 source_name: 'b.rb'
               ),
             ]
