@@ -43,7 +43,7 @@ export const Show: React.FC = () => {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: calc(100% - 1px); // 100% - padding-top of layout
+  height: calc(100% - 1px); /* 100% - padding-top of layout */
   width: 100vw;
 `
 

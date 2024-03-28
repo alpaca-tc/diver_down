@@ -4,7 +4,7 @@ import { ThemeProvider as SmartHRUIThemeProvider } from 'smarthr-ui'
 import styled, { ThemeProvider as StyledComponentsThemeProvider } from 'styled-components'
 import { SWRConfig } from 'swr'
 
-import { GlobalStyle, spacing, theme } from '@/constants/theme'
+import { GlobalStyle, theme } from '@/constants/theme'
 import 'smarthr-ui/smarthr-ui.css'
 import { Notification, NotificationContext } from '@/context/NotificationContext'
 
@@ -49,6 +49,9 @@ export const Layout: FC<Props> = ({ isLoading }) => {
 }
 
 const Wrapper = styled.div`
-  padding-top: 1px; // for boarder
-  height: calc(100% - 40px - 1px); // 40px is the height of the header
+  /* for boarder */
+  padding-top: 1px;
+
+  /* 40px is the height of the header */
+  height: calc(100% - 40px - 1px);
 `

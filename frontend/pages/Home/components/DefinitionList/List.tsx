@@ -126,7 +126,7 @@ const StyledInfiniteSideNav = styled(InfiniteSideNav)`
     background-color: ${color.WHITE};
   }
 
-  // for definition group
+  /* for definition group */
   li:not(:has(.side-nav-indent)) {
     position: sticky;
     top: 0;
