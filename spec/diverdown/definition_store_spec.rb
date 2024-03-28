@@ -39,18 +39,6 @@ RSpec.describe Diverdown::DefinitionStore do
       end
     end
 
-    describe '#sources' do
-      it 'returns sources' do
-        store = described_class.new
-        definition_1 = Diverdown::Definition.new(title: '1', sources: [Diverdown::Definition::Source.new(source_name: 'a.rb')])
-        definition_2 = Diverdown::Definition.new(title: '2', sources: [Diverdown::Definition::Source.new(source_name: 'a.rb')])
-        definition_3 = Diverdown::Definition.new(title: '3', sources: [Diverdown::Definition::Source.new(source_name: 'b.rb')])
-        store.set(definition_1, definition_2, definition_3)
-
-        expect(store.sources).to eq([Diverdown::Definition::Source.new(source_name: 'a.rb'), Diverdown::Definition::Source.new(source_name: 'b.rb')])
-      end
-    end
-
     describe '#definition_groups' do
       it 'returns definition_groups' do
         store = described_class.new

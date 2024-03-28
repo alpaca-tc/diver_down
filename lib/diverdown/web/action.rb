@@ -21,12 +21,20 @@ module Diverdown
 
       # GET /api/sources.json
       def sources
-        sources = @store.sources.sort_by(&:source_name)
+        source_names = Set.new
+
+        # rubocop:disable Style/HashEachMethods
+        @store.each do |_, definition|
+          definition.sources.each do |source|
+            source_names.add(source.source_name)
+          end
+        end
+        # rubocop:enable Style/HashEachMethods
 
         json(
-          sources: sources.map do |source|
+          sources: source_names.sort.map do |source_name|
             {
-              source_name: source.source_name,
+              source_name:,
             }
           end
         )
@@ -86,7 +94,7 @@ module Diverdown
         related_definitions = []
         reverse_dependencies = Hash.new { |h, k| h[k] = Set.new }
 
-        @store.each do |bit_id, definition|
+        @store.each do |id, definition|
           found_source = nil
 
           definition.sources.each do |definition_source|
@@ -105,7 +113,7 @@ module Diverdown
 
           if found_source
             found_sources << found_source
-            related_definitions << [bit_id, definition]
+            related_definitions << [id, definition]
           end
         end
 
@@ -120,9 +128,9 @@ module Diverdown
         json(
           source_name:,
           modules: modules.map(&:to_h),
-          related_definitions: related_definitions.map do |bit_id, definition|
+          related_definitions: related_definitions.map do |id, definition|
             {
-              bit_id:,
+              id:,
               title: definition.title,
             }
           end,

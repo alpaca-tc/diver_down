@@ -6,7 +6,7 @@ import { Layout } from "./components/layout"
 import { path } from './constants/path';
 import { NotFound } from "./pages/Errors"
 import { Show as Home } from "./pages/Home"
-import { Show as SourceShow } from "./pages/Sources"
+import { Index as SourceIndex, Show as SourceShow } from "./pages/Sources"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -14,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Layout isLoading={false} />}>
           <Route path={path.home()} element={<Home />} />
+          <Route path={path.sources.index()} element={<SourceIndex />} />
           <Route path={path.sources.show(':source_name')} element={<SourceShow />} />
           <Route path="*" element={<NotFound />} />
         </Route>

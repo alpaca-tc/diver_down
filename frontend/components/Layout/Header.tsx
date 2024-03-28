@@ -6,6 +6,7 @@ import {
   AppNavi,
   NotificationBar,
 } from '@/components/ui'
+import { path } from '@/constants/path'
 import { NotificationContext } from "@/context/NotificationContext"
 
 export const Header: React.FC = () => {
@@ -25,6 +26,11 @@ export const Header: React.FC = () => {
     {
       children: 'Definition List',
       current: pathname === '/',
+      onClick: () => navigate('/'),
+    },
+    {
+      children: 'Source List',
+      current: pathname === path.sources.index() || /^\/sources\//.test(pathname),
       onClick: () => navigate('/'),
     },
   ]

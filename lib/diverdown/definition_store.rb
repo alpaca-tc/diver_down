@@ -32,17 +32,8 @@ module Diverdown
         @invert_id[_1] = id
         @definition_group_store[_1.definition_group] << _1
 
-        _1.sources.each do |source|
-          @sources.add(source)
-        end
-
         id
       end
-    end
-
-    # @return [Array<Diverdown::Definition::Source>]
-    def sources
-      @sources.to_a
     end
 
     # @return [Array<String, nil>]
@@ -93,7 +84,6 @@ module Diverdown
       @definitions = []
       @invert_id = {}
       @definition_group_store = Hash.new { |h, k| h[k] = [] }
-      @sources = Set.new
     end
 
     # @yield [Diverdown::Definition]
