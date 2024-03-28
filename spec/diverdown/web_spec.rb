@@ -202,7 +202,7 @@ RSpec.describe Diverdown::Web do
 
   describe 'GET /api/definitions/:id.json' do
     it 'returns 404 if id is not found' do
-      get '/definitions/0.json'
+      get '/api/definitions/0.json'
       expect(last_response.status).to eq(404)
     end
 

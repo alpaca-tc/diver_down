@@ -56,6 +56,8 @@ module Diverdown
         action.source(source)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
+      in ['GET', /\.json\z/]
+        not_found
       else
         @files_server.call(env.merge('PATH_INFO' => '/index.html'))
       end
