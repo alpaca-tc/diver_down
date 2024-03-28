@@ -20,6 +20,12 @@ dependencies:
   react-router-dom:
     specifier: ^6.22.3
     version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
+  react-svg-pan-zoom:
+    specifier: ^3.12.1
+    version: 3.12.1
+  react-svg-pan-zoom-loader:
+    specifier: ^1.6.1
+    version: 1.6.1(prop-types@15.8.1)(react@18.2.0)
   smarthr-normalize-css:
     specifier: ^1.1.0
     version: 1.1.0(styled-components@6.1.8)
@@ -46,6 +52,12 @@ devDependencies:
   '@types/react-router-dom':
     specifier: ^5.3.3
     version: 5.3.3
+  '@types/react-svg-pan-zoom':
+    specifier: ^3.3.9
+    version: 3.3.9
+  '@types/react-svg-pan-zoom-loader':
+    specifier: ^1.5.0
+    version: 1.5.0
   '@types/styled-components':
     specifier: ^5.1.34
     version: 5.1.34
@@ -1049,6 +1061,18 @@ packages:
       '@types/react': 18.2.67
     dev: true
 
+  /@types/react-svg-pan-zoom-loader@1.5.0:
+    resolution: {integrity: sha512-XdojrcISZtj05vHZjOihbrS+l6bXB6pgTKtRISEt+7I1Q+b6gs+EaHuufZzgv4SPK6+TzpKGuLRgBaaIej/8jA==}
+    dependencies:
+      '@types/react': 18.2.67
+    dev: true
+
+  /@types/react-svg-pan-zoom@3.3.9:
+    resolution: {integrity: sha512-/VA3nI3OmIjgrvWPPeesyON2OxoC27v4yuZ2VRjItXrQnmGZTnQb2WUafLm7+weTUsfFfmngGAyH8oIlbKDkNA==}
+    dependencies:
+      '@types/react': 18.2.67
+    dev: true
+
   /@types/react@18.2.67:
     resolution: {integrity: sha512-vkIE2vTIMHQ/xL0rgmuoECBCkZFZeHr49HeWSc24AptMbNRo7pwSBvj73rlJJs9fGKj0koS+V7kQB1jHS0uCgw==}
     dependencies:
@@ -1820,6 +1844,10 @@ packages:
 
   /csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+
+  /d3-ease@1.0.7:
+    resolution: {integrity: sha512-lx14ZPYkhNx0s/2HX5sLFUI3mbasHjSSpwO/KaaNACweVwxUruKyWVcb293wMv1RqTPZyZ8kSZ2NogUZNcLOFQ==}
+    dev: false
 
   /damerau-levenshtein@1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
@@ -3967,6 +3995,35 @@ packages:
       react: 18.2.0
     dev: false
 
+  /react-svg-pan-zoom-loader@1.6.1(prop-types@15.8.1)(react@18.2.0):
+    resolution: {integrity: sha512-U0zgBfaXhadHs9CSB/KLj3sVKeZ/tNjN+Bl1ASsWK5dcHsFRXqWC+jM/UMffRbrlE+t9gqOXLwdUbis2g5zEkA==}
+    peerDependencies:
+      prop-types: ^15.6.2
+      react: '>=16.0.0'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-svg-pan-zoom: 3.12.1
+      react-svgmt: 2.0.2(react@18.2.0)
+    dev: false
+
+  /react-svg-pan-zoom@3.12.1:
+    resolution: {integrity: sha512-ug1LHCN5qed56C64xFypr/ClajuMFkig1OKvwJrIgGeSyHOjWM7XGgSgeP3IfHAkNw8QEc6a31ggZRpTijWYRw==}
+    dependencies:
+      prop-types: 15.8.1
+      transformation-matrix: 2.16.1
+    dev: false
+
+  /react-svgmt@2.0.2(react@18.2.0):
+    resolution: {integrity: sha512-nFVNqUaPCd/iSLLjlkEBBufuYXYZ9q0vj0/RHyN12AK3t1x11a7UZphvlguI3p+vbKu/IHbg0z3FuGyEJrUInQ==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      d3-ease: 1.0.7
+      prop-types: 15.8.1
+      react: 18.2.0
+    dev: false
+
   /react-transition-group@4.4.5(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
@@ -4720,6 +4777,10 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /transformation-matrix@2.16.1:
+    resolution: {integrity: sha512-tdtC3wxVEuzU7X/ydL131Q3JU5cPMEn37oqVLITjRDSDsnSHVFzW2JiCLfZLIQEgWzZHdSy3J6bZzvKEN24jGA==}
+    dev: false
 
   /ts-api-utils@1.3.0(typescript@5.4.2):
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}

@@ -31,11 +31,10 @@ export const DefinitionView: FC<Props> = ({ definitionIds }) => {
 }
 
 const StyledSection = styled(Section)`
-  overflow: scroll;
   height: inherit;
 `
 
 const Padding = styled.div`
-  padding: ${spacing.XXS} ${spacing.S};
-  height: calc(100% - ${spacing.XXS} - ${spacing.XXS});
+  padding: 0 ${spacing.S};
+  height: inherit;
 `

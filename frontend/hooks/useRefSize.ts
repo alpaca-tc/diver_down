@@ -1,27 +1,39 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useRef, useState } from "react";
 
-export const useRefSize = (ref: React.RefObject<HTMLElement>): [number | undefined, number | undefined] => {
-  const subscribe = useCallback((onStoreChange: () => void) => {
-    const observer = new ResizeObserver(onStoreChange)
+type Size = {
+  width: number | undefined
+  height: number | undefined
+}
 
-    if (ref.current) {
-      observer.observe(ref.current);
+export const useRefSize = <T extends HTMLElement>() => {
+  const [size, setSize] = useState<Size>({ width: undefined, height: undefined })
+  const observer = useRef<ResizeObserver | null>(null)
+  const element = useRef<T | null>(null)
+
+  const handleResize = useCallback((entries: ResizeObserverEntry[]) => {
+    const entry = entries[0];
+    setSize({ width: entry.contentBoxSize[0].inlineSize, height: entry.contentBoxSize[0].blockSize });
+  }, []);
+
+  // initialize resize observer
+  const observeRef = useCallback((target: T) => {
+    if (!target) {
+      return;
     }
 
-    return () => {
-      observer.disconnect();
+    if (!observer.current) {
+      observer.current = new ResizeObserver((entries) => handleResize(entries));
     }
-  }, [ref]);
 
-  const width = useSyncExternalStore(
-    subscribe,
-    () => ref.current?.clientWidth,
-  );
+    if (element.current !== target) {
+      if (element.current) {
+        observer.current.disconnect()
+      }
 
-  const height = useSyncExternalStore(
-    subscribe,
-    () => ref.current?.clientHeight,
-  );
+      element.current = target
+      observer.current.observe(target)
+    }
+  }, [handleResize])
 
-  return [width, height]
+  return { observeRef, size };
 }
