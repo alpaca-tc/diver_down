@@ -28,7 +28,7 @@ export const Header: React.FC = () => {
     {
       children: 'Source List',
       current: pathname === path.sources.index() || /^\/sources\//.test(pathname),
-      onClick: () => navigate('/'),
+      onClick: () => navigate('/sources'),
     },
   ]
 

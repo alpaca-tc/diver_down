@@ -54,10 +54,10 @@ module Diverdown
       in ['GET', %r{\A/api/sources/(?<source>.+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
-      in ['GET', '/']
-        @files_server.call(env.merge('PATH_INFO' => '/index.html'))
-      else
+      in ['GET', %r{\A/assets/}]
         @files_server.call(env)
+      else
+        @files_server.call(env.merge('PATH_INFO' => '/index.html'))
       end
     end
 

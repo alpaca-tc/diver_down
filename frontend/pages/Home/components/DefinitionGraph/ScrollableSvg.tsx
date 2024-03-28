@@ -27,7 +27,6 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
   if (!svg) return null
 
   const svgSize = extractSvgSize(svg)
-  console.log(size)
 
   return (
     <Wrapper ref={observeRef}>
