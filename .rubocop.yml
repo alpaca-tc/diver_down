@@ -8,6 +8,7 @@ AllCops:
     - 'spec/**/*'
   Exclude:
     - '.bundle/**/*'
+    - 'vendor/**/*'
     - './spec/fixtures/**/*'
     - Gemfile
   TargetRubyVersion: 3.2
