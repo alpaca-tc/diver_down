@@ -56,14 +56,9 @@ const StyledSection = styled(Section)`
 `
 
 const StyledAside = styled(Aside)`
-  width: 200px;
   box-sizing: border-box;
   border-top: 1px solid ${color.BORDER};
   border-right: 1px solid ${color.BORDER};
   background-color: ${color.WHITE};
   height: inherit;
-
-  &:hover {
-    width: 80%;
-  }
 `

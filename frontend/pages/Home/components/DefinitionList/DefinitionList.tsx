@@ -20,6 +20,7 @@ type DialogType = 'configureSearchOptionsDiaglog'
 export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDefinitionIds }) => {
   const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
   const [searchDefinitionsOptions, setSearchDefinitionsOptions] = useLocalStorage<SearchDefinitionsOptions>('Home-DefinitionList-SearchDefinitionOptions', { title: '', source: '', folding: false })
+  const [foldingSection, setFoldingSection] = useState<boolean>(false)
 
   const {
     isLoading,
@@ -43,17 +44,26 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
     setSelectedDefinitionIds([])
   }, [setSelectedDefinitionIds])
 
+  const toggleFoldingSection = useCallback(() => {
+    setFoldingSection((prev) => !prev)
+  }, [setFoldingSection])
+
   return (
     isLoading ?
       (<Loading text="Loading..." alt="Loading" />) :
       (
-        <StyledSection>
+        <StyledSection foldingSection={foldingSection}>
           <Cluster align="center">
             <Cluster gap={0.5}>
-              <Button size="s" square onClick={() => setVisibleDialog('configureSearchOptionsDiaglog')} prefix={<FaGearIcon alt="Open Options" />}>
-                Open Options
-              </Button>
-              <Button size="s" onClick={onClickReset}>Clear</Button>
+              {foldingSection && (
+                <>
+                  <Button size="s" square onClick={() => setVisibleDialog('configureSearchOptionsDiaglog')} prefix={<FaGearIcon alt="Open Options" />}>
+                    Open Options
+                  </Button>
+                  <Button size="s" onClick={onClickReset}>Clear</Button>
+                </>
+              )}
+              <Button size="s" onClick={toggleFoldingSection}>{foldingSection ? 'unfold' : 'fold'}</Button>
             </Cluster>
           </Cluster>
           <ConfigureSearchOptionsDialog isOpen={visibleDialog === 'configureSearchOptionsDiaglog'} onClickClose={onClickCloseDialog} searchDefinitionsOptions={searchDefinitionsOptions} setSearchDefinitionsOptions={setSearchDefinitionsOptions} />
@@ -67,7 +77,8 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
   )
 }
 
-const StyledSection = styled(Section)`
+const StyledSection = styled(Section)<{ foldingSection: boolean }>`
   height: inherit;
   overflow: scroll;
+  width: ${({ foldingSection }) => foldingSection ? `100%` : '200px'};
 `
