@@ -1,5 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import { FC, useEffect, useState } from "react";
 
 import { CombinedDefinition } from "@/models/combinedDefinition";
 import { renderDot } from "@/utils/renderDot";
@@ -10,7 +9,7 @@ type Props = {
   combinedDefinition: CombinedDefinition
 }
 
-export const Content: FC<Props> = ({ combinedDefinition }) => {
+export const DefinitionGraph: FC<Props> = ({ combinedDefinition }) => {
   const [svg, setSvg] = useState<string>('');
 
   useEffect(() => {
