@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import { Link } from "@/components/Link"
 import { Aside, EmptyTableBody, Table, Td, Text, Th } from "@/components/ui"
+import { color } from "@/constants/theme"
 import { CombinedDefinition } from "@/models/combinedDefinition"
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
 export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => (
   <WrapperAside>
     <div style={{ overflow: 'clip' }}>
-      <Table fixedHead>
+      <StyledTable fixedHead>
         <thead>
           <tr>
             <Th>
@@ -38,7 +39,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => (
             ))}
           </tbody>
         )}
-      </Table>
+      </StyledTable>
     </div>
   </WrapperAside>
 )
@@ -52,9 +53,8 @@ const WrapperAside = styled(Aside)`
   &&& {
     margin-top: 0;
   }
+`
 
-  > li {
-    margin-top: 2rem;
-    padding: 0 2rem;
-  }
+const StyledTable = styled(Table)`
+  border-left: 1px ${color.BORDER} solid;
 `

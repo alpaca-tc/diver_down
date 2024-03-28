@@ -47,6 +47,6 @@ export const Layout: FC<Props> = ({ isLoading }) => {
 }
 
 const Wrapper = styled.div`
-  padding-top: ${spacing.XS};
-  height: calc(100% - 40px - ${spacing.XS}); // 40px is the height of the header
+  padding-top: 1px; // for boarder
+  height: calc(100% - 40px - 1px); // 40px is the height of the header
 `
