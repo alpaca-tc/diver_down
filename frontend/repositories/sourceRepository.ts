@@ -10,26 +10,23 @@ type SourcesReponse = {
 }
 
 export const useSources = () => {
-  const { data, isLoading } = useSWR(
-    path.api.sources.index(),
-    async () => {
-      const response = await get<SourcesReponse>(path.api.sources.index())
-      return response.sources.map((source) => ({ sourceName: source.source_name }))
-    }
-  )
+  const { data, isLoading } = useSWR(path.api.sources.index(), async () => {
+    const response = await get<SourcesReponse>(path.api.sources.index())
+    return response.sources.map((source) => ({ sourceName: source.source_name }))
+  })
 
   return { sources: data, isLoading }
 }
 
 type SpecificSourceResponse = {
-  source_name: string,
+  source_name: string
   modules: Array<{
     module_name: string
-  }>,
+  }>
   related_definitions: Array<{
     id: number
     title: string
-  }>,
+  }>
   reverse_dependencies: Array<{
     source_name: string
     method_ids: Array<{
@@ -41,26 +38,23 @@ type SpecificSourceResponse = {
 }
 
 export const useSource = (sourceName: string) => {
-  const { data, isLoading } = useSWR(
-    path.api.sources.show(sourceName),
-    async (): Promise<SpecificSource> => {
-      const response = await get<SpecificSourceResponse>(path.api.sources.show(sourceName))
+  const { data, isLoading } = useSWR(path.api.sources.show(sourceName), async (): Promise<SpecificSource> => {
+    const response = await get<SpecificSourceResponse>(path.api.sources.show(sourceName))
 
-      return {
-        sourceName: response.source_name,
-        modules: response.modules.map((module) => ({ moduleName: module.module_name })),
-        relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
-        reverseDependencies: response.reverse_dependencies.map((dependency) => ({
-          sourceName: dependency.source_name,
-          methodIds: dependency.method_ids.map((methodId) => ({
-            name: methodId.name,
-            context: methodId.context,
-            paths: methodId.paths
-          }))
-        }))
-      }
+    return {
+      sourceName: response.source_name,
+      modules: response.modules.map((module) => ({ moduleName: module.module_name })),
+      relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
+      reverseDependencies: response.reverse_dependencies.map((dependency) => ({
+        sourceName: dependency.source_name,
+        methodIds: dependency.method_ids.map((methodId) => ({
+          name: methodId.name,
+          context: methodId.context,
+          paths: methodId.paths,
+        })),
+      })),
     }
-  )
+  })
 
   return { specificSource: data, isLoading }
 }

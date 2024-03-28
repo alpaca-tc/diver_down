@@ -28,9 +28,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
   }
 }
 
-export const useCombinedDefinition = (
-  ids: number[],
-) => {
+export const useCombinedDefinition = (ids: number[]) => {
   const requestPath = path.api.definitions.show(ids)
   const shouldFetch = ids.length > 0
   const { data, isLoading } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)

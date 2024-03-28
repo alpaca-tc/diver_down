@@ -21,10 +21,7 @@ type DefinitionsResponse = {
 
 export const PER = 100
 
-export const useDefinitionList = (
-  query: { title: string, source: string },
-  keepPreviousData: boolean = false
-) => {
+export const useDefinitionList = (query: { title: string; source: string }, keepPreviousData: boolean = false) => {
   const getKey = (pageIndex: number, previousPageData: DefinitionReponse[] | null) => {
     if (previousPageData && previousPageData.length === 0) {
       return null
@@ -32,7 +29,7 @@ export const useDefinitionList = (
     const params = {
       per: PER,
       page: pageIndex + 1,
-      ...query
+      ...query,
     }
 
     return `${path.api.definitions.index()}?${stringify(params)}`

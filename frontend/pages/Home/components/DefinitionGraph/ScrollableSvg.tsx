@@ -1,18 +1,18 @@
-import React, { FC, useState } from "react"
-import { ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom';
-import { ReactSvgPanZoomLoader} from 'react-svg-pan-zoom-loader'
-import styled from "styled-components";
+import React, { FC, useState } from 'react'
+import { ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom'
+import { ReactSvgPanZoomLoader } from 'react-svg-pan-zoom-loader'
+import styled from 'styled-components'
 
-import { useRefSize } from "@/hooks/useRefSize";
+import { useRefSize } from '@/hooks/useRefSize'
 
-import type { Tool, Value } from 'react-svg-pan-zoom';
+import type { Tool, Value } from 'react-svg-pan-zoom'
 
 type Props = {
   svg: string
 }
 
 const extractSvgSize = (svg: string) => {
-  const html: SVGElement = new DOMParser().parseFromString(svg, "text/html").body.querySelector('svg')!
+  const html: SVGElement = new DOMParser().parseFromString(svg, 'text/html').body.querySelector('svg')!
   const width = parseInt(html.getAttribute('width')!.replace(/pt/, ''), 10)!
   const height = parseInt(html.getAttribute('height')!.replace(/pt/, ''), 10)!
 
@@ -31,22 +31,27 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
 
   return (
     <Wrapper ref={observeRef}>
-      <ReactSvgPanZoomLoader svgXML={svg} render={(content) => (
-        <ReactSVGPanZoom
-          background='white'
-          width={size.width ?? 1000}
-          height={size.height ?? 1000}
-          defaultTool={TOOL_PAN}
-          preventPanOutside={false}
-          tool={tool} onChangeTool={setTool}
-          value={value} onChangeValue={setValue}
-          miniatureProps={{ background: '#616264', position: 'none', width: 0, height: 0 }}
-        >
-          <svg width={svgSize.width} height={svgSize.height}>
-            {content}
-          </svg>
-        </ReactSVGPanZoom>
-      )}/>
+      <ReactSvgPanZoomLoader
+        svgXML={svg}
+        render={(content) => (
+          <ReactSVGPanZoom
+            background="white"
+            width={size.width ?? 1000}
+            height={size.height ?? 1000}
+            defaultTool={TOOL_PAN}
+            preventPanOutside={false}
+            tool={tool}
+            onChangeTool={setTool}
+            value={value}
+            onChangeValue={setValue}
+            miniatureProps={{ background: '#616264', position: 'none', width: 0, height: 0 }}
+          >
+            <svg width={svgSize.width} height={svgSize.height}>
+              {content}
+            </svg>
+          </ReactSVGPanZoom>
+        )}
+      />
     </Wrapper>
   )
 }

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest'
 
-import { decode, encode } from ".."
+import { decode, encode } from '..'
 
 describe('encode', () => {
   const testCases: Array<[bigint, string]> = [
@@ -20,14 +20,7 @@ describe('encode', () => {
 })
 
 describe('decodes', () => {
-  const testCases: bigint[] = [
-    0n,
-    1n,
-    13029n,
-    11n,
-    10000n,
-    BigInt('10195092303920935493'),
-  ]
+  const testCases: bigint[] = [0n, 1n, 13029n, 11n, 10000n, BigInt('10195092303920935493')]
 
   it('decodes encoded value', () => {
     testCases.forEach((input) => {

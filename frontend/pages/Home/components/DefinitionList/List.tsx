@@ -2,9 +2,7 @@ import React, { ComponentProps, forwardRef, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 
 import { InfiniteSideNav } from '@/components/InfiniteSideNav'
-import {
-  CheckBox,
-} from '@/components/ui'
+import { CheckBox } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { Definition } from '@/models/definition'
 import { groupBy } from '@/utils/groupBy'
@@ -31,7 +29,10 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
   }, [inView, loadNextPage])
 
   const sideNavItems: ComponentProps<typeof InfiniteSideNav>['items'] = useMemo(() => {
-    const groupedDefinitions = groupBy<Definition>(definitions, (definition) => definition.definitionGroup ?? NULL_DEFINITION_GROUP)
+    const groupedDefinitions = groupBy<Definition>(
+      definitions,
+      (definition) => definition.definitionGroup ?? NULL_DEFINITION_GROUP,
+    )
     const items: ComponentProps<typeof InfiniteSideNav>['items'] = []
 
     Object.keys(groupedDefinitions).forEach((definitionGroup) => {
@@ -41,19 +42,17 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
         const definitionIds = filteredDefinitions.map(({ id }) => id)
         const allSelected = definitionIds.every((id) => selectedDefinitionIds.includes(id))
 
-        const onClickDefinitionGroup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+        const onClickDefinitionGroup = (
+          event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement, MouseEvent>,
+        ) => {
           event.preventDefault()
 
           if (allSelected) {
             // disable all definitions in definition_group
-            setSelectedDefinitionIds((prev) => (
-              prev.filter((prevId) => !definitionIds.includes(prevId))
-            ))
+            setSelectedDefinitionIds((prev) => prev.filter((prevId) => !definitionIds.includes(prevId)))
           } else {
             // enable all definitions in definition_group
-            setSelectedDefinitionIds((prev) => (
-              [...(new Set<number>([...prev, ...definitionIds]))]
-            ))
+            setSelectedDefinitionIds((prev) => [...new Set<number>([...prev, ...definitionIds])])
           }
         }
 
@@ -62,13 +61,15 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
           title: definitionGroup,
           isSelected: allSelected,
           onClick: onClickDefinitionGroup,
-          prefix: <CheckBox checked={allSelected} onClick={onClickDefinitionGroup} />
+          prefix: <CheckBox checked={allSelected} onClick={onClickDefinitionGroup} />,
         })
       }
 
       if (!folding || definitionGroup === NULL_DEFINITION_GROUP) {
         filteredDefinitions.forEach((definition) => {
-          const onClickDefinition = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement>) => {
+          const onClickDefinition = (
+            event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLInputElement>,
+          ) => {
             event.stopPropagation()
 
             setSelectedDefinitionIds((prev) => {
@@ -92,7 +93,7 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
                 {definitionGroup === NULL_DEFINITION_GROUP ? null : <InfiniteSideNavIndent className="side-nav-indent" />}
                 <CheckBox checked={isSelected} onClick={onClickDefinition} />
               </>
-            )
+            ),
           })
         })
       }
@@ -114,9 +115,7 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
     return items
   }, [definitions, selectedDefinitionIds, ref, setSelectedDefinitionIds, folding, isReachingEnd])
 
-  return (
-    <StyledInfiniteSideNav size="s" items={sideNavItems} />
-  )
+  return <StyledInfiniteSideNav size="s" items={sideNavItems} />
 })
 
 const StyledInfiniteSideNav = styled(InfiniteSideNav)`

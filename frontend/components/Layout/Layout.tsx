@@ -22,10 +22,12 @@ export const Layout: FC<Props> = ({ isLoading }) => {
   return (
     <SmartHRUIThemeProvider theme={theme}>
       <StyledComponentsThemeProvider theme={theme}>
-        <SWRConfig value={{
-          revalidateOnFocus: false,
-          shouldRetryOnError: false,
-        }}>
+        <SWRConfig
+          value={{
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+          }}
+        >
           <NotificationContext.Provider value={{ notification, setNotification }}>
             <GlobalStyle />
 

@@ -2,12 +2,9 @@ import React, { ComponentProps, useCallback, useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import {
-  AppNavi,
-  NotificationBar,
-} from '@/components/ui'
+import { AppNavi, NotificationBar } from '@/components/ui'
 import { path } from '@/constants/path'
-import { NotificationContext } from "@/context/NotificationContext"
+import { NotificationContext } from '@/context/NotificationContext'
 
 export const Header: React.FC = () => {
   const { notification, setNotification } = useContext(NotificationContext)
@@ -41,9 +38,7 @@ export const Header: React.FC = () => {
         <StyledAppNavi label="DiverDown" buttons={buttons} />
       </header>
 
-      {notification && (
-        <NotificationBar type={notification.type} message={notification.message} onClose={onCloseNotification} />
-      )}
+      {notification && <NotificationBar type={notification.type} message={notification.message} onClose={onCloseNotification} />}
     </>
   )
 }

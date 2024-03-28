@@ -1,1 +1,1 @@
-export { DefinitionList } from "./DefinitionList"
+export { DefinitionList } from './DefinitionList'

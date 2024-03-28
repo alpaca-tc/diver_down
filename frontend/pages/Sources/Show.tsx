@@ -39,9 +39,7 @@ export const Show: React.FC = () => {
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>
-                            Module Name
-                          </Th>
+                          <Th>Module Name</Th>
                         </tr>
                       </thead>
                       {specificSource.modules.length === 0 ? (
@@ -67,18 +65,16 @@ export const Show: React.FC = () => {
               <Section>
                 <Stack gap={0.5}>
                   <Cluster>
-                    <Heading type="sectionTitle">
-                      Related Definitions
-                    </Heading>
-                    <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>Select All</Link>
+                    <Heading type="sectionTitle">Related Definitions</Heading>
+                    <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>
+                      Select All
+                    </Link>
                   </Cluster>
                   <div style={{ overflow: 'clip' }}>
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>
-                            Title
-                          </Th>
+                          <Th>Title</Th>
                         </tr>
                       </thead>
                       {specificSource.relatedDefinitions.length === 0 ? (
@@ -90,7 +86,9 @@ export const Show: React.FC = () => {
                           {specificSource.relatedDefinitions.map((relatedDefinition) => (
                             <tr key={relatedDefinition.id}>
                               <Td>
-                                <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId([relatedDefinition.id])) })}`}>{relatedDefinition.title}</Link>
+                                <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId([relatedDefinition.id])) })}`}>
+                                  {relatedDefinition.title}
+                                </Link>
                               </Td>
                             </tr>
                           ))}
@@ -103,22 +101,14 @@ export const Show: React.FC = () => {
 
               <Section>
                 <Stack gap={0.5}>
-                  <Heading type="sectionTitle">
-                    Reverse Dependencies
-                  </Heading>
+                  <Heading type="sectionTitle">Reverse Dependencies</Heading>
                   <div style={{ overflow: 'clip' }}>
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>
-                            Source Name
-                          </Th>
-                          <Th>
-                            Method Id
-                          </Th>
-                          <Th>
-                            Path
-                          </Th>
+                          <Th>Source Name</Th>
+                          <Th>Method Id</Th>
+                          <Th>Path</Th>
                         </tr>
                       </thead>
                       {specificSource.reverseDependencies.length === 0 ? (
@@ -127,27 +117,29 @@ export const Show: React.FC = () => {
                         </EmptyTableBody>
                       ) : (
                         <tbody>
-                          {specificSource.reverseDependencies.map((reverseDependency) => (
+                          {specificSource.reverseDependencies.map((reverseDependency) =>
                             reverseDependency.methodIds.map((methodId, index) => (
                               <tr key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}`}>
                                 <Td>
                                   {index === 0 ? (
-                                    <Link to={`${path.sources.show(reverseDependency.sourceName)}`}>{reverseDependency.sourceName}</Link>
+                                    <Link to={`${path.sources.show(reverseDependency.sourceName)}`}>
+                                      {reverseDependency.sourceName}
+                                    </Link>
                                   ) : null}
                                 </Td>
+                                <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
                                 <Td>
-                                  {`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}
-                                </Td>
-                                <Td>
-                                  {methodId.paths.map((methodIdPath, methodIdIndex) => (
-                                    <div key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}-${methodIdPath}`}>
+                                  {methodId.paths.map((methodIdPath) => (
+                                    <div
+                                      key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}-${methodIdPath}`}
+                                    >
                                       <Text>{methodIdPath}</Text>
                                     </div>
                                   ))}
                                 </Td>
                               </tr>
-                            ))
-                          ))}
+                            )),
+                          )}
                         </tbody>
                       )}
                     </Table>

@@ -23,25 +23,17 @@ type Props = {
 }
 
 export const InfiniteSideNavItemButton = forwardRef<HTMLLIElement, Props>((props, ref) => {
-  const {
-    title,
-    prefix,
-    isSelected = false,
-    size,
-    onClick,
-  } = props
+  const { title, prefix, isSelected = false, size, onClick } = props
 
   const classNames = useClassNames()
-  const handleClick = onClick
-    ? (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onClick(e)
-    : undefined
+  const handleClick = onClick ? (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => onClick(e) : undefined
 
   const itemClassName = `${isSelected ? 'selected' : ''} ${classNames.item}`
 
   return (
     <Wrapper ref={ref} className={itemClassName}>
       <Button className={size} onClick={handleClick}>
-        {prefix && <PrefixWrapper >{prefix}</PrefixWrapper>}
+        {prefix && <PrefixWrapper>{prefix}</PrefixWrapper>}
         <span className={classNames.itemTitle}>{title}</span>
       </Button>
     </Wrapper>
@@ -50,9 +42,7 @@ export const InfiniteSideNavItemButton = forwardRef<HTMLLIElement, Props>((props
 
 const Wrapper = styled.li`
   color: ${color.TEXT_BLACK};
-  transition: ${isTouchDevice
-    ? 'none'
-    : `background-color ${interaction.hover.animation}, color ${interaction.hover.animation}`};
+  transition: ${isTouchDevice ? 'none' : `background-color ${interaction.hover.animation}, color ${interaction.hover.animation}`};
 
   &:hover {
     background-color: ${theme.color.hoverColor(color.COLUMN)};

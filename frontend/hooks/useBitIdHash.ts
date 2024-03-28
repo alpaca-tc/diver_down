@@ -1,12 +1,7 @@
-import { useEffect, useRef, useState } from "react"
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
-import {
-  bitIdToIds,
-  encode as bitIdToString,
-  idsToBitId,
-  decode as stringToBitId,
-} from "@/utils/bitId"
+import { bitIdToIds, encode as bitIdToString, idsToBitId, decode as stringToBitId } from '@/utils/bitId'
 
 export const KEY = 'bit_id'
 
@@ -23,7 +18,7 @@ const decode = (bitId64: string): number[] => {
 export const useBitIdHash = () => {
   const [ids, setIds] = useState<number[]>([])
   const initialized = useRef<boolean>(false)
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // Load ids on load
   useEffect(() => {

@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest'
 
-import { bitIdToIds, idsToBitId } from ".."
+import { bitIdToIds, idsToBitId } from '..'
 
 describe('bitIdToIds', () => {
   it('converts bit_id to ids', () => {
-    const ids = Array.from({length: 100}, (_, i) => i + 1)
+    const ids = Array.from({ length: 100 }, (_, i) => i + 1)
     const bitIds = ids.map((id) => BigInt(idsToBitId([id])))
     const intOr = bitIds.reduce((current, bitId) => current | bitId, 0n)
 

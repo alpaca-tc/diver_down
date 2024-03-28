@@ -1,5 +1,5 @@
-import { MethodId } from "./methodId"
-import { Module } from "./module"
+import { MethodId } from './methodId'
+import { Module } from './module'
 
 export type Source = {
   sourceName: string
@@ -17,7 +17,7 @@ type ReverseDependency = {
 
 export type SpecificSource = {
   sourceName: string
-  modules: Module[],
-  relatedDefinitions: RelatedDefinition[],
-  reverseDependencies: ReverseDependency[],
+  modules: Module[]
+  relatedDefinitions: RelatedDefinition[]
+  reverseDependencies: ReverseDependency[]
 }

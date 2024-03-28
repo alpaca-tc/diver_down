@@ -2,15 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
-import {
-  Aside,
-  Section,
-  Sidebar,
-  Stack,
-} from '@/components/ui'
+import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
-import { useCombinedDefinition } from "@/repositories/combinedDefinitionRepository"
+import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
 
 import { DefinitionGraph } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'

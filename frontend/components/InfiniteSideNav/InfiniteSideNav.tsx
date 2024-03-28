@@ -21,12 +21,7 @@ type Props = {
 }
 type ElementProps = Omit<HTMLAttributes<HTMLUListElement>, keyof Props>
 
-export const InfiniteSideNav: FC<Props & ElementProps> = ({
-  items,
-  size = 'default',
-  className = '',
-  ...props
-}) => {
+export const InfiniteSideNav: FC<Props & ElementProps> = ({ items, size = 'default', className = '', ...props }) => {
   const classNames = useClassNames()
 
   return (

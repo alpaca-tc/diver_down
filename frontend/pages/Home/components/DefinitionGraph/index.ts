@@ -1,1 +1,1 @@
-export { DefinitionGraph } from "./DefinitionGraph"
+export { DefinitionGraph } from './DefinitionGraph'
