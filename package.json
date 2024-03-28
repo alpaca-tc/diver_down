@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "prettier": "prettier-config-smarthr",
   "engines": {
-    "node": "20.11.1"
+    "node": ">= 20.0.0"
   },
   "packageManager": "pnpm@8.15.5",
   "license": "MIT",

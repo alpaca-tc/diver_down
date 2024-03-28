@@ -12,10 +12,6 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: []
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up frontend
@@ -28,10 +24,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: []
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up frontend
