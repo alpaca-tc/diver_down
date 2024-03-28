@@ -46,6 +46,8 @@ module Diverdown
           title: request.params['title'] || '',
           source: request.params['source'] || ''
         )
+      in ['GET', %r{\A/api/sources\.json\z}]
+        action.sources
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         action.combine_definitions(bit_id)

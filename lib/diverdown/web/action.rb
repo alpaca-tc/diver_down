@@ -19,6 +19,19 @@ module Diverdown
         @request = request
       end
 
+      # GET /api/sources.json
+      def sources
+        sources = @store.sources.sort_by(&:source_name)
+
+        json(
+          sources: sources.map do |source|
+            {
+              source_name: source.source_name,
+            }
+          end
+        )
+      end
+
       # GET /api/definitions.json
       #
       # @param page [Integer]
