@@ -13,14 +13,14 @@ module DiverDown
         @strategy = strategy
       end
 
-      # @param [Module, String] mod_or_module_name
+      # @param [Module] mod
       # @return [Boolean]
-      def include?(mod_or_module_name)
-        result = @strategy[mod_or_module_name]
+      def include?(mod)
+        result = @strategy[mod]
 
         if result.nil?
           # If the strategy doesn't know, check the superclass
-          superclass_include(mod_or_module_name)
+          superclass_include(mod)
         else
           result
         end

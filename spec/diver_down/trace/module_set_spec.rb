@@ -14,9 +14,6 @@ RSpec.describe DiverDown::Trace::ModuleSet do
 
           expect(set.include?(A)).to be(true)
           expect(set.include?(B)).to be(false)
-
-          expect(set.include?('A')).to be(true)
-          expect(set.include?('B')).to be(false)
         end
 
         it 'checks superclass' do
@@ -31,10 +28,6 @@ RSpec.describe DiverDown::Trace::ModuleSet do
           expect(set.include?(A)).to be(false)
           expect(set.include?(B)).to be(true)
           expect(set.include?(C)).to be(true)
-
-          expect(set.include?('A')).to be(false)
-          expect(set.include?('B')).to be(true)
-          expect(set.include?('C')).to be(true)
         end
       end
 
@@ -62,11 +55,6 @@ RSpec.describe DiverDown::Trace::ModuleSet do
 
             expect(set.include?(A)).to be(true)
             expect(set.include?(::DiverDown)).to be(false)
-
-            expect(set.include?('A')).to be(true)
-            expect(set.include?('::A')).to be(true)
-            expect(set.include?('::DiverDown')).to be(false)
-            expect(set.include?('DiverDown')).to be(false)
           end
         end
 
@@ -86,10 +74,6 @@ RSpec.describe DiverDown::Trace::ModuleSet do
             expect(set.include?(A)).to be(true)
             expect(set.include?(B)).to be(true)
             expect(set.include?(DiverDown::Trace::ModuleSet)).to be(false)
-
-            expect(set.include?('A')).to be(true)
-            expect(set.include?('B')).to be(true)
-            expect(set.include?('DiverDown::Trace::ModuleSet')).to be(false)
           end
         end
       end

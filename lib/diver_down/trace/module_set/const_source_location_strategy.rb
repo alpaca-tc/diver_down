@@ -15,51 +15,27 @@ module DiverDown
           @exclude = exclude.to_set
         end
 
-        # @param [Module, String] mod_or_module_name
+        # @param [Module, String] mod
         # @return [Boolean, nil]
-        def [](mod_or_module_name)
-          unless @cache.key?(mod_or_module_name)
-            module_name = if DiverDown::Helper.module?(mod_or_module_name)
-                            normalize_module_name(mod_or_module_name)
-                          else
-                            mod_or_module_name
-                          end
+        def [](mod)
+          unless @cache.key?(mod)
+            module_name = DiverDown::Helper.normalize_module_name(mod)
 
             path, = begin
               Object.const_source_location(module_name)
-            rescue NameError
+            rescue NameError, TypeError
               nil
-            rescue TypeError
-              binding.irb
             end
 
-            @cache[mod_or_module_name] = @include.include?(path) && !@exclude.include?(path)
+            @cache[mod] = @include.include?(path) && !@exclude.include?(path)
           end
 
-          @cache.fetch(mod_or_module_name)
+          @cache.fetch(mod)
         end
 
-        # @param [Module, String] mod_or_module_name
-        def []=(mod_or_module_name, value)
-          @set[mod_or_module_name] = value
-
-          if DiverDown::Helper.module?(mod_or_module_name)
-            @set[normalize_module_name(mod_or_module_name)] = value
-          else
-            @set[constantize(mod_or_module_name)] = value
-          end
-        end
-
-        private
-
-        def add(set, mod_or_module_name)
-          set[mod_or_module_name] = true
-
-          if DiverDown::Helper.module?(mod_or_module_name)
-            set[normalize_module_name(mod_or_module_name)] = true
-          else
-            set[constantize(mod_or_module_name)] = true
-          end
+        # @param [Module] mod
+        def []=(mod, value)
+          @set[mod] = value
         end
       end
     end

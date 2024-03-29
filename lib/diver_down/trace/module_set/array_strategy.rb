@@ -11,27 +11,28 @@ module DiverDown
           @set = {}
 
           modules.each do
-            self[_1] = true
+            mod = if DiverDown::Helper.module?(_1)
+                    _1
+                  else
+                    # constantize if it is a string
+                    DiverDown::Helper.constantize(_1)
+                  end
+
+            self[mod] = true
           end
         end
 
-        # @param [Module, String] mod_or_module_name
+        # @param [Module] mod
         # @return [Boolean, nil]
-        def [](mod_or_module_name)
-          @set[mod_or_module_name]
+        def [](mod)
+          @set[mod]
         end
 
-        # @param [Module, String] mod_or_module_name
+        # @param [Module] mod
         # @param value [Boolean]
         # @return [void]
-        def []=(mod_or_module_name, value)
-          @set[mod_or_module_name] = value
-
-          if DiverDown::Helper.module?(mod_or_module_name)
-            @set[normalize_module_name(mod_or_module_name)] = value
-          else
-            @set[constantize(mod_or_module_name)] = value
-          end
+        def []=(mod, value)
+          @set[mod] = value
         end
       end
     end
