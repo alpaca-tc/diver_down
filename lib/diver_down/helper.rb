@@ -16,7 +16,7 @@ module DiverDown
         mod = resolve_module(obj)
 
         # Do not call the original method as much as possible
-        CLASS_NAME_QUERY.bind(mod).call ||
+        CLASS_NAME_QUERY.bind_call(mod) ||
           (mod.name if mod.respond_to?(:name))
       end
     end
@@ -30,7 +30,7 @@ module DiverDown
       if module?(obj) # Do not call method of this
         resolve_singleton_class(obj)
       else
-        k = INSTANCE_CLASS_QUERY.bind(obj).call
+        k = INSTANCE_CLASS_QUERY.bind_call(obj)
         resolve_singleton_class(k)
       end
     end

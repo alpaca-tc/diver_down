@@ -25,13 +25,13 @@ module DiverDown
                             mod_or_module_name
                           end
 
-            path, _ = begin
-                        Object.const_source_location(module_name)
-                      rescue NameError
-                        nil
-                      rescue TypeError
-                        binding.irb
-                      end
+            path, = begin
+              Object.const_source_location(module_name)
+            rescue NameError
+              nil
+            rescue TypeError
+              binding.irb
+            end
 
             @cache[mod_or_module_name] = @include.include?(path) && !@exclude.include?(path)
           end
