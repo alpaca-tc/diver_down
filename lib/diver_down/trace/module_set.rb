@@ -6,6 +6,7 @@ module DiverDown
     class ModuleSet
       require 'diver_down/trace/module_set/base_strategy'
       require 'diver_down/trace/module_set/array_strategy'
+      require 'diver_down/trace/module_set/const_source_location_strategy'
 
       # @param [DiverDown::Trace::ModuleSet::BaseStrategy] strategy
       def initialize(strategy)
