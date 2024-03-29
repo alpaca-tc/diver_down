@@ -27,8 +27,12 @@ module DiverDown
 
         @module_set = if module_set.is_a?(DiverDown::Trace::ModuleSet)
                         module_set
-                      else
+                      elsif module_set.is_a?(DiverDown::Trace::ModuleSet::BaseStrategy)
                         DiverDown::Trace::ModuleSet.new(module_set)
+                      else
+                        DiverDown::Trace::ModuleSet.new(
+                          DiverDown::Trace::ModuleSet::ArrayStrategy.new(module_set)
+                        )
                       end
 
         @target_file_set = target_files&.to_set

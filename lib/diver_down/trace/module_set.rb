@@ -4,23 +4,25 @@ module DiverDown
   module Trace
     # A class to quickly determine if a TracePoint is a module to be traced.
     class ModuleSet
-      # @param [Array<Module, String>] modules
-      def initialize(modules)
-        @set = {}
-        @normalized_module_name_cache = {}
-        @constantized_cache = {}
+      require 'diver_down/trace/module_set/base_strategy'
+      require 'diver_down/trace/module_set/array_strategy'
 
-        modules.each do
-          add(_1, true)
-        end
+      # @param [DiverDown::Trace::ModuleSet::BaseStrategy] strategy
+      def initialize(strategy)
+        @strategy = strategy
       end
 
       # @param [Module, String] mod_or_module_name
       # @return [Boolean]
       def include?(mod_or_module_name)
-        return @set.fetch(mod_or_module_name) if @set.key?(mod_or_module_name)
+        result = @strategy[mod_or_module_name]
 
-        superclass_include(mod_or_module_name)
+        if result.nil?
+          # If the strategy doesn't know, check the superclass
+          superclass_include(mod_or_module_name)
+        else
+          result
+        end
       end
 
       private
@@ -33,7 +35,7 @@ module DiverDown
         found = nil
 
         while current && found.nil?
-          found = @set.fetch(current) if @set.key?(current)
+          found = @strategy[current] # nil or boolean
           stack.push(current)
           current = current.superclass
         end
@@ -42,7 +44,7 @@ module DiverDown
         found = !!found
 
         stack.each do
-          add(_1, found)
+          @strategy[_1] = found
         end
 
         found
@@ -51,31 +53,6 @@ module DiverDown
         return false if e.message == 'uninitialized class'
 
         raise
-      end
-
-      # @param [Module, String] mod_or_module_name
-      # @param value [Boolean]
-      # @return [void]
-      def add(mod_or_module_name, value)
-        @set[mod_or_module_name] = value
-
-        if DiverDown::Helper.module?(mod_or_module_name)
-          @set[normalize_module_name(mod_or_module_name)] = value
-        else
-          @set[constantize(mod_or_module_name)] = value
-        end
-      end
-
-      # @param [String] module_name
-      # @return [Module]
-      def constantize(module_name)
-        @constantized_cache[module_name] ||= DiverDown::Helper.constantize(module_name)
-      end
-
-      # @param [Module] mod
-      # @return [String]
-      def normalize_module_name(mod)
-        @normalized_module_name_cache[mod] ||= DiverDown::Helper.normalize_module_name(mod)
       end
     end
   end
