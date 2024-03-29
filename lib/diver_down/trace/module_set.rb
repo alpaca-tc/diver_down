@@ -4,56 +4,72 @@ module DiverDown
   module Trace
     # A class to quickly determine if a TracePoint is a module to be traced.
     class ModuleSet
-      require 'diver_down/trace/module_set/base_strategy'
-      require 'diver_down/trace/module_set/array_strategy'
-      require 'diver_down/trace/module_set/const_source_location_strategy'
+      require 'diver_down/trace/module_set/array_module_set'
+      require 'diver_down/trace/module_set/const_source_location_module_set'
 
-      # @param [DiverDown::Trace::ModuleSet::BaseStrategy] strategy
-      def initialize(strategy)
-        @strategy = strategy
+      # @param [Array<Module, String>, Set<Module, String>, nil] modules
+      # @param [Array<String>] include
+      def initialize(modules: nil, include: nil)
+        @cache = {}
+        @array_module_set = DiverDown::Trace::ModuleSet::ArrayModuleSet.new(modules) unless modules.nil?
+        @const_source_location_module_set = DiverDown::Trace::ModuleSet::ConstSourceLocationModuleSet.new(include:) unless include.nil?
       end
 
       # @param [Module] mod
       # @return [Boolean]
       def include?(mod)
-        result = @strategy[mod]
+        unless @cache.key?(mod)
+          if DiverDown::Helper.class?(mod)
+            # class
+            begin
+              dig_superclass(mod)
+            rescue TypeError => e
+              # https://github.com/ruby/ruby/blob/f42164e03700469a7000b4f00148a8ca01d75044/object.c#L2232
+              return false if e.message == 'uninitialized class'
 
-        if result.nil?
-          # If the strategy doesn't know, check the superclass
-          superclass_include(mod)
-        else
-          result
+              raise
+            end
+          else
+            # module
+            @cache[mod] = !!_include?(mod)
+          end
         end
+
+        @cache.fetch(mod)
       end
 
       private
 
-      def superclass_include(mod)
-        return false unless Class === mod
+      def _include?(mod)
+        @array_module_set&.include?(mod) ||
+          @const_source_location_module_set&.include?(mod)
+      end
 
-        stack = [mod]
-        current = mod.superclass
-        found = nil
+      def dig_superclass(mod)
+        stack = []
+        current = mod
+        included = nil
 
-        while current && found.nil?
-          found = @strategy[current] # nil or boolean
-          stack.push(current)
-          current = current.superclass
+        until current.nil?
+          if @cache.key?(current)
+            included = @cache.fetch(current)
+            break
+          else
+            stack.push(current)
+            included = _include?(current)
+
+            break if included
+
+            current = current.superclass
+          end
         end
 
         # Convert nil to boolean
-        found = !!found
+        included = !!included
 
         stack.each do
-          @strategy[_1] = found
+          @cache[_1] = included unless @cache.key?(_1)
         end
-
-        found
-      rescue TypeError => e
-        # https://github.com/ruby/ruby//blob/f42164e03700469a7000b4f00148a8ca01d75044/object.c#L2232
-        return false if e.message == 'uninitialized class'
-
-        raise
       end
     end
   end

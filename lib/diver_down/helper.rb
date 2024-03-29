@@ -45,10 +45,16 @@ module DiverDown
       end
     end
 
-    # @param obj [Object, Module, Class]
-    # @return ['instance', 'class']
+    # @param obj [Object]
+    # @return [Boolean]
     def self.module?(obj)
       Module === obj
+    end
+
+    # @param obj [Object]
+    # @return [Boolean]
+    def self.class?(obj)
+      Class === obj
     end
 
     # @param str [String]

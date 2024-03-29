@@ -3,13 +3,13 @@
 RSpec.describe DiverDown::Trace::ModuleSet do
   describe 'InstanceMethods' do
     describe '#include?' do
-      context 'array strategy' do
+      context 'with modules' do
         it 'checks module or module name' do
           stub_const('A', Module.new)
           stub_const('B', Module.new)
 
           set = described_class.new(
-            DiverDown::Trace::ModuleSet::ArrayStrategy.new([A])
+            modules: [A]
           )
 
           expect(set.include?(A)).to be(true)
@@ -22,7 +22,7 @@ RSpec.describe DiverDown::Trace::ModuleSet do
           stub_const('C', Class.new(B))
 
           set = described_class.new(
-            DiverDown::Trace::ModuleSet::ArrayStrategy.new([B])
+            modules: [B]
           )
 
           expect(set.include?(A)).to be(false)
@@ -48,9 +48,7 @@ RSpec.describe DiverDown::Trace::ModuleSet do
             # rubocop:enable Lint/ConstantDefinitionInBlock
 
             set = described_class.new(
-              DiverDown::Trace::ModuleSet::ConstSourceLocationStrategy.new(
-                include: [__FILE__]
-              )
+              include: [__FILE__]
             )
 
             expect(set.include?(A)).to be(true)
@@ -66,9 +64,7 @@ RSpec.describe DiverDown::Trace::ModuleSet do
             # rubocop:enable Lint/ConstantDefinitionInBlock
 
             set = described_class.new(
-              DiverDown::Trace::ModuleSet::ConstSourceLocationStrategy.new(
-                include: [__FILE__]
-              )
+              include: [__FILE__]
             )
 
             expect(set.include?(A)).to be(true)

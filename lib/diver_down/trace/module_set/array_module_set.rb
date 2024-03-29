@@ -3,12 +3,10 @@
 module DiverDown
   module Trace
     class ModuleSet
-      class ArrayStrategy < BaseStrategy
+      class ArrayModuleSet
         # @param [Array<Module, String>, #each] modules
         def initialize(modules)
-          super()
-
-          @set = {}
+          @map = {}
 
           modules.each do
             mod = if DiverDown::Helper.module?(_1)
@@ -18,21 +16,14 @@ module DiverDown
                     DiverDown::Helper.constantize(_1)
                   end
 
-            self[mod] = true
+            @map[mod] = true
           end
         end
 
         # @param [Module] mod
         # @return [Boolean, nil]
-        def [](mod)
-          @set[mod]
-        end
-
-        # @param [Module] mod
-        # @param value [Boolean]
-        # @return [void]
-        def []=(mod, value)
-          @set[mod] = value
+        def include?(mod)
+          @map[mod]
         end
       end
     end

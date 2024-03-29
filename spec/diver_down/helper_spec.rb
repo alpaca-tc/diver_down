@@ -145,6 +145,25 @@ RSpec.describe DiverDown::Helper do
       end
     end
 
+    describe '.class?' do
+      it 'returns true given class' do
+        expect(described_class.class?(Class.new)).to be(true)
+      end
+
+      it 'returns true given singleton class' do
+        expect(described_class.class?(Class.new.singleton_class)).to be(true)
+      end
+
+      it 'returns false given module' do
+        expect(described_class.class?(Module.new)).to be(false)
+      end
+
+      it 'returns false given instance' do
+        klass = Class.new
+        expect(described_class.class?(klass.new)).to be(false)
+      end
+    end
+
     describe '.constantize' do
       it 'returns constant given string' do
         expect(described_class.constantize('String')).to eq(String)
