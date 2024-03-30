@@ -24,8 +24,8 @@
   },
   "include": [
     "vite-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "./frontend/**/*.ts",
+    "./frontend/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

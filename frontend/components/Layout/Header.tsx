@@ -22,13 +22,18 @@ export const Header: React.FC = () => {
   const buttons: ComponentProps<typeof AppNavi>['buttons'] = [
     {
       children: 'Definition List',
-      current: pathname === '/',
-      onClick: () => navigate('/'),
+      current: pathname === path.home(),
+      onClick: () => navigate(path.home()),
     },
     {
       children: 'Source List',
       current: pathname === path.sources.index() || /^\/sources\//.test(pathname),
-      onClick: () => navigate('/sources'),
+      onClick: () => navigate(path.sources.index()),
+    },
+    {
+      children: 'License',
+      current: pathname === path.licenses.index(),
+      onClick: () => navigate(path.licenses.index()),
     },
   ]
 

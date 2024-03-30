@@ -12,6 +12,7 @@ export {
   FormControl,
   Heading,
   Input,
+  LineClamp,
   Loader,
   NotificationBar,
   PageHeading,
