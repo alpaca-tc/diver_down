@@ -7,6 +7,13 @@ module DiverDown
       @store = store
     end
 
+    # @param dir [String]
+    def load_directory(dir)
+      Dir["#{dir}/**/*.{yml,yaml,msgpack}"].each do
+        load_file(_1)
+      end
+    end
+
     # @param path [String]
     def load_file(path)
       case File.extname(path)
