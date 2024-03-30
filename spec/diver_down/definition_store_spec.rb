@@ -30,12 +30,12 @@ RSpec.describe DiverDown::DefinitionStore do
         expect(ids).to eq([1, 2, 3])
       end
 
-      it 'raises exception if definition already set' do
+      it 'returns id if definition already set' do
         store = described_class.new
         definition = DiverDown::Definition.new(title: 'a')
-        store.set(definition)
+        ids = store.set(definition)
 
-        expect { store.set(definition) }.to raise_error(ArgumentError, /Definition already set/)
+        expect(store.set(definition)).to eq(ids)
       end
     end
 

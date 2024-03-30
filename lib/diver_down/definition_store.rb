@@ -25,25 +25,29 @@ module DiverDown
     # @return [Array<Integer>] ids of the definitions
     def set(*definitions)
       definitions.map do
-        raise ArgumentError, "Definition already set #{_1.to_h}" if @invert_id.key?(_1)
+        if @invert_id.key?(_1)
+          @invert_id.fetch(_1)
+        else
+          id = @definitions.size + 1
+          @definitions.push(_1)
+          @invert_id[_1] = id
+          @definition_group_store[_1.definition_group] << _1
 
-        id = @definitions.size + 1
-        @definitions.push(_1)
-        @invert_id[_1] = id
-        @definition_group_store[_1.definition_group] << _1
-
-        id
+          id
+        end
       end
     end
 
     # @return [Array<String, nil>]
     def definition_groups
       keys = @definition_group_store.keys
+
+      # Sort keys with nil at the end
       with_nil = keys.include?(nil)
       keys.delete(nil) if with_nil
-
       keys.sort!
       keys.push(nil) if with_nil
+
       keys
     end
 
