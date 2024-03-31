@@ -50,6 +50,8 @@ module DiverDown
       in ['GET', %r{\A/api/sources/(?<source>.+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
+      in ['GET', %r{\A/api/pid\.json\z}]
+        action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
         action.initialization_status(@total_definition_files_size)
       in ['GET', %r{\A/assets/}]

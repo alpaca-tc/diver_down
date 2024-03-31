@@ -213,6 +213,17 @@ RSpec.describe DiverDown::Web do
     end
   end
 
+  describe 'GET /api/pid.json' do
+    it 'returns pid' do
+      get '/api/pid.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'pid' => Process.pid,
+      })
+    end
+  end
+
   describe 'GET /api/sources.json' do
     it 'returns [] if store is blank' do
       get '/api/sources.json'

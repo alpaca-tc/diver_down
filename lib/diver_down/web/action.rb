@@ -70,6 +70,13 @@ module DiverDown
         )
       end
 
+      # GET /api/pid.json
+      def pid
+        json(
+          pid: Process.pid
+        )
+      end
+
       # GET /api/definitions/:bit_id.json
       #
       # @param bit_id [Integer]

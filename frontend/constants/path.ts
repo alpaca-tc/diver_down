@@ -13,6 +13,7 @@ export const path = {
     index: () => '/licenses',
   },
   api: {
+    pid: () => `/api/pid.json`,
     initializationStatus: () => `/api/initialization_status.json`,
     definitions: {
       index: () => '/api/definitions.json',
