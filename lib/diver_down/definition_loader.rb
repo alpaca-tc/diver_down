@@ -4,26 +4,32 @@ module DiverDown
   class DefinitionLoader
     # @param path [String]
     def load_file(path)
-      case File.extname(path)
-      when '.yaml', '.yml'
-        from_yaml(path)
-      when '.msgpack'
-        from_msgpack(path)
-      else
-        raise ArgumentError, "Unsupported file type: #{path}"
-      end
+      hash = case File.extname(path)
+             when '.yaml', '.yml'
+               from_yaml(path)
+             when '.msgpack'
+               from_msgpack(path)
+             when '.json'
+               from_json(path)
+             else
+               raise ArgumentError, "Unsupported file type: #{path}"
+             end
+
+      DiverDown::Definition.from_hash(hash)
     end
 
     private
 
+    def from_json(path)
+      JSON.parse(File.read(path))
+    end
+
     def from_yaml(path)
-      hash = YAML.load_file(path)
-      DiverDown::Definition.from_hash(hash)
+      YAML.load_file(path)
     end
 
     def from_msgpack(path)
-      hash = MessagePack.unpack(File.binread(path))
-      DiverDown::Definition.from_hash(hash)
+      MessagePack.unpack(File.binread(path))
     end
   end
 end

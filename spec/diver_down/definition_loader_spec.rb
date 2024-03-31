@@ -27,6 +27,18 @@ RSpec.describe DiverDown::DefinitionStore do
         expect(loader.load_file(path)).to eq(definition)
       end
 
+      it 'loads json' do
+        dir = Dir.mktmpdir
+        path = File.join(dir, 'a.json')
+
+        definition = DiverDown::Definition.new(title: 'a')
+        File.write(path, JSON.dump(definition.to_h))
+
+        loader = DiverDown::DefinitionLoader.new
+
+        expect(loader.load_file(path)).to eq(definition)
+      end
+
       it 'loads msgpack' do
         dir = Dir.mktmpdir
         path = File.join(dir, 'a.msgpack')
