@@ -51,7 +51,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
   return isLoading ? (
     <Loading text="Loading..." alt="Loading" />
   ) : (
-    <StyledSection foldingSection={foldingSection}>
+    <StyledSection $foldingSection={foldingSection}>
       <Cluster align="center">
         <Cluster gap={0.5}>
           <Button size="s" onClick={toggleFoldingSection}>
@@ -98,8 +98,8 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
   )
 }
 
-const StyledSection = styled(Section)<{ foldingSection: boolean }>`
+const StyledSection = styled(Section)<{ $foldingSection: boolean }>`
   height: inherit;
   overflow: scroll;
-  width: ${({ foldingSection }) => (foldingSection ? `100%` : '200px')};
+  width: ${({ $foldingSection }) => ($foldingSection ? `100%` : '200px')};
 `
