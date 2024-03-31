@@ -3,7 +3,7 @@ import React from 'react'
 export type Notification = {
   type: 'success' | 'info' | 'warning' | 'error'
   message: string
-  onClose: () => void
+  onClose?: () => void
 }
 
 export type NotificationContextProps = {

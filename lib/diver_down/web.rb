@@ -16,14 +16,16 @@ module DiverDown
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
 
-    M = Mutex.new
-
     # @param definition_dir [String]
     # @param store [DiverDown::DefinitionStore]
     def initialize(definition_dir:, store: DiverDown::DefinitionStore.new)
-      @definition_dir = definition_dir
       @store = store
       @files_server = Rack::Files.new(File.join(WEB_DIR))
+
+      definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"]
+      @total_definition_files_size = definition_files.size
+
+      load_definition_files_on_thread(definition_files)
     end
 
     # @param env [Hash]
@@ -31,12 +33,6 @@ module DiverDown
     def call(env)
       request = Rack::Request.new(env)
       action = DiverDown::Web::Action.new(store: @store, request:)
-
-      if @store.empty?
-        M.synchronize do
-          load_store if @store.empty?
-        end
-      end
 
       case [request.request_method, request.path]
       in ['GET', %r{\A/api/definitions\.json\z}]
@@ -54,10 +50,12 @@ module DiverDown
       in ['GET', %r{\A/api/sources/(?<source>.+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
+      in ['GET', %r{\A/api/initialization_status\.json\z}]
+        action.initialization_status(@total_definition_files_size)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
       in ['GET', /\.json\z/]
-        not_found
+        action.not_found
       else
         @files_server.call(env.merge('PATH_INFO' => '/index.html'))
       end
@@ -65,20 +63,20 @@ module DiverDown
 
     private
 
-    def load_store
-      # TODO: Optimize load yaml
-      # TODO: How to implement packages and modules...
-      # TODO: Loading all yaml is slow. Need to filter to load only wanted yaml.
-      files = Dir[File.join(@definition_dir, '**', '*.msgpack')].sort.first(1000)
+    def load_definition_files_on_thread(definition_files)
+      definition_loader = DiverDown::DefinitionLoader.new
 
-      concurrency_worker = DiverDown::Web::ConcurrencyWorker.new(concurrency: 30)
-      concurrency_worker.run(files) do |path|
-        hash = DiverDown::Helper.deep_symbolize_keys(MessagePack.unpack(File.binread(path)))
-        definition = DiverDown::Definition.from_hash(hash)
-        @store.set(definition)
+      Thread.new do
+        loop do
+          break if definition_files.empty?
+
+          definition_file = definition_files.shift
+          definition = definition_loader.load_file(definition_file)
+
+          # No needed to synchronize because this is executed on a single thread.
+          @store.set(definition)
+        end
       end
-
-      puts 'store loaded!'
     end
   end
 end

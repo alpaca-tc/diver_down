@@ -13,6 +13,7 @@ export const path = {
     index: () => '/licenses',
   },
   api: {
+    initializationStatus: () => `/api/initialization_status.json`,
     definitions: {
       index: () => '/api/definitions.json',
       show: (ids: number[]) => `/api/definitions/${idsToBitId(ids)}.json`,

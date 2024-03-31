@@ -181,6 +181,38 @@ RSpec.describe DiverDown::Web do
     end
   end
 
+  describe 'GET /api/initialization_status.json' do
+    it 'returns { total: 0, loaded: 0 } if store is blank' do
+      get '/api/initialization_status.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'total' => 0,
+        'loaded' => 0,
+      })
+    end
+
+    it 'returns loaded size if definition files exist' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      File.binwrite(File.join(definition_dir, '1.msgpack'), definition.to_h.to_msgpack)
+
+      get '/api/initialization_status.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to match({
+        'total' => 1,
+        'loaded' => [eq(0), eq(1)].inject(&:or), # It depends on the timing of Thread execution. Since this is a simple test, the or condition was used.
+      })
+    end
+  end
+
   describe 'GET /api/sources.json' do
     it 'returns [] if store is blank' do
       get '/api/sources.json'

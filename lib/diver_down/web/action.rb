@@ -62,6 +62,14 @@ module DiverDown
         )
       end
 
+      # GET /api/initialization_status.json
+      def initialization_status(total)
+        json(
+          total:,
+          loaded: @store.size
+        )
+      end
+
       # GET /api/definitions/:bit_id.json
       #
       # @param bit_id [Integer]

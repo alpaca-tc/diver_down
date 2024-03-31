@@ -11,6 +11,7 @@ import { Notification, NotificationContext } from '@/context/NotificationContext
 import { Loading } from '../Loading'
 
 import { Header } from './Header'
+import { InitializationStatusChecker } from './InitializationStatusChecker'
 
 type Props = {
   isLoading: boolean
@@ -30,6 +31,7 @@ export const Layout: FC<Props> = ({ isLoading }) => {
         >
           <NotificationContext.Provider value={{ notification, setNotification }}>
             <GlobalStyle />
+            <InitializationStatusChecker />
 
             {isLoading ? (
               <Loading text="Loading..." alt="Loading" />
