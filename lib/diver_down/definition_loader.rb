@@ -2,32 +2,16 @@
 
 module DiverDown
   class DefinitionLoader
-    # @param store [DiverDown::DefinitionStore]
-    def initialize(store)
-      @store = store
-    end
-
-    # @param dir [String]
-    def load_directory(dir)
-      files = ::Dir["#{dir}/**/*.{yml,yaml,msgpack}"]
-
-      files.each do
-        load_file(_1)
-      end
-    end
-
     # @param path [String]
     def load_file(path)
-      definition = case File.extname(path)
-                   when '.yaml', '.yml'
-                     from_yaml(path)
-                   when '.msgpack'
-                     from_msgpack(path)
-                   else
-                     raise ArgumentError, "Unsupported file type: #{path}"
-                   end
-
-      @store.set(definition)
+      case File.extname(path)
+      when '.yaml', '.yml'
+        from_yaml(path)
+      when '.msgpack'
+        from_msgpack(path)
+      else
+        raise ArgumentError, "Unsupported file type: #{path}"
+      end
     end
 
     private
