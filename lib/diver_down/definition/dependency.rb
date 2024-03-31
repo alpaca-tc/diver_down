@@ -8,12 +8,12 @@ module DiverDown
       # @param hash [Hash]
       # @return [DiverDown::Definition::Dependency]
       def self.from_hash(hash)
-        method_ids = (hash[:method_ids] || []).map do
-          DiverDown::Definition::MethodId.new(**_1)
+        method_ids = (hash[:method_ids] || hash['method_ids'] || []).map do
+          DiverDown::Definition::MethodId.from_hash(_1)
         end
 
         new(
-          source_name: hash[:source_name],
+          source_name: hash[:source_name] || hash['source_name'],
           method_ids:
         )
       end

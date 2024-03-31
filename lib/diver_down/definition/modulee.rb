@@ -8,6 +8,13 @@ module DiverDown
 
       attr_reader :module_name
 
+      # @param hash [Hash]
+      def self.from_hash(hash)
+        new(
+          module_name: hash[:module_name] || hash['module_name']
+        )
+      end
+
       # @param name [String]
       def initialize(module_name:)
         @module_name = module_name

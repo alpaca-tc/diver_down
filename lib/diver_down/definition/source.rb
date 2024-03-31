@@ -8,9 +8,9 @@ module DiverDown
       # @param hash [Hash]
       def self.from_hash(hash)
         new(
-          source_name: hash[:source_name],
-          dependencies: (hash[:dependencies] || []).map { DiverDown::Definition::Dependency.from_hash(_1) },
-          modules: (hash[:modules] || []).map { DiverDown::Definition::Modulee.new(**_1) }
+          source_name: hash[:source_name] || hash['source_name'],
+          dependencies: (hash[:dependencies] || hash['dependencies'] || []).map { DiverDown::Definition::Dependency.from_hash(_1) },
+          modules: (hash[:modules] || hash['modules'] || []).map { DiverDown::Definition::Modulee.from_hash(_1) }
         )
       end
 

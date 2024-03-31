@@ -9,38 +9,37 @@ module DiverDown
 
     # @param dir [String]
     def load_directory(dir)
-      Dir["#{dir}/**/*.{yml,yaml,msgpack}"].each do
+      files = ::Dir["#{dir}/**/*.{yml,yaml,msgpack}"]
+
+      files.each do
         load_file(_1)
       end
     end
 
     # @param path [String]
     def load_file(path)
-      case File.extname(path)
-      when '.yaml', '.yml'
-        load_yaml(path)
-      when '.msgpack'
-        load_msgpack(path)
-      else
-        raise ArgumentError, "Unsupported file type: #{path}"
-      end
+      definition = case File.extname(path)
+                   when '.yaml', '.yml'
+                     from_yaml(path)
+                   when '.msgpack'
+                     from_msgpack(path)
+                   else
+                     raise ArgumentError, "Unsupported file type: #{path}"
+                   end
+
+      @store.set(definition)
     end
 
     private
 
-    def load_yaml(path)
-      hash = DiverDown::Helper.deep_symbolize_keys(YAML.load_file(path))
-      load_hash(hash)
+    def from_yaml(path)
+      hash = YAML.load_file(path)
+      DiverDown::Definition.from_hash(hash)
     end
 
-    def load_msgpack(path)
-      hash = DiverDown::Helper.deep_symbolize_keys(MessagePack.unpack(File.binread(path)))
-      load_hash(hash)
-    end
-
-    def load_hash(hash)
-      definition = DiverDown::Definition.from_hash(hash)
-      @store.set(definition)
+    def from_msgpack(path)
+      hash = MessagePack.unpack(File.binread(path))
+      DiverDown::Definition.from_hash(hash)
     end
   end
 end

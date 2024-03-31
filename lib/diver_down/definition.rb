@@ -13,9 +13,9 @@ module DiverDown
     # @return [DiverDown::Definition]
     def self.from_hash(hash)
       new(
-        title: hash[:title] || '',
-        definition_group: hash[:definition_group],
-        sources: (hash[:sources] || []).map do |source_hash|
+        title: hash[:title] || hash['title'] || '',
+        definition_group: hash[:definition_group] || hash['definition_group'],
+        sources: (hash[:sources] || hash['sources'] || []).map do |source_hash|
           DiverDown::Definition::Source.from_hash(source_hash)
         end
       )

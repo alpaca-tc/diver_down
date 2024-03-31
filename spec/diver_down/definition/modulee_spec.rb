@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe DiverDown::Definition::Modulee do
+  describe 'ClassMethods' do
+    describe '.from_hash' do
+      it 'loads hash' do
+        modulee = described_class.new(module_name: 'A')
+        expect(described_class.from_hash(modulee.to_h)).to eq(modulee)
+      end
+    end
+  end
+
   describe 'InstanceMethods' do
     describe '#hash' do
       it 'returns a hash' do

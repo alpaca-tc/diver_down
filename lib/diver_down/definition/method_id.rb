@@ -10,6 +10,15 @@ module DiverDown
 
       attr_reader :name, :context, :paths
 
+      # @param hash [Hash]
+      def self.from_hash(hash)
+        new(
+          name: hash[:name] || hash['name'],
+          context: hash[:context] || hash['context'],
+          paths: (hash[:paths] || hash['paths'] || [])
+        )
+      end
+
       # @param name [String, Symbol]
       # @param context ['instance', 'class']
       # @param paths [Set<String>]

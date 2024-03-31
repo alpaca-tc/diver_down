@@ -1,6 +1,20 @@
 # frozen_string_literal: true
 
 RSpec.describe DiverDown::Definition::MethodId do
+  describe 'ClassMethods' do
+    describe '.from_hash' do
+      it 'loads hash' do
+        method_id = described_class.new(
+          name: 'to_s',
+          context: 'class',
+          paths: ['a.rb']
+        )
+
+        expect(described_class.from_hash(method_id.to_h)).to eq(method_id)
+      end
+    end
+  end
+
   describe 'InstanceMethods' do
     describe '#human_method_name' do
       it 'returns a string' do
