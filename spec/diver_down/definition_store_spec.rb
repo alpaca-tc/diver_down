@@ -33,9 +33,9 @@ RSpec.describe DiverDown::DefinitionStore do
       it 'returns id if definition already set' do
         store = described_class.new
         definition = DiverDown::Definition.new(title: 'a')
-        ids = store.set(definition)
+        store.set(definition)
 
-        expect(store.set(definition)).to eq(ids)
+        expect { store.set(definition) }.to raise_error(ArgumentError, 'definition already set')
       end
     end
 
@@ -67,20 +67,6 @@ RSpec.describe DiverDown::DefinitionStore do
       end
     end
 
-    describe '#get_id' do
-      it 'raises KeyError if key not found' do
-        store = described_class.new
-        expect { store.get_id(DiverDown::Definition.new) }.to raise_error(KeyError)
-      end
-
-      it 'returns bit_id if definition is found' do
-        store = described_class.new
-        definition = DiverDown::Definition.new
-        ids = store.set(definition)
-        expect(store.get_id(definition)).to eq(ids[0])
-      end
-    end
-
     describe '#key?' do
       it 'raises KeyError if key not found' do
         store = described_class.new
@@ -92,17 +78,6 @@ RSpec.describe DiverDown::DefinitionStore do
         definition = DiverDown::Definition.new
         ids = store.set(definition)
         expect(store.key?(ids[0])).to be(true)
-      end
-    end
-
-    describe '#clear' do
-      it 'clears store' do
-        store = described_class.new
-        definition = DiverDown::Definition.new
-        store.set(definition)
-        expect(store.length).to eq(1)
-        store.clear
-        expect(store.length).to eq(0)
       end
     end
 

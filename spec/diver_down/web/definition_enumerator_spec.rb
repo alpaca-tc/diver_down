@@ -9,26 +9,26 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
         definition_2 = DiverDown::Definition.new(definition_group: 'b', title: 'definition_2')
         definition_3 = DiverDown::Definition.new(definition_group: 'c', title: 'definition_3')
         definition_4 = DiverDown::Definition.new(definition_group: 'c', title: 'definition_4')
-        ids = store.set(definition_1, definition_2, definition_3, definition_4)
+        store.set(definition_1, definition_2, definition_3, definition_4)
 
         expect(described_class.new(store).each.to_a).to eq(
           [
             # definition_group b
-            [ids[1], definition_2],
+            definition_2,
 
             # definition_group c
-            [ids[2], definition_3],
-            [ids[3], definition_4],
+            definition_3,
+            definition_4,
 
             # definition_group nil
-            [ids[0], definition_1],
+            definition_1,
           ]
         )
       end
 
       describe 'with title' do
         def assert_query(store, title, expected)
-          actual = described_class.new(store, title:).each.map { _2 }
+          actual = described_class.new(store, title:).each.to_a
           expect(actual).to eq(expected), -> {
             "title: #{title.inspect}\n" \
             "expected: #{expected.inspect}\n" \
@@ -74,7 +74,7 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
 
       describe 'with source' do
         def assert_query(store, source, expected)
-          actual = described_class.new(store, source:).each.map { _2 }
+          actual = described_class.new(store, source:).each.to_a
           expect(actual).to eq(expected), -> {
             "source: #{source.inspect}\n" \
             "expected: #{expected.inspect}\n" \

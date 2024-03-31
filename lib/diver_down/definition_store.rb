@@ -7,7 +7,9 @@ module DiverDown
     attr_reader :bit_id
 
     def initialize
-      clear
+      # Hash{ Integer(unique bit flag) => DiverDown::Definition }
+      @definitions = []
+      @definition_group_store = Hash.new { |h, k| h[k] = [] }
     end
 
     # @param id [Integer]
@@ -25,16 +27,14 @@ module DiverDown
     # @return [Array<Integer>] ids of the definitions
     def set(*definitions)
       definitions.map do
-        if @invert_id.key?(_1)
-          @invert_id.fetch(_1)
-        else
-          id = @definitions.size + 1
-          @definitions.push(_1)
-          @invert_id[_1] = id
-          @definition_group_store[_1.definition_group] << _1
+        raise(ArgumentError, "definition already set") if _1.store_id
 
-          id
-        end
+        _1.store_id = @definitions.size + 1
+
+        @definitions.push(_1)
+        @definition_group_store[_1.definition_group] << _1
+
+        _1.store_id
       end
     end
 
@@ -57,13 +57,6 @@ module DiverDown
       @definition_group_store.fetch(definition_group, [])
     end
 
-    # @param definition [DiverDown::Definition]
-    # @raise [KeyError] if the definition is not found
-    # @return [Integer]
-    def get_id(definition)
-      @invert_id.fetch(definition)
-    end
-
     # @param id [Integer]
     # @return [Boolean]
     def key?(id)
@@ -79,15 +72,6 @@ module DiverDown
     # @return [Boolean]
     def empty?
       @definitions.empty?
-    end
-
-    # Clear the store
-    # @return [void]
-    def clear
-      # Hash{ Integer(unique bit flag) => DiverDown::Definition }
-      @definitions = []
-      @invert_id = {}
-      @definition_group_store = Hash.new { |h, k| h[k] = [] }
     end
 
     # @yield [DiverDown::Definition]

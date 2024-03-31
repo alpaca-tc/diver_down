@@ -23,8 +23,7 @@ module DiverDown
           definitions.each do
             next unless match_definition?(_1)
 
-            id = @store.get_id(_1)
-            yield(id, _1)
+            yield(_1)
           end
         end
       end

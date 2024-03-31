@@ -51,9 +51,9 @@ module DiverDown
         definitions, pagination = paginate(definition_enumerator, page, per)
 
         json(
-          definitions: definitions.map do |(id, definition)|
+          definitions: definitions.map do |definition|
             {
-              id:,
+              id: definition.store_id,
               definition_group: definition.definition_group,
               title: definition.title,
             }

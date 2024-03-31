@@ -40,6 +40,12 @@ module DiverDown
 
     attr_reader :definition_group, :title
 
+    # ID issued when stored in DefinitionStore
+    # I want to manage ID in DefinitionStore, but for performance reasons, I have to set Definition#id to determine its identity
+    # because naive comparing the identity by instance variables of Definitions is slow.
+    # @attr_accessor [Integer]
+    attr_accessor :store_id
+
     # @param title [String]
     # @param sources [Array<DiverDown::Definition::Source>]
     def initialize(definition_group: nil, title: '', sources: [])
@@ -82,17 +88,26 @@ module DiverDown
     # @param other [Object, DiverDown::Definition::Source]
     # @return [Boolean]
     def ==(other)
-      other.is_a?(self.class) &&
-        definition_group == other.definition_group &&
-        title == other.title &&
-        sources.sort == other.sources.sort
+      if store_id
+        other.is_a?(self.class) &&
+          store_id == other.store_id
+      else
+        other.is_a?(self.class) &&
+          definition_group == other.definition_group &&
+          title == other.title &&
+          sources.sort == other.sources.sort
+      end
     end
     alias eq? ==
     alias eql? ==
 
     # @return [Integer]
     def hash
-      [self.class, definition_group, title, sources].hash
+      if store_id
+        [self.class, store_id].hash
+      else
+        [self.class, definition_group, title, sources].hash
+      end
     end
   end
 end

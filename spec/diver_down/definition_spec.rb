@@ -253,5 +253,51 @@ RSpec.describe DiverDown::Definition do
         expect(described_class.from_hash(hash)).to eq(definition)
       end
     end
+
+    describe '#hash' do
+      it 'returns a hash' do
+        definition = described_class.new(
+          title: 'title',
+          sources: [
+            DiverDown::Definition::Source.new(
+              source_name: 'a.rb',
+              dependencies: [
+                DiverDown::Definition::Dependency.new(
+                  source_name: 'b.rb',
+                  method_ids: [
+                    DiverDown::Definition::MethodId.new(
+                      name: 'A',
+                      context: 'class',
+                      paths: ['a.rb']
+                    ),
+                  ]
+                ),
+                DiverDown::Definition::Dependency.new(
+                  source_name: 'c.rb'
+                ),
+              ],
+              modules: [
+                DiverDown::Definition::Modulee.new(
+                  module_name: 'A'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        expect(definition.hash).to eq(definition.dup.hash)
+
+        definition.store_id = 1
+        expect(definition.hash).to eq(definition.dup.hash)
+
+        same_store_id = described_class.new
+        same_store_id.store_id = 1
+        expect(definition.hash).to eq(same_store_id.hash)
+
+        different_store_id = described_class.new
+        different_store_id.store_id = 2
+        expect(definition.hash).to_not eq(different_store_id.hash)
+      end
+    end
   end
 end
