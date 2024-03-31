@@ -54,6 +54,9 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
     <StyledSection foldingSection={foldingSection}>
       <Cluster align="center">
         <Cluster gap={0.5}>
+          <Button size="s" onClick={toggleFoldingSection}>
+            {foldingSection ? 'fold': 'unfold'}
+          </Button>
           {foldingSection && (
             <>
               <Button
@@ -69,9 +72,6 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
               </Button>
             </>
           )}
-          <Button size="s" onClick={toggleFoldingSection}>
-            {foldingSection ? 'unfold' : 'fold'}
-          </Button>
         </Cluster>
       </Cluster>
       <ConfigureSearchOptionsDialog
