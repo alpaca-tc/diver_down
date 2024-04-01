@@ -8,6 +8,9 @@ module DiverDown
     class CallStack
       class StackEmptyError < RuntimeError; end
 
+      # @attr_reader stack [Integer] stack size
+      attr_reader :stack_size
+
       def initialize
         @stack_size = 0
         @stack = {}

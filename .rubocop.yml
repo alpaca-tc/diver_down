@@ -50,6 +50,9 @@ Metrics/BlockLength:
 Metrics/ModuleLength:
   Enabled: false
 
+Style/YodaCondition:
+  Enabled: false
+
 Style/CaseEquality:
   Enabled: false
 

@@ -3,7 +3,11 @@
 module DiverDown
   module Trace
     class Tracer
-      StackContext = Data.define(:source, :method_id, :caller_location)
+      StackContext = Data.define(
+        :source,
+        :method_id,
+        :caller_location
+      )
 
       # @return [Array<Symbol>]
       def self.trace_events
@@ -17,10 +21,11 @@ module DiverDown
 
       # @param module_set [DiverDown::Trace::ModuleSet, Array<Module, String>]
       # @param target_files [Array<String>, nil] if nil, trace all files
+      # @param ignored_method_ids [Array<String>]
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
       # @param module_finder [#call] find module from source
-      def initialize(module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil)
+      def initialize(module_set: [], target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil, module_finder: nil)
         if target_files && !target_files.all? { Pathname.new(_1).absolute? }
           raise ArgumentError, "target_files must be absolute path(#{target_files})"
         end
@@ -32,6 +37,12 @@ module DiverDown
                       else
                         DiverDown::Trace::ModuleSet.new(modules: module_set)
                       end
+
+        @ignored_method_ids = if ignored_method_ids.is_a?(DiverDown::Trace::IgnoredMethodIds)
+                                ignored_method_ids
+                              elsif !ignored_method_ids.nil?
+                                DiverDown::Trace::IgnoredMethodIds.new(ignored_method_ids)
+                              end
 
         @target_file_set = target_files&.to_set
         @filter_method_id_path = filter_method_id_path
@@ -51,21 +62,27 @@ module DiverDown
           title:
         )
 
+        @ignored_stack_size = nil
+
         tracer = TracePoint.new(*self.class.trace_events) do |tp|
           case tp.event
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
             mod = DiverDown::Helper.resolve_module(tp.self)
             source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            already_ignored = !@ignored_stack_size.nil? # If the current method_id is ignored
+            current_ignored = !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
             pushed = false
 
-            unless source_name.nil?
+            if !source_name.nil? && !(already_ignored || current_ignored)
               source = definition.find_or_build_source(source_name)
 
               # Determine module name from source
               module_names = @module_finder&.call(source)
               source.set_modules(module_names) if module_names
 
+              # If the call stack contains a call to a module to be traced
+              # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored
               unless call_stack.empty?
                 # Add dependency to called source
                 called_stack_context = call_stack.stack[-1]
@@ -88,6 +105,7 @@ module DiverDown
 
               if caller_location
                 pushed = true
+
                 call_stack.push(
                   StackContext.new(
                     source:,
@@ -99,7 +117,14 @@ module DiverDown
             end
 
             call_stack.push unless pushed
+
+            # If a value is already stored, it means that call stack already determined to be ignored at the shallower call stack size.
+            # Since stacks deeper than the shallowest stack size are ignored, priority is given to already stored values.
+            if !already_ignored && current_ignored
+              @ignored_stack_size = call_stack.stack_size
+            end
           when :return, :c_return
+            @ignored_stack_size = nil if @ignored_stack_size == call_stack.stack_size
             call_stack.pop
           end
         end

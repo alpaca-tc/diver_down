@@ -17,7 +17,7 @@ RSpec.describe DiverDown::Trace::Tracer do
     describe 'when tracing script' do
       # @param path [String]
       # @return [DiverDown::Definition]
-      def trace_fixture(path, module_set: [], target_files: nil, filter_method_id_path: nil, module_finder: nil, definition_group: nil)
+      def trace_fixture(path, module_set: [], target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, module_finder: nil, definition_group: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -26,6 +26,7 @@ RSpec.describe DiverDown::Trace::Tracer do
         tracer = described_class.new(
           module_set:,
           target_files:,
+          ignored_method_ids:,
           filter_method_id_path:,
           module_finder:
         )
@@ -564,6 +565,49 @@ RSpec.describe DiverDown::Trace::Tracer do
             },
             {
               source_name: 'C',
+            },
+          ]
+        ))
+      end
+
+      it 'traces tracer_ignored_call_stack.rb' do
+        definition = trace_fixture(
+          'tracer_ignored_call_stack.rb',
+          ignored_method_ids: [
+            'AntipollutionModule::B.class_call',
+          ],
+          module_set: [
+            'AntipollutionModule::A',
+            'AntipollutionModule::B',
+            'AntipollutionModule::C',
+            'AntipollutionModule::D',
+          ],
+          target_files: [
+            fixture_path('tracer_ignored_call_stack.rb'),
+          ]
+        )
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'AntipollutionModule::A',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::D',
+                  method_ids: [
+                    {
+                      name: 'class_call',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_ignored_call_stack\.rb:\d+/),
+                      ]
+                    },
+                  ],
+                },
+              ],
+            }, {
+              source_name: 'AntipollutionModule::D', dependencies: [], modules: [],
             },
           ]
         ))

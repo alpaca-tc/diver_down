@@ -8,6 +8,7 @@ module DiverDown
     require 'diver_down/trace/call_stack'
     require 'diver_down/trace/module_set'
     require 'diver_down/trace/redefine_ruby_methods'
+    require 'diver_down/trace/ignored_method_ids'
 
     @trace_events = %i[
       call c_call return c_return
