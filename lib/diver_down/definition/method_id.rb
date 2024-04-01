@@ -15,7 +15,7 @@ module DiverDown
         new(
           name: hash[:name] || hash['name'],
           context: hash[:context] || hash['context'],
-          paths: (hash[:paths] || hash['paths'] || [])
+          paths: hash[:paths] || hash['paths'] || []
         )
       end
 

@@ -27,7 +27,7 @@ module DiverDown
     # @return [Array<Integer>] ids of the definitions
     def set(*definitions)
       definitions.map do
-        raise(ArgumentError, "definition already set") if _1.store_id
+        raise(ArgumentError, 'definition already set') if _1.store_id
 
         _1.store_id = @definitions.size + 1
 
