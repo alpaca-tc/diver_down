@@ -1,5 +1,8 @@
 import { FC, useEffect, useState } from 'react'
+import styled from 'styled-components'
 
+import { Heading, LineClamp, Section, Text } from '@/components/ui'
+import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 import { renderDot } from '@/utils/renderDot'
 
@@ -25,5 +28,41 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition }) => {
     loadSvg()
   }, [combinedDefinition.dot, setSvg])
 
-  return <ScrollableSvg svg={svg} />
+  return (
+    <WrapperSection>
+      <FixedHeightHeading type="sectionTitle">
+        <LineClamp>
+          {combinedDefinition.titles.map((title, index) => (
+            <BlockText key={index} size="XXS">
+              {title}
+            </BlockText>
+          ))}
+        </LineClamp>
+      </FixedHeightHeading>
+      <FlexHeightSvgWrapper>
+        <ScrollableSvg svg={svg} />
+      </FlexHeightSvgWrapper>
+    </WrapperSection>
+  )
 }
+
+const WrapperSection = styled(Section)`
+  display: flex;
+  flex-direction: column;
+  height: inherit;
+  flex-grow: 1;
+`
+
+const FixedHeightHeading = styled(Heading)`
+  min-height: 60px;
+  overflow: scroll;
+  border-bottom: ${color.BORDER} 1px solid;
+`
+
+const FlexHeightSvgWrapper = styled.div`
+  height: calc(100% - 60px);
+`
+
+const BlockText = styled(Text)`
+  display: block;
+`

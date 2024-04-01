@@ -87,12 +87,22 @@ module DiverDown
           @store.key?(_1)
         end
 
-        definition = fetch_definition(valid_ids)
+        definition, titles = case valid_ids.length
+                             when 0
+                               return not_found
+                             when 1
+                               definition = @store.get(ids[0])
+                               [definition, [definition.title]]
+                             else
+                               definitions = valid_ids.map { @store.get(_1) }
+                               definition = DiverDown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
+                               [definition, definitions.map(&:title)]
+                             end
 
         if definition
           json(
+            titles:,
             bit_id: DiverDown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
-            title: definition.title,
             dot: DiverDown::Web::DefinitionToDot.new(definition).to_s,
             sources: definition.sources.map { { source_name: _1.source_name } }
           )
@@ -214,11 +224,6 @@ module DiverDown
         else
           combine_ids_definitions(ids)
         end
-      end
-
-      def combine_ids_definitions(ids)
-        definitions = ids.map { @store.get(_1) }
-        DiverDown::Definition.combine(definition_group: nil, title: 'combined', definitions:)
       end
 
       def json(data)

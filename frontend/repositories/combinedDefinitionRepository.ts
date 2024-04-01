@@ -8,7 +8,7 @@ import { get } from './httpRequest'
 
 type CombinedDefinitionReponse = {
   bit_id: string
-  title: string
+  titles: string[]
   dot: string
   sources: Array<{
     source_name: string
@@ -20,7 +20,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
 
   return {
     ids: bitIdToIds(BigInt(response.bit_id)),
-    title: response.title,
+    titles: response.titles,
     dot: response.dot,
     sources: response.sources.map((source) => ({
       sourceName: source.source_name,

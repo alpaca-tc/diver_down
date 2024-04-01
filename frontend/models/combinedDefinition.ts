@@ -1,6 +1,6 @@
 export type CombinedDefinition = {
   ids: number[]
-  title: string
+  titles: string[]
   dot: string
   sources: Array<{ sourceName: string }>
 }

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useCallback, useState } from 'react'
 import { ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom'
 import { ReactSvgPanZoomLoader } from 'react-svg-pan-zoom-loader'
 import styled from 'styled-components'
@@ -13,6 +13,11 @@ type Props = {
 
 const extractSvgSize = (svg: string) => {
   const html: SVGElement = new DOMParser().parseFromString(svg, 'text/html').body.querySelector('svg')!
+
+  if (html === null) {
+    return { width: 0, height: 0 }
+  }
+
   const width = parseInt(html.getAttribute('width')!.replace(/pt/, ''), 10)!
   const height = parseInt(html.getAttribute('height')!.replace(/pt/, ''), 10)!
 
@@ -24,9 +29,15 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
   const [value, setValue] = useState<Value>({} as Value) // NOTE: react-svg-pan-zoom supported blank object as a initial value. but types is not supported.
   const [tool, setTool] = useState<Tool>(TOOL_PAN)
 
-  if (!svg) return null
-
   const svgSize = extractSvgSize(svg)
+
+  const fitToViewerOnMount = useCallback((node: ReactSVGPanZoom) => {
+    if (node) {
+      node.fitToViewer('center', 'top')
+    }
+  }, [])
+
+  if (!svg) return null
 
   return (
     <Wrapper ref={observeRef}>
@@ -34,6 +45,7 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
         svgXML={svg}
         render={(content) => (
           <ReactSVGPanZoom
+            ref={fitToViewerOnMount}
             background="white"
             width={size.width ?? 1000}
             height={size.height ?? 1000}

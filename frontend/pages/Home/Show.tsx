@@ -22,18 +22,20 @@ export const Show: React.FC = () => {
           <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
         </StyledAside>
         <StyledSection>
-          <StyledStack>
-            {isLoading ? (
+          {isLoading ? (
+            <CenterStack>
               <Loading text="Loading..." alt="Loading" />
-            ) : !combinedDefinition ? (
+            </CenterStack>
+          ) : !combinedDefinition ? (
+            <CenterStack>
               <p>No data</p>
-            ) : (
-              <>
-                <StyledDefinitionGraph combinedDefinition={combinedDefinition} />
-                <StyledDefinitionSources combinedDefinition={combinedDefinition} />
-              </>
-            )}
-          </StyledStack>
+            </CenterStack>
+          ) : (
+            <StyledStack>
+              <DefinitionGraph combinedDefinition={combinedDefinition} />
+              <StyledDefinitionSources combinedDefinition={combinedDefinition} />
+            </StyledStack>
+          )}
         </StyledSection>
       </StyledSidebar>
     </Wrapper>
@@ -65,14 +67,16 @@ const StyledSection = styled(Section)`
   height: inherit;
 `
 
-const StyledStack = styled(Stack)`
+const CenterStack = styled(Stack)`
   display: flex;
   flex-direction: row;
   height: inherit;
   justify-content: center;
 `
 
-const StyledDefinitionGraph = styled(DefinitionGraph)`
+const StyledStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
   height: inherit;
 `
 
