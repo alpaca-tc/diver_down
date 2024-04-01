@@ -7,6 +7,15 @@ require 'rackup'
 require 'diver_down'
 require 'diver_down-web'
 
-Rackup::Server.new(
-  app: DiverDown::Web.new(definition_dir: ENV.fetch('DIVER_DOWN_DIR'))
-).start
+app = DiverDown::Web.new(definition_dir: ENV.fetch('DIVER_DOWN_DIR'))
+
+begin
+  # Rack 2.0
+  require 'rack'
+  require 'rack/server'
+  Rack::Server.new(app:).start
+rescue NameError
+  # Rack 3.0
+  require 'rackup'
+  Rackup::Server.new(app:).start
+end
