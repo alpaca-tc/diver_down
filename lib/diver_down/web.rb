@@ -22,7 +22,7 @@ module DiverDown
       @store = store
       @files_server = Rack::Files.new(File.join(WEB_DIR))
 
-      definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"]
+      definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"].sort
       @total_definition_files_size = definition_files.size
 
       load_definition_files_on_thread(definition_files)
