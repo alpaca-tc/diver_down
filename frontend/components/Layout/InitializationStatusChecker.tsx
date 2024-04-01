@@ -1,9 +1,9 @@
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, useContext, useEffect, useState } from 'react'
 
-import { Notification, NotificationContext } from "@/context/NotificationContext"
-import { useLocalStorage } from "@/hooks/useLocalStorage"
-import { useInitializationStatus } from "@/repositories/initializationStatusRepository"
-import { usePid } from "@/repositories/pidRepository"
+import { Notification, NotificationContext } from '@/context/NotificationContext'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useInitializationStatus } from '@/repositories/initializationStatusRepository'
+import { usePid } from '@/repositories/pidRepository'
 
 const INITIAL_KEY = 'InitializationStatusChecker-closed'
 
@@ -16,7 +16,7 @@ export const InitializationStatusChecker: FC = () => {
   const [initialized, setInitialized] = useState<boolean>(false)
 
   // Stop loading if initialization process is finished
-  const { initializationStatus } = useInitializationStatus((initialized || closed) ? 0 : 100)
+  const { initializationStatus } = useInitializationStatus(initialized || closed ? 0 : 100)
 
   useEffect(() => {
     if (error) {
@@ -28,7 +28,7 @@ export const InitializationStatusChecker: FC = () => {
   }, [error, setNotification])
 
   useEffect(() => {
-    if (!initializationStatus || !pid) return;
+    if (!initializationStatus || !pid) return
 
     let notification: Notification | undefined = undefined
 
@@ -38,15 +38,15 @@ export const InitializationStatusChecker: FC = () => {
       notification = {
         type: 'success',
         message: `Successfully loaded ${initializationStatus.loaded} definitions!`,
-        onClose: () => setClosed(true)
+        onClose: () => setClosed(true),
       }
     } else if (!closed) {
-      const progress = Math.round(initializationStatus.loaded / initializationStatus.total * 100)
+      const progress = Math.round((initializationStatus.loaded / initializationStatus.total) * 100)
 
       notification = {
         type: 'info',
         message: `Loading definitions... ${progress}% (${initializationStatus.loaded}/${initializationStatus.total})`,
-        onClose: () => setClosed(true)
+        onClose: () => setClosed(true),
       }
     }
 

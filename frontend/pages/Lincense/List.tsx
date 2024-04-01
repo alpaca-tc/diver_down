@@ -1,9 +1,9 @@
-import { FC } from "react";
-import styled from "styled-components";
+import { FC } from 'react'
+import styled from 'styled-components'
 
-import { Heading, LineClamp, Section, Stack, Table, Td, Th } from "@/components/ui";
-import { spacing } from "@/constants/theme";
-import { useLicenses } from "@/repositories/licenseRepository";
+import { Heading, LineClamp, Section, Stack, Table, Td, Th } from '@/components/ui'
+import { spacing } from '@/constants/theme'
+import { useLicenses } from '@/repositories/licenseRepository'
 
 export const List: FC = () => {
   const licenses = useLicenses()
@@ -32,9 +32,7 @@ export const List: FC = () => {
                   <Td>{license.repository}</Td>
                   <Td>{license.copyright}</Td>
                   <Td>
-                    <LineClamp maxLines={2}>
-                      {license.licenseText}
-                    </LineClamp>
+                    <LineClamp maxLines={2}>{license.licenseText}</LineClamp>
                   </Td>
                 </tr>
               ))}

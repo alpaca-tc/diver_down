@@ -55,7 +55,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
       <Cluster align="center">
         <Cluster gap={0.5}>
           <Button size="s" onClick={toggleFoldingSection}>
-            {foldingSection ? 'fold': 'unfold'}
+            {foldingSection ? 'fold' : 'unfold'}
           </Button>
           {foldingSection && (
             <>

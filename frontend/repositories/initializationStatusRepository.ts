@@ -11,10 +11,14 @@ type InitializationStatusReponse = {
 }
 
 export const useInitializationStatus = (refreshInterval: number) => {
-  const { data, isLoading } = useSWR(path.api.initializationStatus(), async (): Promise<InitializationStatus> => {
-    const response = await get<InitializationStatusReponse>(path.api.initializationStatus())
-    return response
-  }, { refreshInterval })
+  const { data, isLoading } = useSWR(
+    path.api.initializationStatus(),
+    async (): Promise<InitializationStatus> => {
+      const response = await get<InitializationStatusReponse>(path.api.initializationStatus())
+      return response
+    },
+    { refreshInterval },
+  )
 
   return { initializationStatus: data, isLoading }
 }
