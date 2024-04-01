@@ -4,7 +4,6 @@ PATH
     diver_down (0.1.0)
       activesupport (>= 7.0.0)
       msgpack (>= 1.7.0)
-      rackup
 
 GEM
   remote: https://rubygems.org/
@@ -99,6 +98,7 @@ DEPENDENCIES
   puma
   rack-proxy
   rack-test
+  rackup
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.21)

@@ -27,5 +27,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'activesupport', '>= 7.0.0'
   spec.add_dependency 'msgpack', '>= 1.7.0'
-  spec.add_dependency 'rackup'
 end

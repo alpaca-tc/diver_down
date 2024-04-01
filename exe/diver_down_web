@@ -2,8 +2,8 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'rackup'
 require 'webrick'
+require 'rackup'
 require 'diver_down'
 require 'diver_down-web'
 
