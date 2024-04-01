@@ -601,7 +601,7 @@ RSpec.describe DiverDown::Trace::Tracer do
                       context: 'class',
                       paths: [
                         match(/tracer_ignored_call_stack\.rb:\d+/),
-                      ]
+                      ],
                     },
                   ],
                 },
