@@ -69,6 +69,7 @@ const StyledStack = styled(Stack)`
   display: flex;
   flex-direction: row;
   height: inherit;
+  justify-content: center;
 `
 
 const StyledDefinitionGraph = styled(DefinitionGraph)`

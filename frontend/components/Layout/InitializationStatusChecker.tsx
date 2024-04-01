@@ -10,13 +10,22 @@ const INITIAL_KEY = 'InitializationStatusChecker-closed'
 export const InitializationStatusChecker: FC = () => {
   const { setNotification } = useContext(NotificationContext)
 
-  const { pid } = usePid()
+  const { pid, error } = usePid()
   const key = pid ? `InitializationStatusChecker-closed-${pid}` : INITIAL_KEY
   const [closed, setClosed] = useLocalStorage<boolean>(key, false)
   const [initialized, setInitialized] = useState<boolean>(false)
 
   // Stop loading if initialization process is finished
   const { initializationStatus } = useInitializationStatus((initialized || closed) ? 0 : 100)
+
+  useEffect(() => {
+    if (error) {
+      setNotification({
+        type: 'error',
+        message: `Failed to load definitions! ${JSON.stringify(error.data)}`,
+      })
+    }
+  }, [error, setNotification])
 
   useEffect(() => {
     if (!initializationStatus || !pid) return;

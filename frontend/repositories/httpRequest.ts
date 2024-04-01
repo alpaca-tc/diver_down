@@ -27,6 +27,11 @@ const parseResponse = (response: Response): void | Promise<any> => {
 
 export const get = async <T>(url: string): Promise<T> => {
   const response = await fetch(url)
+
+  if (url.endsWith('.json') && response.headers.get('content-type') !== 'application/json') {
+    throw new HTTPError(response, { messages: ['content-type is invalid'] })
+  }
+
   return parseResponse(response)
 }
 

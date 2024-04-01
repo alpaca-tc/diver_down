@@ -9,10 +9,10 @@ type PidReponse = {
 }
 
 export const usePid = () => {
-  const { data } = useSWR(path.api.pid(), async (): Promise<number> => {
+  const { data, error } = useSWR(path.api.pid(), async (): Promise<number> => {
     const response = await get<PidReponse>(path.api.pid())
     return response.pid
   })
 
-  return { pid: data }
+  return { pid: data, error }
 }
