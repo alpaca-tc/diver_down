@@ -3,7 +3,6 @@
 
 require 'bundler/setup'
 require 'webrick'
-require 'rackup'
 require 'diver_down'
 require 'diver_down-web'
 
@@ -14,7 +13,7 @@ begin
   require 'rack'
   require 'rack/server'
   Rack::Server.new(app:).start
-rescue NameError
+rescue LoadError
   # Rack 3.0
   require 'rackup'
   Rackup::Server.new(app:).start
