@@ -23,6 +23,13 @@ RSpec.describe DiverDown::Web::BitId do
 
         expect(described_class.bit_id_to_ids(int_or)).to eq(ids)
       end
+
+      it 'converts given specific bit_id to id' do
+        id = 1922
+        bit_id = described_class.ids_to_bit_id([id])
+
+        expect(described_class.bit_id_to_ids(bit_id)).to eq([id])
+      end
     end
   end
 end

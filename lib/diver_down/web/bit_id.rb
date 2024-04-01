@@ -18,7 +18,7 @@ module DiverDown
           ids = []
           shift = 0
           while bit_id.positive?
-            if bit_id & 1
+            if (bit_id & 1) == 1
               ids.push(shift + 1)
             end
 
