@@ -126,13 +126,6 @@ const StyledInfiniteSideNav = styled(InfiniteSideNav)`
     background-color: ${color.WHITE};
   }
 
-  /* for definition group */
-  li:not(:has(.side-nav-indent)) {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
   button {
     display: flex;
     align-items: center;

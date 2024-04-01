@@ -52,7 +52,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
     <Loading text="Loading..." alt="Loading" />
   ) : (
     <StyledSection $foldingSection={foldingSection}>
-      <Cluster align="center">
+      <StickyCluster align="center">
         <Cluster gap={0.5}>
           <Button size="s" onClick={toggleFoldingSection}>
             {foldingSection ? 'fold' : 'unfold'}
@@ -73,7 +73,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
             </>
           )}
         </Cluster>
-      </Cluster>
+      </StickyCluster>
       <ConfigureSearchOptionsDialog
         isOpen={visibleDialog === 'configureSearchOptionsDiaglog'}
         onClickClose={onClickCloseDialog}
@@ -97,6 +97,13 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
     </StyledSection>
   )
 }
+
+const StickyCluster = styled(Cluster)`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+`
 
 const StyledSection = styled(Section)<{ $foldingSection: boolean }>`
   height: inherit;
