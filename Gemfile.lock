@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     diver_down (0.1.0)
-      activesupport
-      msgpack
+      activesupport (>= 7.0.0)
+      msgpack (>= 1.7.0)
       rackup
 
 GEM
