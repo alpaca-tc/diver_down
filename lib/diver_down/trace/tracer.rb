@@ -27,10 +27,10 @@ module DiverDown
 
         @module_set = if module_set.is_a?(DiverDown::Trace::ModuleSet)
                         module_set
-                      elsif module_set.respond_to?(:to_set)
-                        DiverDown::Trace::ModuleSet.new(modules: module_set)
-                      else
+                      elsif module_set.is_a?(Hash)
                         DiverDown::Trace::ModuleSet.new(**module_set)
+                      else
+                        DiverDown::Trace::ModuleSet.new(modules: module_set)
                       end
 
         @target_file_set = target_files&.to_set
