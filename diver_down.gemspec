@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
     Dir['lib/**/*'] + Dir['web/**/*'] + ['README.md', 'LICENSE.txt', 'CHANGELOG.md']
   end
   spec.bindir = 'exe'
-  spec.executables = []
+  spec.executables = ['diver_down_web']
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activesupport', '>= 7.0.0'

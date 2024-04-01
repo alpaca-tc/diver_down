@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'rackup'
+require 'webrick'
+require 'diver_down'
+require 'diver_down-web'
+
+Rackup::Server.new(
+  app: DiverDown::Web.new(definition_dir: ENV.fetch('DIVER_DOWN_DIR'))
+).start
