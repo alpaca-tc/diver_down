@@ -48,7 +48,7 @@ RSpec.describe DiverDown::Trace::ModuleSet do
             # rubocop:enable Lint/ConstantDefinitionInBlock
 
             set = described_class.new(
-              include: [__FILE__]
+              paths: [__FILE__]
             )
 
             expect(set.include?(A)).to be(true)
@@ -64,7 +64,7 @@ RSpec.describe DiverDown::Trace::ModuleSet do
             # rubocop:enable Lint/ConstantDefinitionInBlock
 
             set = described_class.new(
-              include: [__FILE__]
+              paths: [__FILE__]
             )
 
             expect(set.include?(A)).to be(true)

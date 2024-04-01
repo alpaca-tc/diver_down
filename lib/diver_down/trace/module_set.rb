@@ -9,10 +9,10 @@ module DiverDown
 
       # @param [Array<Module, String>, Set<Module, String>, nil] modules
       # @param [Array<String>] include
-      def initialize(modules: nil, include: nil)
+      def initialize(modules: nil, paths: nil)
         @cache = {}
         @array_module_set = DiverDown::Trace::ModuleSet::ArrayModuleSet.new(modules) unless modules.nil?
-        @const_source_location_module_set = DiverDown::Trace::ModuleSet::ConstSourceLocationModuleSet.new(include:) unless include.nil?
+        @const_source_location_module_set = DiverDown::Trace::ModuleSet::ConstSourceLocationModuleSet.new(paths:) unless paths.nil?
       end
 
       # @param [Module] mod

@@ -4,9 +4,9 @@ module DiverDown
   module Trace
     class ModuleSet
       class ConstSourceLocationModuleSet
-        # @param [Array<String>, Set<String>] include
-        def initialize(include: [])
-          @include = include.to_set
+        # @param [Array<String>, Set<String>] paths
+        def initialize(paths: [])
+          @paths = paths.to_set
         end
 
         # @param [Module] mod
@@ -20,7 +20,7 @@ module DiverDown
             nil
           end
 
-          path && @include.include?(path)
+          path && @paths.include?(path)
         end
       end
     end
