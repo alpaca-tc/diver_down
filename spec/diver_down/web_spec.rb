@@ -258,6 +258,124 @@ RSpec.describe DiverDown::Web do
     end
   end
 
+  describe 'GET /api/modules.json' do
+    it 'returns [] if store is blank' do
+      get '/api/modules.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'modules' => [],
+      })
+    end
+
+    it 'returns modules' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb',
+            modules: [
+              DiverDown::Definition::Modulee.new(
+                module_name: 'A'
+              ),
+              DiverDown::Definition::Modulee.new(
+                module_name: 'B'
+              ),
+            ]
+          ),
+          DiverDown::Definition::Source.new(
+            source_name: 'b.rb',
+            modules: [
+              DiverDown::Definition::Modulee.new(
+                module_name: 'B'
+              ),
+              DiverDown::Definition::Modulee.new(
+                module_name: 'C'
+              ),
+            ]
+          ),
+          DiverDown::Definition::Source.new(
+            source_name: 'c.rb',
+            modules: []
+          ),
+        ]
+      )
+      store.set(definition)
+
+      get '/api/modules.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'modules' => [
+          {
+            'module_name' => 'A',
+          }, {
+            'module_name' => 'B',
+          }, {
+            'module_name' => 'C',
+          },
+        ],
+      })
+    end
+  end
+
+  describe 'GET /api/modules/:module_name.json' do
+    it 'returns unknown if store is blank' do
+      get '/api/modules/unknown.json'
+
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'returns module if store has one' do
+      definition_1 = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb',
+            modules: [
+              DiverDown::Definition::Modulee.new(
+                module_name: 'A'
+              ),
+              DiverDown::Definition::Modulee.new(
+                module_name: 'B'
+              ),
+            ]
+          ),
+        ]
+      )
+      definition_2 = DiverDown::Definition.new(
+        title: 'title 2',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb',
+            modules: []
+          ),
+        ]
+      )
+
+      ids = store.set(definition_1, definition_2)
+
+      get '/api/modules/A.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'module_name' => 'A',
+        'sources' => [
+          {
+            'source_name' => 'a.rb',
+          }
+        ],
+        'related_definitions' => [
+          {
+            'id' => ids[0],
+            'title' => 'title',
+          }
+        ],
+      })
+    end
+  end
+
+
   describe 'GET /api/definitions/:id.json' do
     it 'returns 404 if id is not found' do
       get '/api/definitions/0.json'

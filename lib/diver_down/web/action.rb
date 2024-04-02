@@ -40,6 +40,70 @@ module DiverDown
         )
       end
 
+      # GET /api/modules.json
+      def modules
+        # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
+        modules = Set.new
+
+        # rubocop:disable Style/HashEachMethods
+        @store.each do |_, definition|
+          definition.sources.each do |source|
+            source.modules.each do |modulee|
+              modules.add(modulee)
+            end
+          end
+        end
+        # rubocop:enable Style/HashEachMethods
+
+        json(
+          modules: modules.sort.map do |modulee|
+            {
+              module_name: modulee.module_name,
+            }
+          end
+        )
+      end
+
+      # GET /api/modules/:module_name.json
+      # @param module_name [String]
+      def module(module_name)
+        # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
+        related_definition_store_ids = Set.new
+        source_names = Set.new
+
+        # rubocop:disable Style/HashEachMethods
+        @store.each do |_, definition|
+          definition.sources.each do |source|
+            next if source.modules.none? { _1.module_name == module_name }
+
+            source_names.add(source.source_name)
+            related_definition_store_ids.add(definition.store_id)
+          end
+        end
+        # rubocop:enable Style/HashEachMethods
+
+        if related_definition_store_ids.empty?
+          return not_found
+        end
+
+        related_definitions = related_definition_store_ids.map { @store.get(_1) }
+
+        json(
+          module_name:,
+          sources: source_names.sort.map do |source_name|
+            {
+              source_name:,
+            }
+          end,
+          related_definitions: related_definitions.map do |definition|
+            {
+              id: definition.store_id,
+              title: definition.title,
+            }
+          end
+        )
+      end
+
       # GET /api/definitions.json
       #
       # @param page [Integer]
