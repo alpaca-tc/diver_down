@@ -9,6 +9,9 @@ export const path = {
     index: () => '/sources',
     show: (sourceName: string) => `/sources/${sourceName}`,
   },
+  modules: {
+    show: (moduleName: string) => `/modules/${moduleName}`,
+  },
   licenses: {
     index: () => '/licenses',
   },

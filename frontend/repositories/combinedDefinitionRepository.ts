@@ -12,6 +12,9 @@ type CombinedDefinitionReponse = {
   dot: string
   sources: Array<{
     source_name: string
+    modules: Array<{
+      module_name: string
+    }>
   }>
 }
 
@@ -24,6 +27,9 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
     dot: response.dot,
     sources: response.sources.map((source) => ({
       sourceName: source.source_name,
+      modules: source.modules.map((module) => ({
+        moduleName: module.module_name,
+      }))
     })),
   }
 }

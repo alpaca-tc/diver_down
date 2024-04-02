@@ -104,7 +104,14 @@ module DiverDown
             titles:,
             bit_id: DiverDown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
             dot: DiverDown::Web::DefinitionToDot.new(definition).to_s,
-            sources: definition.sources.map { { source_name: _1.source_name } }
+            sources: definition.sources.map do
+              {
+                source_name: _1.source_name,
+                modules: _1.modules.map do |modulee|
+                  { module_name: modulee.module_name }
+                end,
+              }
+            end
           )
         else
           not_found
