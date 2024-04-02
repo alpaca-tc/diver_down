@@ -51,7 +51,7 @@ export const Show: React.FC = () => {
                           {specificSource.modules.map((module) => (
                             <tr key={module.moduleName}>
                               <Td>
-                                <Link to={`/modules/${module.moduleName}`}>{module.moduleName}</Link>
+                                <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
                               </Td>
                             </tr>
                           ))}

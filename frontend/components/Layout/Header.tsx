@@ -31,6 +31,11 @@ export const Header: React.FC = () => {
       onClick: () => navigate(path.sources.index()),
     },
     {
+      children: 'Module List',
+      current: pathname === path.modules.index() || /^\/modules\//.test(pathname),
+      onClick: () => navigate(path.modules.index()),
+    },
+    {
       children: 'License',
       current: pathname === path.licenses.index(),
       onClick: () => navigate(path.licenses.index()),

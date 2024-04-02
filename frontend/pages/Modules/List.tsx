@@ -6,10 +6,10 @@ import { Loading } from '@/components/Loading'
 import { EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
-import { useSources } from '@/repositories/sourceRepository'
+import { useModules } from '@/repositories/moduleRepository'
 
 export const List: FC = () => {
-  const { sources, isLoading } = useSources()
+  const { modules, isLoading } = useModules()
 
   return (
     <StyledSection>
@@ -23,12 +23,12 @@ export const List: FC = () => {
                 <Th>Source name</Th>
               </tr>
             </thead>
-            {sources && sources.length > 0 ? (
+            {modules && modules.length > 0 ? (
               <tbody>
-                {sources.map((source) => (
-                  <tr key={source.sourceName}>
+                {modules.map((module) => (
+                  <tr key={module.moduleName}>
                     <Td>
-                      <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                      <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
                     </Td>
                   </tr>
                 ))}
