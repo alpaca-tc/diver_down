@@ -29,7 +29,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
       sourceName: source.source_name,
       modules: source.modules.map((module) => ({
         moduleName: module.module_name,
-      }))
+      })),
     })),
   }
 }

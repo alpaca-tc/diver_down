@@ -363,18 +363,17 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
-          }
+          },
         ],
         'related_definitions' => [
           {
             'id' => ids[0],
             'title' => 'title',
-          }
+          },
         ],
       })
     end
   end
-
 
   describe 'GET /api/definitions/:id.json' do
     it 'returns 404 if id is not found' do

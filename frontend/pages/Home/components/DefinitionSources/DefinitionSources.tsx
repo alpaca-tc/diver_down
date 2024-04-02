@@ -13,7 +13,7 @@ type Props = {
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
-type SortTypes = typeof sortTypes[number]
+type SortTypes = (typeof sortTypes)[number]
 
 type SortState = {
   key: 'sourceName' | 'modules'
@@ -23,19 +23,21 @@ type SortState = {
 export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
 
-  const setNextSortType = useCallback((key: SortState['key']) => {
-    setSortState((prev) => {
-      if (prev.key === key) {
-       return {
-          key,
-          sort: sortTypes[(sortTypes.indexOf(prev.sort) + 1) % sortTypes.length],
+  const setNextSortType = useCallback(
+    (key: SortState['key']) => {
+      setSortState((prev) => {
+        if (prev.key === key) {
+          return {
+            key,
+            sort: sortTypes[(sortTypes.indexOf(prev.sort) + 1) % sortTypes.length],
+          }
+        } else {
+          return { key, sort: 'asc' }
         }
-      } else {
-        return { key, sort: 'asc' }
-      }
-
-    })
-  }, [setSortState])
+      })
+    },
+    [setSortState],
+  )
 
   const sources: CombinedDefinition['sources'] = useMemo(() => {
     let sorted = [...combinedDefinition.sources]
@@ -53,10 +55,15 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
     switch (sortState.key) {
       case 'sourceName': {
         sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
-        break;
+        break
       }
       case 'modules': {
-        sorted = sorted.sort((a, b) => ascString(a.modules.map((module) => module.moduleName).join('-'), b.modules.map((module) => module.moduleName).join('-')))
+        sorted = sorted.sort((a, b) =>
+          ascString(
+            a.modules.map((module) => module.moduleName).join('-'),
+            b.modules.map((module) => module.moduleName).join('-'),
+          ),
+        )
       }
     }
 
@@ -73,8 +80,12 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
         <StyledTable fixedHead>
           <thead>
             <tr>
-              <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>Source name</Th>
-              <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>Modules</Th>
+              <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
+                Source name
+              </Th>
+              <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
+                Modules
+              </Th>
             </tr>
           </thead>
           {sources.length === 0 ? (
