@@ -156,12 +156,10 @@ module DiverDown
           last_module_writer = proc do
             io.puts %(#{' ' unless modules.empty?}subgraph "#{module_label(last_module)}" {), indent: false
             io.indented do
-              source_attributes = build_attributes(label: last_module.module_name, _wrap: false)
-              module_attributes = build_attributes(label: source.source_name)
+              module_attributes = build_attributes(label: last_module.module_name, _wrap: false)
+              source_attributes = build_attributes(label: source.source_name, id: build_id(:source, source.source_name))
 
-              io.write %(#{source_attributes} "#{source.source_name}")
-              io.write(" #{module_attributes}", indent: false) if module_attributes
-              io.write "\n"
+              io.puts %(#{module_attributes} "#{source.source_name}" #{source_attributes})
             end
             io.puts '}'
           end
@@ -221,6 +219,10 @@ module DiverDown
         return if modules.empty?
 
         "cluster_#{modules[0].module_name}"
+      end
+
+      def build_id(type, identity)
+        "#{type}-#{identity}"
       end
     end
   end

@@ -91,7 +91,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               subgraph "cluster_A" {
                 label="A" subgraph "cluster_B" {
-                  label="B" "a.rb" [label="a.rb"]
+                  label="B" "a.rb" [label="a.rb" id="source-a.rb"]
                 }
               }
             }
@@ -139,14 +139,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               compound=true
               subgraph "cluster_A" {
-                label="A" "a.rb" [label="a.rb"]
+                label="A" "a.rb" [label="a.rb" id="source-a.rb"]
               }
               "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" "b.rb" [label="b.rb"]
+                label="B" "b.rb" [label="b.rb" id="source-b.rb"]
               }
               subgraph "cluster_B" {
-                label="B" "c.rb" [label="c.rb"]
+                label="B" "c.rb" [label="c.rb" id="source-c.rb"]
               }
             }
           DOT
