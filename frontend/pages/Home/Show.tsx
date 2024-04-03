@@ -14,8 +14,15 @@ import { DefinitionSources } from './components/DefinitionSources'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
-  const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', { compound: false, concentrate: false })
-  const { data: combinedDefinition, isLoading } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate)
+  const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', {
+    compound: false,
+    concentrate: false,
+  })
+  const { data: combinedDefinition, isLoading } = useCombinedDefinition(
+    selectedDefinitionIds,
+    graphOptions.compound,
+    graphOptions.concentrate,
+  )
 
   return (
     <Wrapper>
@@ -34,7 +41,11 @@ export const Show: React.FC = () => {
             </CenterStack>
           ) : (
             <StyledStack>
-              <DefinitionGraph combinedDefinition={combinedDefinition} graphOptions={graphOptions} setGraphOptions={setGraphOptions} />
+              <DefinitionGraph
+                combinedDefinition={combinedDefinition}
+                graphOptions={graphOptions}
+                setGraphOptions={setGraphOptions}
+              />
               <StyledDefinitionSources combinedDefinition={combinedDefinition} />
             </StyledStack>
           )}

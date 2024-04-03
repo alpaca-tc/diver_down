@@ -16,14 +16,8 @@ type Props = {
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-export const ConfigureViewOptionsDialog: React.FC<Props> = ({
-  isOpen,
-  onClickClose,
-  graphOptions,
-  setGraphOptions,
-}) => {
-  const [temporaryViewOptions, setTemporaryViewOptions] =
-    useState<GraphOptions>(graphOptions)
+export const ConfigureViewOptionsDialog: React.FC<Props> = ({ isOpen, onClickClose, graphOptions, setGraphOptions }) => {
+  const [temporaryViewOptions, setTemporaryViewOptions] = useState<GraphOptions>(graphOptions)
 
   const handleDialogClose = () => {
     onClickClose()
@@ -73,7 +67,10 @@ export const ConfigureViewOptionsDialog: React.FC<Props> = ({
                 <CheckBox name="compound" onChange={onChangeCompound} checked={temporaryViewOptions.compound} />
               </FormControl>
 
-              <FormControl title="Use edge concentrators" helpMessage="This merges multiedges into a single edge and causes partially parallel edges to share part of their paths.">
+              <FormControl
+                title="Use edge concentrators"
+                helpMessage="This merges multiedges into a single edge and causes partially parallel edges to share part of their paths."
+              >
                 <CheckBox name="compound" onChange={onChangeConcentrate} checked={temporaryViewOptions.concentrate} />
               </FormControl>
             </Stack>

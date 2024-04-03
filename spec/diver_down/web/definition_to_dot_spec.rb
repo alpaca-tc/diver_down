@@ -56,7 +56,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               },
               {
                 source_name: 'b.rb',
-              }
+              },
             ]
           )
 
@@ -83,7 +83,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                     module_name: 'B',
                   },
                 ],
-              }
+              },
             ]
           )
 
