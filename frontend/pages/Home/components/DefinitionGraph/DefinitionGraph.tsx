@@ -1,12 +1,11 @@
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
-import { renderDot } from '@/utils/renderDot'
 
-import { ConfigureViewOptionsDialog, GraphOptions } from './ConfigureGraphOptionsDialog'
+import { ConfigureGraphOptionsDialog, GraphOptions } from './ConfigureGraphOptionsDialog'
 import { ScrollableSvg } from './ScrollableSvg'
 
 type Props = {
@@ -15,24 +14,10 @@ type Props = {
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-type DialogType = 'configureViewOptionsDiaglog'
+type DialogType = 'configureGraphOptionsDiaglog'
 
 export const DefinitionGraph: FC<Props> = ({ combinedDefinition, graphOptions, setGraphOptions }) => {
   const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
-  const [svg, setSvg] = useState<string>('')
-
-  useEffect(() => {
-    const loadSvg = async () => {
-      if (combinedDefinition.dot) {
-        const newSvg = await renderDot(combinedDefinition.dot)
-        setSvg(newSvg)
-      } else {
-        setSvg('')
-      }
-    }
-
-    loadSvg()
-  }, [combinedDefinition.dot, setSvg])
 
   const onClickCloseDialog = useCallback(() => {
     setVisibleDialog(null)
@@ -40,8 +25,8 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition, graphOptions, s
 
   return (
     <WrapperSection>
-      <ConfigureViewOptionsDialog
-        isOpen={visibleDialog === 'configureViewOptionsDiaglog'}
+      <ConfigureGraphOptionsDialog
+        isOpen={visibleDialog === 'configureGraphOptionsDiaglog'}
         onClickClose={onClickCloseDialog}
         graphOptions={graphOptions}
         setGraphOptions={setGraphOptions}
@@ -57,14 +42,14 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition, graphOptions, s
         <Button
           size="s"
           square
-          onClick={() => setVisibleDialog('configureViewOptionsDiaglog')}
+          onClick={() => setVisibleDialog('configureGraphOptionsDiaglog')}
           prefix={<FaGearIcon alt="Open Options" />}
         >
-          Open View Options
+          Open Graph Options
         </Button>
       </FixedHeightHeading>
       <FlexHeightSvgWrapper>
-        <ScrollableSvg svg={svg} />
+        <ScrollableSvg combinedDefinition={combinedDefinition} />
       </FlexHeightSvgWrapper>
     </WrapperSection>
   )

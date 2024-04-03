@@ -1,46 +1,141 @@
-import React, { FC, useCallback, useState } from 'react'
-import { ReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { ReactSVGPanZoom, TOOL_NONE, TOOL_PAN } from 'react-svg-pan-zoom'
 import { ReactSvgPanZoomLoader } from 'react-svg-pan-zoom-loader'
 import styled from 'styled-components'
 
 import { useRefSize } from '@/hooks/useRefSize'
+import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
+import { renderDot } from '@/utils/renderDot'
+import { extractSvgSize, getClosestAndSmallestElement, toSVGPoint } from '@/utils/svgHelper'
+
+import { MetadataDialog } from './MetadataDialog'
 
 import type { Tool, Value } from 'react-svg-pan-zoom'
 
 type Props = {
-  svg: string
+  combinedDefinition: CombinedDefinition
 }
 
-const extractSvgSize = (svg: string) => {
-  const html: SVGElement = new DOMParser().parseFromString(svg, 'text/html').body.querySelector('svg')!
+// Return .cluster, .node, .edge or null
+const findClosestElementOnCursor = (event: MouseEvent): SVGGElement | null => {
+  const svg = (event.target as HTMLElement).closest<SVGSVGElement>('svg')
 
-  if (html === null) {
-    return { width: 0, height: 0 }
+  // If outside svg, do nothing.
+  if (!svg) {
+    return null
   }
 
-  const width = parseInt(html.getAttribute('width')!.replace(/pt/, ''), 10)!
-  const height = parseInt(html.getAttribute('height')!.replace(/pt/, ''), 10)!
+  const elementsUnderCursor = document.elementsFromPoint(event.clientX, event.clientY)
+  const point = toSVGPoint(svg, event.target! as Element, event.clientX, event.clientY)
+  const neastElement = getClosestAndSmallestElement(elementsUnderCursor, point)
 
-  return { width, height }
+  const neastGeometryElement = neastElement?.closest<SVGGElement>('g.node, g.edge, g.cluster')
+
+  return neastGeometryElement ?? null
 }
 
-export const ScrollableSvg: FC<Props> = ({ svg }) => {
+type ClickedMetadata = {
+  metadata: DotMetadata
+  left: number
+  top: number
+}
+
+export const ScrollableSvg: FC<Props> = ({ combinedDefinition }) => {
   const { observeRef, size } = useRefSize<HTMLDivElement>()
+  const viewerRef = useRef<ReactSVGPanZoom | null>(null)
+
   const [value, setValue] = useState<Value>({} as Value) // NOTE: react-svg-pan-zoom supported blank object as a initial value. but types is not supported.
   const [tool, setTool] = useState<Tool>(TOOL_PAN)
+  const [hoverMetadata, setHoverMetadata] = useState<DotMetadata | null>(null)
+  const [clickedMetadata, setClickedMetadata] = useState<ClickedMetadata | null>(null)
+  const [svg, setSvg] = useState<string>('')
 
   const svgSize = extractSvgSize(svg)
 
   const fitToViewerOnMount = useCallback((node: ReactSVGPanZoom) => {
     if (node) {
       node.fitToViewer('center', 'top')
+      viewerRef.current = node
+    } else {
+      viewerRef.current = null
     }
   }, [])
+
+  // Convert dot to SVG
+  useEffect(() => {
+    const loadSvg = async () => {
+      if (combinedDefinition.dot) {
+        const newSvg = await renderDot(combinedDefinition.dot)
+        setSvg(newSvg)
+      } else {
+        setSvg('')
+      }
+    }
+
+    loadSvg()
+  }, [combinedDefinition.dot, setSvg])
+
+  // On click .node, .edge, .cluster
+  useEffect(() => {
+    if (tool !== TOOL_NONE) {
+      setClickedMetadata(null)
+      return
+    }
+
+    const onClickGeometry = (event: MouseEvent) => {
+      if (hoverMetadata) {
+        event.preventDefault()
+        setClickedMetadata({ metadata: hoverMetadata, left: event.clientX, top: event.clientY })
+      }
+    }
+
+    document.addEventListener('click', onClickGeometry)
+
+    return () => {
+      document.removeEventListener('click', onClickGeometry)
+    }
+  }, [tool, hoverMetadata, setClickedMetadata])
+
+  // On hover .node, .edge, .cluster
+  useEffect(() => {
+    if (tool !== TOOL_NONE) {
+      setHoverMetadata(null)
+      return
+    }
+
+    const onMouseMove = (event: MouseEvent) => {
+      const element = findClosestElementOnCursor(event)
+
+      if (element) {
+        const metadata = combinedDefinition.dotMetadata.find(({ id }) => element.id === id)
+        setHoverMetadata(metadata ?? null)
+      } else {
+        setHoverMetadata(null)
+      }
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+    }
+  }, [tool, combinedDefinition.dotMetadata])
+
+  const onCloseDialog = useCallback(() => {
+    setClickedMetadata(null)
+  }, [setClickedMetadata])
 
   if (!svg) return null
 
   return (
-    <Wrapper ref={observeRef}>
+    <Wrapper ref={observeRef} $idOnHover={hoverMetadata?.id}>
+      <MetadataDialog
+        dotMetadata={clickedMetadata?.metadata ?? null}
+        isOpen={!!clickedMetadata}
+        onClose={onCloseDialog}
+        top={clickedMetadata?.top ?? 0}
+        left={clickedMetadata?.left ?? 0}
+      />
       <ReactSvgPanZoomLoader
         svgXML={svg}
         render={(content) => (
@@ -67,7 +162,24 @@ export const ScrollableSvg: FC<Props> = ({ svg }) => {
   )
 }
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ $idOnHover: string | undefined }>`
   height: 100%;
   width: 100%;
+
+  /* overwride pointer-events: none; for oncursormove events */
+  .node,
+  .edge,
+  .cluster {
+    pointer-events: all;
+  }
+
+  ${(props) =>
+    props.$idOnHover &&
+    `
+    #${props.$idOnHover} {
+      stroke-width: 3;
+    }
+
+    cursor: pointer;
+  `}
 `
