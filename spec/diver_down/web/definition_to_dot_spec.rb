@@ -5,15 +5,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
     describe '#to_s' do
       def build_definition(title: 'title', sources: [])
         definition_sources = sources.map do |source|
-          dependencies = (source[:dependencies] || []).map do |dependency|
-            DiverDown::Definition::Dependency.new(**dependency)
-          end
-
-          modules = (source[:modules] || []).map do |mod|
-            DiverDown::Definition::Modulee.new(**mod)
-          end
-
-          DiverDown::Definition::Source.new(**source, dependencies:, modules:)
+          DiverDown::Definition::Source.from_hash(source)
         end
 
         DiverDown::Definition.new(title:, sources: definition_sources)
@@ -62,13 +54,17 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   },
                 ],
               },
+              {
+                source_name: 'b.rb',
+              },
             ]
           )
 
           expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb"]
-                "a.rb" -> "b.rb"
+              "a.rb" -> "b.rb"
+              "b.rb" [label="b.rb"]
             }
           DOT
         end
@@ -98,6 +94,77 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   label="B" "a.rb" [label="a.rb"]
                 }
               }
+            }
+          DOT
+        end
+
+        it 'returns compound digraph if compound = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+                modules: [
+                  {
+                    module_name: 'A',
+                  },
+                ],
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                  }, {
+                    source_name: 'c.rb',
+                  },
+                ],
+              }, {
+                source_name: 'b.rb',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+                dependencies: [],
+              }, {
+                source_name: 'c.rb',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+                dependencies: [],
+              },
+            ]
+          )
+
+          expect(described_class.new(definition, compound: true).to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              compound=true
+              subgraph "cluster_A" {
+                label="A" "a.rb" [label="a.rb"]
+              }
+              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B" minlen="3"]
+              subgraph "cluster_B" {
+                label="B" "b.rb" [label="b.rb"]
+              }
+              subgraph "cluster_B" {
+                label="B" "c.rb" [label="c.rb"]
+              }
+            }
+          DOT
+        end
+
+        it 'returns concentrate digraph if concentrate = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+              },
+            ]
+          )
+
+          expect(described_class.new(definition, concentrate: true).to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              concentrate=true
+              "a.rb" [label="a.rb"]
             }
           DOT
         end
