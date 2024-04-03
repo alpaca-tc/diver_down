@@ -68,7 +68,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(described_class.new(definition).to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb"]
-                "a.rb" -> "b.rb"
+              "a.rb" -> "b.rb"
             }
           DOT
         end
