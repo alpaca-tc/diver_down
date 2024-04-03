@@ -12,9 +12,9 @@ begin
   # Rack 2.0
   require 'rack'
   require 'rack/server'
-  Rack::Server.new(app:).start
+  Rack::Server.new(app:, server: :webrick).start
 rescue LoadError
   # Rack 3.0
   require 'rackup'
-  Rackup::Server.new(app:).start
+  Rackup::Server.new(app:, server: :webrick).start
 end
