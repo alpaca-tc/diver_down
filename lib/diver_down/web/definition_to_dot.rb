@@ -88,6 +88,7 @@ module DiverDown
         @io = DiverDown::IndentedStringIo.new
         @indent = 0
         @compound = compound
+        @compound_map = Hash.new { |h, k| h[k] = Set.new } # { ltail => Set<lhead> }
         @concentrate = concentrate
       end
 
@@ -122,13 +123,24 @@ module DiverDown
 
         source.dependencies.each do
           attributes = {}
+          ltail = module_label(*source.modules)
+          lhead = module_label(*definition.source(_1.source_name).modules)
+          skip_rendering = false
 
-          if @compound
-            ltail = module_label(*source.modules)
-            lhead = module_label(*definition.source(_1.source_name).modules)
+          if @compound && (ltail || lhead)
+            # Rendering of dependencies between modules is done only once
+            between_modules = ltail != lhead
+            skip_rendering ||= @compound_map[ltail].include?(lhead) if between_modules
+            @compound_map[ltail].add(lhead)
 
-            attributes.merge!(ltail:, lhead:)
+            attributes.merge!(
+              ltail:,
+              lhead:,
+              minlen: (between_modules ? 3 : nil) # Between modules is prominently distanced
+            )
           end
+
+          next if skip_rendering
 
           io.write(%("#{source.source_name}" -> "#{_1.source_name}"))
           io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
@@ -176,10 +188,10 @@ module DiverDown
       # rubocop:disable Lint/UnderscorePrefixedVariableName
       # attrsの参考 https://qiita.com/rubytomato@github/items/51779135bc4b77c8c20d
       def build_attributes(_wrap: '[]', **attrs)
-        attrs_str = attrs.filter_map { %(#{_1}="#{_2}") if _2 }.join(ATTRIBUTE_DELIMITER)
-        attrs.merge!(label: 'a-b', headlabel: 'head', taillabel: 'tail')
+        attrs = attrs.reject { _2.nil? || _2 == '' }
+        return if attrs.empty?
 
-        return if attrs_str.empty?
+        attrs_str = attrs.map { %(#{_1}="#{_2}") }.join(ATTRIBUTE_DELIMITER)
 
         if _wrap
           "#{_wrap[0]}#{attrs_str}#{_wrap[1]}"

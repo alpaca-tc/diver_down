@@ -54,6 +54,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   },
                 ],
               },
+              {
+                source_name: 'b.rb',
+              }
             ]
           )
 
@@ -61,6 +64,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               "a.rb" [label="a.rb"]
               "a.rb" -> "b.rb"
+              "b.rb" [label="b.rb"]
             }
           DOT
         end
@@ -79,7 +83,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                     module_name: 'B',
                   },
                 ],
-              },
+              }
             ]
           )
 
@@ -137,8 +141,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               subgraph "cluster_A" {
                 label="A" "a.rb" [label="a.rb"]
               }
-              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B"]
-              "a.rb" -> "c.rb" [ltail="cluster_A" lhead="cluster_B"]
+              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
                 label="B" "b.rb" [label="b.rb"]
               }
