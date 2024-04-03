@@ -5,15 +5,19 @@ import { Loading } from '@/components/Loading'
 import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
 
-import { DefinitionGraph } from './components/DefinitionGraph'
+import { DefinitionGraph, GraphOptions } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'
 import { DefinitionSources } from './components/DefinitionSources'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
-  const { data: combinedDefinition, isLoading } = useCombinedDefinition(selectedDefinitionIds)
+  const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', { compound: false })
+  const { data: combinedDefinition, isLoading } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound)
+
+  console.log({ graphOptions })
 
   return (
     <Wrapper>
@@ -32,7 +36,7 @@ export const Show: React.FC = () => {
             </CenterStack>
           ) : (
             <StyledStack>
-              <DefinitionGraph combinedDefinition={combinedDefinition} />
+              <DefinitionGraph combinedDefinition={combinedDefinition} graphOptions={graphOptions} setGraphOptions={setGraphOptions} />
               <StyledDefinitionSources combinedDefinition={combinedDefinition} />
             </StyledStack>
           )}

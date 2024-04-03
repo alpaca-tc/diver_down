@@ -3,6 +3,7 @@ import useSWR from 'swr'
 import { path } from '@/constants/path'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 import { bitIdToIds } from '@/utils/bitId'
+import { stringify } from '@/utils/queryString'
 
 import { get } from './httpRequest'
 
@@ -34,8 +35,8 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
   }
 }
 
-export const useCombinedDefinition = (ids: number[]) => {
-  const requestPath = path.api.definitions.show(ids)
+export const useCombinedDefinition = (ids: number[], compound: boolean) => {
+  const requestPath = `${path.api.definitions.show(ids)}?${stringify({ compound: compound ? '1' : null })}`
   const shouldFetch = ids.length > 0
   const { data, isLoading } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
 

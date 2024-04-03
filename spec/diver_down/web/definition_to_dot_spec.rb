@@ -102,7 +102,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           DOT
         end
 
-        it 'returns composed digraph if composed = true' do
+        it 'returns compound digraph if compound = true' do
           definition = build_definition(
             sources: [
               {
@@ -115,10 +115,20 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 dependencies: [
                   {
                     source_name: 'b.rb',
+                  }, {
+                    source_name: 'c.rb',
                   },
                 ],
               }, {
                 source_name: 'b.rb',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+                dependencies: [],
+              }, {
+                source_name: 'c.rb',
                 modules: [
                   {
                     module_name: 'B',
@@ -131,12 +141,17 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
 
           expect(described_class.new(definition, compound: true).to_s).to eq(<<~DOT)
             strict digraph "title" {
+              compound=true
               subgraph "cluster_A" {
                 label="A" "a.rb" [label="a.rb"]
               }
-              "a.rb" -> "b.rb" [lhead="cluster_A" ltail="cluster_B"]
+              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B"]
+              "a.rb" -> "c.rb" [ltail="cluster_A" lhead="cluster_B"]
               subgraph "cluster_B" {
                 label="B" "b.rb" [label="b.rb"]
+              }
+              subgraph "cluster_B" {
+                label="B" "c.rb" [label="c.rb"]
               }
             }
           DOT

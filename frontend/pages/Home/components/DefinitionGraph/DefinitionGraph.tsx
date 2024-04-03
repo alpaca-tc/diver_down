@@ -1,18 +1,24 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { Heading, LineClamp, Section, Text } from '@/components/ui'
+import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 import { renderDot } from '@/utils/renderDot'
 
+import { ConfigureViewOptionsDialog, GraphOptions } from './ConfigureGraphOptionsDialog'
 import { ScrollableSvg } from './ScrollableSvg'
 
 type Props = {
   combinedDefinition: CombinedDefinition
+  graphOptions: GraphOptions
+  setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-export const DefinitionGraph: FC<Props> = ({ combinedDefinition }) => {
+type DialogType = 'configureViewOptionsDiaglog'
+
+export const DefinitionGraph: FC<Props> = ({ combinedDefinition, graphOptions, setGraphOptions }) => {
+  const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
   const [svg, setSvg] = useState<string>('')
 
   useEffect(() => {
@@ -28,8 +34,18 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition }) => {
     loadSvg()
   }, [combinedDefinition.dot, setSvg])
 
+  const onClickCloseDialog = useCallback(() => {
+    setVisibleDialog(null)
+  }, [setVisibleDialog])
+
   return (
     <WrapperSection>
+      <ConfigureViewOptionsDialog
+        isOpen={visibleDialog === 'configureViewOptionsDiaglog'}
+        onClickClose={onClickCloseDialog}
+        graphOptions={graphOptions}
+        setGraphOptions={setGraphOptions}
+      />
       <FixedHeightHeading type="sectionTitle">
         <LineClamp>
           {combinedDefinition.titles.map((title, index) => (
@@ -38,6 +54,14 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition }) => {
             </BlockText>
           ))}
         </LineClamp>
+        <Button
+          size="s"
+          square
+          onClick={() => setVisibleDialog('configureViewOptionsDiaglog')}
+          prefix={<FaGearIcon alt="Open Options" />}
+        >
+          Open View Options
+        </Button>
       </FixedHeightHeading>
       <FlexHeightSvgWrapper>
         <ScrollableSvg svg={svg} />

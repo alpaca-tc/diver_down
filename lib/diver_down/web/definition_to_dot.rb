@@ -3,6 +3,8 @@
 module DiverDown
   class Web
     class DefinitionToDot
+      ATTRIBUTE_DELIMITER = ' '
+
       class SourceDecorator < BasicObject
         attr_reader :dependencies
 
@@ -119,10 +121,10 @@ module DiverDown
           attributes = {}
 
           if @compound
-            attributes.merge!(
-              lhead: module_label(*source.modules),
-              ltail: module_label(*definition.source(_1.source_name).modules)
-            )
+            ltail = module_label(*source.modules)
+            lhead = module_label(*definition.source(_1.source_name).modules)
+
+            attributes.merge!(ltail:, lhead:)
           end
 
           io.write(%("#{source.source_name}" -> "#{_1.source_name}"))
@@ -171,7 +173,7 @@ module DiverDown
       # rubocop:disable Lint/UnderscorePrefixedVariableName
       # attrsの参考 https://qiita.com/rubytomato@github/items/51779135bc4b77c8c20d
       def build_attributes(_wrap: '[]', **attrs)
-        attrs_str = attrs.filter_map { %(#{_1}="#{_2}") if _2 }.join(' ')
+        attrs_str = attrs.filter_map { %(#{_1}="#{_2}") if _2 }.join(ATTRIBUTE_DELIMITER)
         attrs.merge!(label: 'a-b', headlabel: 'head', taillabel: 'tail')
 
         return if attrs_str.empty?
