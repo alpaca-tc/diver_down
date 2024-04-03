@@ -82,11 +82,13 @@ module DiverDown
 
       # @param definition [DiverDown::Definition]
       # @param compound [Boolean]
-      def initialize(definition, compound: false)
+      # @param concentrate [Boolean] https://graphviz.org/docs/attrs/concentrate/
+      def initialize(definition, compound: false, concentrate: false)
         @definition = definition
         @io = DiverDown::IndentedStringIo.new
         @indent = 0
         @compound = compound
+        @concentrate = concentrate
       end
 
       # @return [String]
@@ -98,6 +100,7 @@ module DiverDown
         io.puts %(strict digraph "#{definition.title}" {)
         io.indented do
           io.puts('compound=true') if @compound
+          io.puts('concentrate=true') if @concentrate
           sources.each do
             insert_source(_1)
           end

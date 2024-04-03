@@ -6,6 +6,7 @@ import { spacing } from '@/constants/theme'
 
 export type GraphOptions = {
   compound: boolean
+  concentrate: boolean
 }
 
 type Props = {
@@ -43,6 +44,13 @@ export const ConfigureViewOptionsDialog: React.FC<Props> = ({
     [setTemporaryViewOptions],
   )
 
+  const onChangeConcentrate = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTemporaryViewOptions((prev) => ({ ...prev, concentrate: event.target.checked }))
+    },
+    [setTemporaryViewOptions],
+  )
+
   return (
     <ActionDialog
       title="Configure Graph Options"
@@ -58,11 +66,15 @@ export const ConfigureViewOptionsDialog: React.FC<Props> = ({
       <WrapperSection>
         <Stack gap={1.5}>
           <Stack gap={1.5}>
-            <p>Configure settings related to the display of definitions.</p>
+            <p>Configure graph settings.</p>
 
             <Stack gap={1.5}>
               <FormControl title="Clip the boundary" helpMessage="Clip the boundary of the module.">
                 <CheckBox name="compound" onChange={onChangeCompound} checked={temporaryViewOptions.compound} />
+              </FormControl>
+
+              <FormControl title="Use edge concentrators" helpMessage="This merges multiedges into a single edge and causes partially parallel edges to share part of their paths.">
+                <CheckBox name="compound" onChange={onChangeConcentrate} checked={temporaryViewOptions.concentrate} />
               </FormControl>
             </Stack>
           </Stack>

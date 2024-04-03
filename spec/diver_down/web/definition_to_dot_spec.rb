@@ -5,15 +5,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
     describe '#to_s' do
       def build_definition(title: 'title', sources: [])
         definition_sources = sources.map do |source|
-          dependencies = (source[:dependencies] || []).map do |dependency|
-            DiverDown::Definition::Dependency.new(**dependency)
-          end
-
-          modules = (source[:modules] || []).map do |mod|
-            DiverDown::Definition::Modulee.new(**mod)
-          end
-
-          DiverDown::Definition::Source.new(**source, dependencies:, modules:)
+          DiverDown::Definition::Source.from_hash(source)
         end
 
         DiverDown::Definition.new(title:, sources: definition_sources)
@@ -153,6 +145,23 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               subgraph "cluster_B" {
                 label="B" "c.rb" [label="c.rb"]
               }
+            }
+          DOT
+        end
+
+        it 'returns concentrate digraph if concentrate = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+              },
+            ]
+          )
+
+          expect(described_class.new(definition, concentrate: true).to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              concentrate=true
+              "a.rb" [label="a.rb"]
             }
           DOT
         end
