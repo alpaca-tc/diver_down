@@ -101,6 +101,46 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
         end
+
+        it 'returns composed digraph if composed = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+                modules: [
+                  {
+                    module_name: 'A',
+                  },
+                ],
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                  },
+                ],
+              }, {
+                source_name: 'b.rb',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+                dependencies: [],
+              },
+            ]
+          )
+
+          expect(described_class.new(definition, compound: true).to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              subgraph "cluster_A" {
+                label="A" "a.rb" [label="a.rb"]
+              }
+              "a.rb" -> "b.rb" [lhead="cluster_A" ltail="cluster_B"]
+              subgraph "cluster_B" {
+                label="B" "b.rb" [label="b.rb"]
+              }
+            }
+          DOT
+        end
       end
     end
   end

@@ -95,6 +95,7 @@ module DiverDown
 
         io.puts %(strict digraph "#{definition.title}" {)
         io.indented do
+          io.puts('compound=true') if @compound
           sources.each do
             insert_source(_1)
           end
@@ -115,10 +116,18 @@ module DiverDown
         end
 
         source.dependencies.each do
-          attributes = build_attributes(tooltip: _1.tooltip)
-          io.write %("#{source.source_name}" -> "#{_1.source_name}")
-          io.write %( #{attributes}) if attributes
-          io.write "\n"
+          attributes = {}
+
+          if @compound
+            attributes.merge!(
+              lhead: module_label(*source.modules),
+              ltail: module_label(*definition.source(_1.source_name).modules)
+            )
+          end
+
+          io.write(%("#{source.source_name}" -> "#{_1.source_name}"))
+          io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
+          io.write("\n")
         end
       end
 
@@ -128,7 +137,7 @@ module DiverDown
 
           # last subgraph
           last_module_writer = proc do
-            io.puts %(#{' ' unless modules.empty?}subgraph "cluster_#{last_module.module_name}" {), indent: false
+            io.puts %(#{' ' unless modules.empty?}subgraph "#{module_label(last_module)}" {), indent: false
             io.indented do
               source_attributes = build_attributes(label: last_module.module_name, _wrap: false)
               module_attributes = build_attributes(label: source.source_name)
@@ -143,7 +152,7 @@ module DiverDown
           # wrapper subgraph
           modules_writer = modules.inject(last_module_writer) do |next_writer, mod|
             proc do
-              io.puts %(subgraph "cluster_#{mod.module_name}" {)
+              io.puts %(subgraph "#{module_label(mod)}" {)
               io.indented do
                 attributes = build_attributes(label: mod.module_name, _wrap: false)
                 io.write attributes
@@ -163,7 +172,7 @@ module DiverDown
       # attrsの参考 https://qiita.com/rubytomato@github/items/51779135bc4b77c8c20d
       def build_attributes(_wrap: '[]', **attrs)
         attrs_str = attrs.filter_map { %(#{_1}="#{_2}") if _2 }.join(' ')
-        attrs.merge!(label: 'a-b', headlabel: "head", taillabel: "tail")
+        attrs.merge!(label: 'a-b', headlabel: 'head', taillabel: 'tail')
 
         return if attrs_str.empty?
 
@@ -189,6 +198,12 @@ module DiverDown
         @io
       ensure
         @io = old_io
+      end
+
+      def module_label(*modules)
+        return if modules.empty?
+
+        "cluster_#{modules[0].module_name}"
       end
     end
   end

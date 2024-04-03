@@ -424,6 +424,25 @@ RSpec.describe DiverDown::Web do
       expect(last_response.headers['content-type']).to eq('application/json')
       expect(last_response.body).to include('digraph')
     end
+
+    it 'returns combined definition with compound=true' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      bit_ids = store.set(definition)
+
+      get "/api/definitions/#{bit_ids.inject(0, &:|)}.json", compound: '1'
+
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers['content-type']).to eq('application/json')
+      expect(last_response.body).to include('digraph')
+      expect(last_response.body).to include('compound')
+    end
   end
 
   describe 'GET /api/sources/:source.json' do
