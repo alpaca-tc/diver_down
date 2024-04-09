@@ -60,7 +60,7 @@ module DiverDown
       # @param other [DiverDown::Definition::MethodId]
       # @return [Integer]
       def <=>(other)
-        [name, context] <=> [other.name, other.context]
+        [context, name] <=> [other.context, other.name]
       end
 
       # @param other [Object, DiverDown::Definition::Source]

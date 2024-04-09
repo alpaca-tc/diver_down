@@ -16,7 +16,7 @@ type Props = {
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-export const ConfigureViewOptionsDialog: React.FC<Props> = ({ isOpen, onClickClose, graphOptions, setGraphOptions }) => {
+export const ConfigureGraphOptionsDialog: React.FC<Props> = ({ isOpen, onClickClose, graphOptions, setGraphOptions }) => {
   const [temporaryViewOptions, setTemporaryViewOptions] = useState<GraphOptions>(graphOptions)
 
   const handleDialogClose = () => {

@@ -62,8 +62,8 @@ RSpec.describe DiverDown::Definition::MethodId do
           ),
         ].shuffle
 
-        expect(array.sort.map(&:name)).to eq(%w[a b b c])
-        expect(array.sort.map(&:context)).to eq(%w[class class instance class])
+        expect(array.sort.map(&:name)).to eq(%w[a b c b])
+        expect(array.sort.map(&:context)).to eq(%w[class class class instance])
       end
     end
 

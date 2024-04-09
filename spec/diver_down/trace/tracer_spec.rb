@@ -378,15 +378,15 @@ RSpec.describe DiverDown::Trace::Tracer do
                   source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
-                      name: 'call_c',
-                      context: 'instance',
+                      name: 'new',
+                      context: 'class',
                       paths: [
                         match(/tracer_instance\.rb:\d+/),
                       ],
                     },
                     {
-                      name: 'new',
-                      context: 'class',
+                      name: 'call_c',
+                      context: 'instance',
                       paths: [
                         match(/tracer_instance\.rb:\d+/),
                       ],
@@ -402,15 +402,15 @@ RSpec.describe DiverDown::Trace::Tracer do
                   source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
-                      name: 'call_d',
-                      context: 'instance',
+                      name: 'new',
+                      context: 'class',
                       paths: [
                         match(/tracer_instance\.rb:\d+/),
                       ],
                     },
                     {
-                      name: 'new',
-                      context: 'class',
+                      name: 'call_d',
+                      context: 'instance',
                       paths: [
                         match(/tracer_instance\.rb:\d+/),
                       ],
@@ -462,15 +462,15 @@ RSpec.describe DiverDown::Trace::Tracer do
                   source_name: 'AntipollutionModule::B',
                   method_ids: [
                     {
-                      name: 'call_c',
-                      context: 'instance',
+                      name: 'new',
+                      context: 'class',
                       paths: [
                         match(/tracer_subclass\.rb:\d+/),
                       ],
                     },
                     {
-                      name: 'new',
-                      context: 'class',
+                      name: 'call_c',
+                      context: 'instance',
                       paths: [
                         match(/tracer_subclass\.rb:\d+/),
                       ],
@@ -486,15 +486,15 @@ RSpec.describe DiverDown::Trace::Tracer do
                   source_name: 'AntipollutionModule::C',
                   method_ids: [
                     {
-                      name: 'call_d',
-                      context: 'instance',
+                      name: 'new',
+                      context: 'class',
                       paths: [
                         match(/tracer_subclass\.rb:\d+/),
                       ],
                     },
                     {
-                      name: 'new',
-                      context: 'class',
+                      name: 'call_d',
+                      context: 'instance',
                       paths: [
                         match(/tracer_subclass\.rb:\d+/),
                       ],

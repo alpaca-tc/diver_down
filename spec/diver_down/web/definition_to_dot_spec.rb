@@ -34,11 +34,22 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          expect(described_class.new(definition).to_s).to eq(<<~DOT)
+          instance = described_class.new(definition)
+          expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
-              "a.rb" [label="a.rb"]
+              "a.rb" [label="a.rb" id="graph_1"]
             }
           DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'source',
+                source_name: 'a.rb',
+              },
+            ]
+          )
         end
       end
 
@@ -60,13 +71,33 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          expect(described_class.new(definition).to_s).to eq(<<~DOT)
+          instance = described_class.new(definition)
+          expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
-              "a.rb" [label="a.rb"]
-              "a.rb" -> "b.rb"
-              "b.rb" [label="b.rb"]
+              "a.rb" [label="a.rb" id="graph_1"]
+              "a.rb" -> "b.rb" [id="graph_2"]
+              "b.rb" [label="b.rb" id="graph_3"]
             }
           DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'source',
+                source_name: 'a.rb',
+              }, {
+                id: 'graph_2',
+                type: 'dependency',
+                source_name: 'b.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_3',
+                type: 'source',
+                source_name: 'b.rb',
+              },
+            ]
+          )
         end
       end
 
@@ -87,15 +118,35 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          expect(described_class.new(definition).to_s).to eq(<<~DOT)
+          instance = described_class.new(definition)
+
+          expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               subgraph "cluster_A" {
-                label="A" subgraph "cluster_B" {
-                  label="B" "a.rb" [label="a.rb"]
+                label="A" id="graph_1" subgraph "cluster_B" {
+                  label="B" id="graph_2" "a.rb" [label="a.rb" id="graph_3"]
                 }
               }
             }
           DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'module',
+                module_name: 'A',
+              }, {
+                id: 'graph_2',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_3',
+                type: 'source',
+                source_name: 'a.rb',
+              },
+            ]
+          )
         end
 
         it 'returns compound digraph if compound = true' do
@@ -135,21 +186,62 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          expect(described_class.new(definition, compound: true).to_s).to eq(<<~DOT)
+          instance = described_class.new(definition, compound: true)
+          expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               compound=true
               subgraph "cluster_A" {
-                label="A" "a.rb" [label="a.rb"]
+                label="A" id="graph_1" "a.rb" [label="a.rb" id="graph_2"]
               }
-              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B" minlen="3"]
+              "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" "b.rb" [label="b.rb"]
+                label="B" id="graph_5" "b.rb" [label="b.rb" id="graph_6"]
               }
               subgraph "cluster_B" {
-                label="B" "c.rb" [label="c.rb"]
+                label="B" id="graph_7" "c.rb" [label="c.rb" id="graph_8"]
               }
             }
           DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'module',
+                module_name: 'A',
+              }, {
+                id: 'graph_2',
+                type: 'source',
+                source_name: 'a.rb',
+              }, {
+                id: 'graph_3',
+                type: 'dependency',
+                source_name: 'b.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_4',
+                type: 'dependency',
+                source_name: 'c.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_5',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_6',
+                type: 'source',
+                source_name: 'b.rb',
+              }, {
+                id: 'graph_7',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_8',
+                type: 'source',
+                source_name: 'c.rb',
+              },
+            ]
+          )
         end
 
         it 'returns concentrate digraph if concentrate = true' do
@@ -161,12 +253,23 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          expect(described_class.new(definition, concentrate: true).to_s).to eq(<<~DOT)
+          instance = described_class.new(definition, concentrate: true)
+          expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               concentrate=true
-              "a.rb" [label="a.rb"]
+              "a.rb" [label="a.rb" id="graph_1"]
             }
           DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'source',
+                source_name: 'a.rb',
+              },
+            ]
+          )
         end
       end
     end

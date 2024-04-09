@@ -166,10 +166,13 @@ module DiverDown
                              end
 
         if definition
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, compound:, concentrate:)
+
           json(
             titles:,
             bit_id: DiverDown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
-            dot: DiverDown::Web::DefinitionToDot.new(definition, compound:, concentrate:).to_s,
+            dot: definition_to_dot.to_s,
+            dot_metadata: definition_to_dot.metadata,
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,

@@ -1,82 +1,71 @@
 # frozen_string_literal: true
 
+require 'json'
+require 'cgi'
+
 module DiverDown
   class Web
     class DefinitionToDot
       ATTRIBUTE_DELIMITER = ' '
 
-      class SourceDecorator < BasicObject
-        attr_reader :dependencies
+      class MetadataStore
+        attr_reader :to_a
 
-        # @param source [DiverDown::Definition::Source]
-        def initialize(source)
-          @source = source
-          @dependencies = source.dependencies.map { DependencyDecorator.new(_1) }
+        def initialize
+          @prefix = 'graph_'
+          @to_a = []
         end
 
-        # @return [String]
-        def label
-          @source.source_name
+        # @param type [Symbol]
+        # @param record [DiverDown::Definition::Source, DiverDown::Definition::Dependency, DiverDown::Definition::Modulee]
+        def issue_id(record)
+          metadata = case record
+                     when DiverDown::Definition::Source
+                       source_to_metadata(record)
+                     when DiverDown::Definition::Dependency
+                       dependency_to_metadata(record)
+                     when DiverDown::Definition::Modulee
+                       module_to_metadata(record)
+                     else
+                       raise NotImplementedError, "not implemented yet #{record.class}"
+                     end
+
+          id = "#{@prefix}#{@to_a.length + 1}"
+          @to_a.push(metadata.merge(id:))
+          id
         end
 
-        # @return [String, nil]
-        def tooltip
-          nil
+        private
+
+        def length
+          @to_a.length
         end
 
-        # @param action [Symbol]
-        # @param args [Array]
-        # @param options [Hash, nil]
-        # @param block [Proc, nil]
-        def method_missing(action, ...)
-          if @source.respond_to?(action, true)
-            @source.send(action, ...)
-          else
-            super
-          end
+        def source_to_metadata(record)
+          {
+            type: 'source',
+            source_name: record.source_name,
+          }
         end
 
-        # @param action [Symbol]
-        # @param include_private [Boolean]
-        # @return [Boolean]
-        def respond_to_missing?(action, include_private = false)
-          super || @source.respond_to?(action, include_private)
-        end
-      end
-
-      class DependencyDecorator < BasicObject
-        # @param dependency [DiverDown::Definition::dependency]
-        def initialize(dependency)
-          @dependency = dependency
-        end
-
-        # @return [String]
-        def label
-          @dependency.dependency
+        def dependency_to_metadata(record)
+          {
+            type: 'dependency',
+            source_name: record.source_name,
+            method_ids: record.method_ids.sort.map do
+              {
+                name: _1.name,
+                context: _1.context,
+              }
+            end,
+          }
         end
 
-        # @return [String, nil]
-        def tooltip
-          nil
-        end
-
-        # @param action [Symbol]
-        # @param args [Array]
-        # @param options [Hash, nil]
-        # @param block [Proc, nil]
-        def method_missing(action, ...)
-          if @dependency.respond_to?(action, true)
-            @dependency.send(action, ...)
-          else
-            super
-          end
-        end
-
-        # @param action [Symbol]
-        # @param include_private [Boolean]
-        # @return [Boolean]
-        def respond_to_missing?(action, include_private = false)
-          super || @dependency.respond_to?(action, include_private)
+        def module_to_metadata(record)
+          {
+            type: 'module',
+            module_name: record.module_name,
+          }
         end
       end
 
@@ -90,13 +79,17 @@ module DiverDown
         @compound = compound
         @compound_map = Hash.new { |h, k| h[k] = Set.new } # { ltail => Set<lhead> }
         @concentrate = concentrate
+        @metadata_store = MetadataStore.new
+      end
+
+      # @return [Array<Hash>]
+      def metadata
+        @metadata_store.to_a
       end
 
       # @return [String]
       def to_s
-        sources = definition.sources
-          .sort_by(&:source_name)
-          .map { SourceDecorator.new(_1) }
+        sources = definition.sources.sort_by(&:source_name)
 
         io.puts %(strict digraph "#{definition.title}" {)
         io.indented do
@@ -116,13 +109,15 @@ module DiverDown
 
       def insert_source(source)
         if source.modules.empty?
-          io.puts %("#{source.source_name}" #{build_attributes(label: source.label)})
+          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_id(source))})
         else
           insert_modules(source)
         end
 
         source.dependencies.each do
-          attributes = {}
+          attributes = {
+            id: @metadata_store.issue_id(_1),
+          }
           ltail = module_label(*source.modules)
           lhead = module_label(*definition.source(_1.source_name).modules)
           skip_rendering = false
@@ -156,12 +151,10 @@ module DiverDown
           last_module_writer = proc do
             io.puts %(#{' ' unless modules.empty?}subgraph "#{module_label(last_module)}" {), indent: false
             io.indented do
-              source_attributes = build_attributes(label: last_module.module_name, _wrap: false)
-              module_attributes = build_attributes(label: source.source_name)
+              module_attributes = build_attributes(label: last_module.module_name, id: @metadata_store.issue_id(last_module), _wrap: false)
+              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_id(source))
 
-              io.write %(#{source_attributes} "#{source.source_name}")
-              io.write(" #{module_attributes}", indent: false) if module_attributes
-              io.write "\n"
+              io.puts %(#{module_attributes} "#{source.source_name}" #{source_attributes})
             end
             io.puts '}'
           end
@@ -171,7 +164,7 @@ module DiverDown
             proc do
               io.puts %(subgraph "#{module_label(mod)}" {)
               io.indented do
-                attributes = build_attributes(label: mod.module_name, _wrap: false)
+                attributes = build_attributes(label: mod.module_name, id: @metadata_store.issue_id(mod), _wrap: false)
                 io.write attributes
                 next_writer.call
               end
