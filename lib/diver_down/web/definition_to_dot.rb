@@ -116,7 +116,7 @@ module DiverDown
 
         source.dependencies.each do
           attributes = {
-            id: @metadata_store.issue_id(_1)
+            id: @metadata_store.issue_id(_1),
           }
           ltail = module_label(*source.modules)
           lhead = module_label(*definition.source(_1.source_name).modules)
