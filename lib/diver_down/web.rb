@@ -57,16 +57,20 @@ module DiverDown
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         action.combine_definitions(bit_id, compound, concentrate)
-      in ['GET', %r{\A/api/sources/(?<source>.+)\.json\z}]
+      in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
+      in ['POST', %r{\A/api/sources/(?<source>[^/]+)/modules.json\z}]
+        source = Regexp.last_match[:source]
+        modules = request.params['modules'] || []
+        action.set_modules(source, modules)
       in ['GET', %r{\A/api/pid\.json\z}]
         action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
         action.initialization_status(@total_definition_files_size)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
-      in ['GET', /\.json\z/]
+      in ['GET', /\.json\z/], ['POST', /\.json\z/]
         action.not_found
       else
         @files_server.call(env.merge('PATH_INFO' => '/index.html'))

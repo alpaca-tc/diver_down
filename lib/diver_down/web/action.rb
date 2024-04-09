@@ -259,6 +259,27 @@ module DiverDown
         )
       end
 
+      # POST /api/sources/:source_name/modules.json
+      #
+      # @param source_name [String]
+      # @param modules [Array<String>]
+      def set_modules(source_name, modules)
+        found_source = @store.any? do |_, definition|
+          definition.sources.any? do |source|
+            source.source_name == source_name
+          end
+        end
+
+        if found_source
+          @module_store.set(source_name, modules)
+          @module_store.flush
+
+          json({})
+        else
+          not_found
+        end
+      end
+
       # @return [Array[Integer, Hash, Array]]
       def not_found
         [404, { 'content-type' => 'text/plain' }, ['not found']]

@@ -5,6 +5,8 @@ require 'yaml'
 module DiverDown
   class Web
     class ModuleStore
+      BLANK_ARRAY = [].freeze
+
       def initialize(path)
         @path = path
         @store = load
@@ -13,13 +15,13 @@ module DiverDown
       # @param source_name [String]
       # @param modules [Array<DiverDown::Web::Modulee>]
       def set(source_name, modules)
-        @store[source_name] = modules
+        @store[source_name] = modules.dup.freeze
       end
 
       # @param source_name [String]
       # @return [Array<Module>]
       def get(source_name)
-        @store[source_name] || []
+        @store[source_name] || BLANK_ARRAY
       end
 
       # @return [Hash]
@@ -38,8 +40,12 @@ module DiverDown
       def load
         store = {}
 
-        loaded = YAML.load_file(@path)
-        store.merge!(loaded) if loaded
+        begin
+          loaded = YAML.load_file(@path)
+          store.merge!(loaded) if loaded
+        rescue StandardError
+          # Ignore error
+        end
 
         store
       end

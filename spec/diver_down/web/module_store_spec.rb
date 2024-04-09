@@ -2,6 +2,13 @@
 
 RSpec.describe DiverDown::Web::ModuleStore do
   describe 'InstanceMethods' do
+    describe '#initialize' do
+      it "does not raise error if file doesn't exist" do
+        path = "#{Dir.tmpdir}/not_exist.yaml"
+        expect { described_class.new(path) }.to_not raise_error
+      end
+    end
+
     describe '#set' do
       it 'set modules to source' do
         tempfile = Tempfile.new(['test', '.yaml'])

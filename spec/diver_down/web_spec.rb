@@ -459,4 +459,30 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
     end
   end
+
+  describe 'POST /api/sources/:source/modules.json' do
+    it 'returns 404 if source is not found' do
+      post '/api/sources/unknown/modules.json'
+
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'set modules if source is found' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/modules.json', { modules: ['A', 'B'] }
+
+      expect(last_response.status).to eq(200)
+
+      expect(module_store.get('a.rb')).to eq(['A', 'B'])
+    end
+  end
 end
