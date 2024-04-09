@@ -1,14 +1,21 @@
-import { ComponentProps, FC, useCallback, useMemo, useState } from 'react'
+import { FC, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Aside, EmptyTableBody, Table, Td, Text, Th } from '@/components/ui'
+import { Aside, Button, EmptyTableBody, FaPencilIcon, Table, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
+import { UpdateSourceModulesDialog } from './UpdateSourceModulesDialog'
+
+import type { DialogType } from '../dialog'
+
 type Props = {
   combinedDefinition: CombinedDefinition
+  visibleDialog: DialogType | null
+  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogType | null>>
+  mutateCombinedDefinition: () => void
 }
 
 const sortTypes = ['asc', 'desc', 'none'] as const
@@ -20,8 +27,14 @@ type SortState = {
   sort: SortTypes
 }
 
-export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
+export const DefinitionSources: FC<Props> = ({
+  combinedDefinition,
+  visibleDialog,
+  setVisibleDialog,
+  mutateCombinedDefinition,
+}) => {
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
+  const [editingSource, setEditingSource] = useState<{ sourceName: string; moduleNames: string[] } | null>(null)
 
   const setNextSortType = useCallback(
     (key: SortState['key']) => {
@@ -76,7 +89,17 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
 
   return (
     <WrapperAside>
-      <div style={{ overflow: 'clip' }}>
+      <UpdateSourceModulesDialog
+        isOpen={visibleDialog === 'updateSourceModulesDialog'}
+        sourceName={editingSource?.sourceName ?? ''}
+        initialModuleNames={editingSource?.moduleNames ?? []}
+        onClose={() => setVisibleDialog(null)}
+        onSave={() => {
+          mutateCombinedDefinition()
+          setVisibleDialog(null)
+        }}
+      />
+      <TableWrapper>
         <StyledTable fixedHead>
           <thead>
             <tr>
@@ -86,6 +109,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
               <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
                 Modules
               </Th>
+              <Th></Th>
             </tr>
           </thead>
           {sources.length === 0 ? (
@@ -102,17 +126,32 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition }) => {
                   </Td>
                   <Td>
                     {source.modules.map((module) => (
-                      <Text key={module.moduleName} as="div">
+                      <Text key={module.moduleName} as="div" whiteSpace="nowrap">
                         <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
                       </Text>
                     ))}
+                  </Td>
+                  <Td>
+                    <Button
+                      square={true}
+                      onClick={() => {
+                        setEditingSource({
+                          sourceName: source.sourceName,
+                          moduleNames: source.modules.map((module) => module.moduleName),
+                        })
+                        setVisibleDialog('updateSourceModulesDialog')
+                      }}
+                      size="s"
+                    >
+                      <FaPencilIcon alt="編集" />
+                    </Button>
                   </Td>
                 </tr>
               ))}
             </tbody>
           )}
         </StyledTable>
-      </div>
+      </TableWrapper>
     </WrapperAside>
   )
 }
@@ -126,6 +165,11 @@ const WrapperAside = styled(Aside)`
   &&& {
     margin-top: 0;
   }
+`
+
+const TableWrapper = styled.div`
+  overflow: clip;
+  overflow-x: scroll;
 `
 
 const StyledTable = styled(Table)`

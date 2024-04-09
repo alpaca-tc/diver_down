@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback } from 'react'
 import styled from 'styled-components'
 
 import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/components/ui'
@@ -8,17 +8,23 @@ import { CombinedDefinition } from '@/models/combinedDefinition'
 import { ConfigureGraphOptionsDialog, GraphOptions } from './ConfigureGraphOptionsDialog'
 import { ScrollableSvg } from './ScrollableSvg'
 
+import type { DialogType } from '../dialog'
+
 type Props = {
   combinedDefinition: CombinedDefinition
+  visibleDialog: DialogType | null
+  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogType | null>>
   graphOptions: GraphOptions
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-type DialogType = 'configureGraphOptionsDiaglog'
-
-export const DefinitionGraph: FC<Props> = ({ combinedDefinition, graphOptions, setGraphOptions }) => {
-  const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
-
+export const DefinitionGraph: FC<Props> = ({
+  combinedDefinition,
+  graphOptions,
+  setGraphOptions,
+  visibleDialog,
+  setVisibleDialog,
+}) => {
   const onClickCloseDialog = useCallback(() => {
     setVisibleDialog(null)
   }, [setVisibleDialog])

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
@@ -12,17 +12,20 @@ import { DefinitionGraph, GraphOptions } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'
 import { DefinitionSources } from './components/DefinitionSources'
 
+import type { DialogType } from './components/dialog'
+
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
+  const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
   const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', {
     compound: false,
     concentrate: false,
   })
-  const { data: combinedDefinition, isLoading } = useCombinedDefinition(
-    selectedDefinitionIds,
-    graphOptions.compound,
-    graphOptions.concentrate,
-  )
+  const {
+    data: combinedDefinition,
+    isLoading,
+    mutate: mutateCombinedDefinition,
+  } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate)
 
   return (
     <Wrapper>
@@ -45,8 +48,15 @@ export const Show: React.FC = () => {
                 combinedDefinition={combinedDefinition}
                 graphOptions={graphOptions}
                 setGraphOptions={setGraphOptions}
+                visibleDialog={visibleDialog}
+                setVisibleDialog={setVisibleDialog}
               />
-              <StyledDefinitionSources combinedDefinition={combinedDefinition} />
+              <StyledDefinitionSources
+                combinedDefinition={combinedDefinition}
+                visibleDialog={visibleDialog}
+                setVisibleDialog={setVisibleDialog}
+                mutateCombinedDefinition={mutateCombinedDefinition}
+              />
             </StyledStack>
           )}
         </StyledSection>

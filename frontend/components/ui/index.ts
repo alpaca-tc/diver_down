@@ -9,7 +9,9 @@ export {
   DefinitionList,
   EmptyTableBody,
   FONT_FAMILY,
+  FaCirclePlusIcon,
   FaGearIcon,
+  FaPencilIcon,
   FormControl,
   Heading,
   Input,
@@ -37,6 +39,7 @@ export {
   defaultRadius,
   defaultSpacing,
   useTheme,
+  FaTrashIcon,
 } from 'smarthr-ui'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'

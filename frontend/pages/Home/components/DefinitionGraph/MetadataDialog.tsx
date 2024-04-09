@@ -2,7 +2,7 @@ import { ComponentProps, FC } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Base, DefinitionList, Heading, ModelessDialog, Stack } from '@/components/ui'
+import { DefinitionList, Heading, ModelessDialog, Stack } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotMetadata } from '@/models/combinedDefinition'

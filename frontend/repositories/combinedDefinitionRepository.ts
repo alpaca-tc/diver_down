@@ -101,7 +101,7 @@ export const useCombinedDefinition = (ids: number[], compound: boolean, concentr
   }
   const requestPath = `${path.api.definitions.show(ids)}?${stringify(params)}`
   const shouldFetch = ids.length > 0
-  const { data, isLoading } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
+  const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
 
-  return { data, isLoading }
+  return { data, isLoading, mutate }
 }
