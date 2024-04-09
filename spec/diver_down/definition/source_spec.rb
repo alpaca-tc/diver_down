@@ -20,11 +20,6 @@ RSpec.describe DiverDown::Definition::Source do
             DiverDown::Definition::Dependency.new(
               source_name: 'c.rb'
             ),
-          ],
-          modules: [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'A'
-            ),
           ]
         )
 
@@ -121,44 +116,6 @@ RSpec.describe DiverDown::Definition::Source do
           )
         )
       end
-
-      it 'combines sources with modules' do
-        source_a = described_class.new(
-          source_name: 'a.rb',
-          modules: [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'A'
-            ),
-            DiverDown::Definition::Modulee.new(
-              module_name: 'B'
-            ),
-          ]
-        )
-
-        source_b = described_class.new(
-          source_name: 'a.rb',
-          modules: [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'A'
-            ),
-            DiverDown::Definition::Modulee.new(
-              module_name: 'B'
-            ),
-          ]
-        )
-
-        source_c = described_class.new(
-          source_name: 'a.rb',
-          modules: [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'C'
-            ),
-          ]
-        )
-
-        expect(described_class.combine(source_a, source_b)).to eq(source_a)
-        expect { described_class.combine(source_a, source_b, source_c) }.to raise_error(ArgumentError, 'modules are unmatched. (["A", "B"], ["C"])')
-      end
     end
   end
 
@@ -198,24 +155,6 @@ RSpec.describe DiverDown::Definition::Source do
       end
     end
 
-    describe '#set_modules' do
-      it 'adds non-duplicated dependencies' do
-        source = described_class.new(source_name: '')
-        source.set_modules(['A', 'B'])
-
-        expect(source.modules).to eq(
-          [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'A'
-            ),
-            DiverDown::Definition::Modulee.new(
-              module_name: 'B'
-            ),
-          ]
-        )
-      end
-    end
-
     describe '#<=>' do
       it 'compares sources' do
         sources = [
@@ -251,11 +190,6 @@ RSpec.describe DiverDown::Definition::Source do
                 ),
               ]
             ),
-          ],
-          modules: [
-            DiverDown::Definition::Modulee.new(
-              module_name: 'A'
-            ),
           ]
         )
 
@@ -271,11 +205,6 @@ RSpec.describe DiverDown::Definition::Source do
                   paths: ['a.rb'],
                 },
               ],
-            },
-          ],
-          modules: [
-            {
-              module_name: 'A',
             },
           ]
         )

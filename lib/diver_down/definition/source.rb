@@ -9,8 +9,7 @@ module DiverDown
       def self.from_hash(hash)
         new(
           source_name: hash[:source_name] || hash['source_name'],
-          dependencies: (hash[:dependencies] || hash['dependencies'] || []).map { DiverDown::Definition::Dependency.from_hash(_1) },
-          modules: (hash[:modules] || hash['modules'] || []).map { DiverDown::Definition::Modulee.from_hash(_1) }
+          dependencies: (hash[:dependencies] || hash['dependencies'] || []).map { DiverDown::Definition::Dependency.from_hash(_1) }
         )
       end
 
@@ -22,31 +21,21 @@ module DiverDown
         unique_sources = sources.map(&:source_name).uniq
         raise ArgumentError, "sources are unmatched. (#{unique_sources})" unless unique_sources.length == 1
 
-        unique_modules = sources.map(&:modules).uniq
-        unless unique_modules.length == 1
-          invalid_module_name_list = unique_modules.map { "[#{_1.map(&:module_name).map(&:inspect).join(', ')}]" }
-
-          raise ArgumentError, "modules are unmatched. (#{invalid_module_name_list.join(', ')})"
-        end
-
         all_dependencies = sources.flat_map(&:dependencies)
 
         new(
           source_name: unique_sources[0],
-          dependencies: DiverDown::Definition::Dependency.combine(*all_dependencies),
-          modules: unique_modules[0]
+          dependencies: DiverDown::Definition::Dependency.combine(*all_dependencies)
         )
       end
 
-      attr_reader :source_name, :modules
+      attr_reader :source_name
 
       # @param source_name [String] filename of the source file
       # @param dependencies [Array<DiverDown::Definition::Dependency>]
-      # @param modules [Array<DiverDown::Definition::Modulee>]
-      def initialize(source_name:, dependencies: [], modules: [])
+      def initialize(source_name:, dependencies: [])
         @source_name = source_name
         @dependency_map = dependencies.map { [_1.source_name, _1] }.to_h
-        @modules = modules
       end
 
       # @param source [String]
@@ -63,14 +52,6 @@ module DiverDown
         @dependency_map[dependency_source_name]
       end
 
-      # @param module_names [Array<String>]
-      # @return [DiverDown::Definition::Modulee]
-      def set_modules(module_names)
-        @modules = module_names.map do
-          DiverDown::Definition::Modulee.new(module_name: _1)
-        end
-      end
-
       # @return [Array<DiverDown::Definition::Dependency>]
       def dependencies
         @dependency_map.values.sort
@@ -81,7 +62,6 @@ module DiverDown
         {
           source_name:,
           dependencies: dependencies.map(&:to_h),
-          modules: modules.map(&:to_h),
         }
       end
 
@@ -96,15 +76,14 @@ module DiverDown
       def ==(other)
         other.is_a?(self.class) &&
           source_name == other.source_name &&
-          dependencies == other.dependencies &&
-          modules == other.modules
+          dependencies == other.dependencies
       end
       alias eq? ==
       alias eql? ==
 
       # @return [Integer]
       def hash
-        [self.class, source_name, dependencies, modules].hash
+        [self.class, source_name, dependencies].hash
       end
     end
   end

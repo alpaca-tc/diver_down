@@ -17,11 +17,6 @@ RSpec.describe DiverDown::Definition do
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
-                ),
               ]
             ),
           ]
@@ -45,11 +40,6 @@ RSpec.describe DiverDown::Definition do
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
-                ),
               ]
             ),
           ]
@@ -66,11 +56,6 @@ RSpec.describe DiverDown::Definition do
                 ),
                 DiverDown::Definition::Dependency.new(
                   source_name: 'f.rb'
-                ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'B'
                 ),
               ]
             ),
@@ -142,11 +127,6 @@ RSpec.describe DiverDown::Definition do
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
-                ),
               ]
             ),
           ]
@@ -171,11 +151,6 @@ RSpec.describe DiverDown::Definition do
                 }, {
                   source_name: 'c.rb',
                   method_ids: [],
-                },
-              ],
-              modules: [
-                {
-                  module_name: 'A',
                 },
               ],
             },
@@ -205,11 +180,6 @@ RSpec.describe DiverDown::Definition do
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
                 ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
-                ),
               ]
             ),
           ]
@@ -237,11 +207,6 @@ RSpec.describe DiverDown::Definition do
                 ),
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
-                ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
                 ),
               ]
             ),
@@ -274,11 +239,6 @@ RSpec.describe DiverDown::Definition do
                 ),
                 DiverDown::Definition::Dependency.new(
                   source_name: 'c.rb'
-                ),
-              ],
-              modules: [
-                DiverDown::Definition::Modulee.new(
-                  module_name: 'A'
                 ),
               ]
             ),

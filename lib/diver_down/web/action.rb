@@ -13,9 +13,11 @@ module DiverDown
       )
 
       # @param store [DiverDown::Definition::Store]
+      # @param module_store [DiverDown::Web::ModuleStore]
       # @param request [Rack::Request]
-      def initialize(store:, request:)
+      def initialize(store:, module_store:, request:)
         @store = store
+        @module_store = module_store
         @request = request
       end
 
@@ -43,22 +45,23 @@ module DiverDown
       # GET /api/modules.json
       def modules
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
-        modules = Set.new
+        module_set = Set.new
 
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            source.modules.each do |modulee|
-              modules.add(modulee)
+            modules = @module_store.get(source.source_name)
+            modules.each do |modulee|
+              module_set.add(modulee)
             end
           end
         end
         # rubocop:enable Style/HashEachMethods
 
         json(
-          modules: modules.sort.map do |modulee|
+          modules: module_set.sort.map do
             {
-              module_name: modulee.module_name,
+              module_name: _1,
             }
           end
         )
@@ -74,7 +77,9 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            next if source.modules.none? { _1.module_name == module_name }
+            modules = @module_store.get(source.source_name)
+
+            next if modules.none? { _1 == module_name }
 
             source_names.add(source.source_name)
             related_definition_store_ids.add(definition.store_id)
@@ -166,7 +171,7 @@ module DiverDown
                              end
 
         if definition
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, compound:, concentrate:)
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @module_store, compound:, concentrate:)
 
           json(
             titles:,
@@ -176,8 +181,8 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
-                modules: _1.modules.map do |modulee|
-                  { module_name: modulee.module_name }
+                modules: @module_store.get(_1.source_name).map do |module_name|
+                  { module_name: }
                 end,
               }
             end
@@ -226,7 +231,8 @@ module DiverDown
         modules = if found_sources.empty?
                     []
                   else
-                    DiverDown::Definition::Source.combine(*found_sources).modules
+                    source = DiverDown::Definition::Source.combine(*found_sources)
+                    @module_store.get(source.source_name)
                   end
 
         json(

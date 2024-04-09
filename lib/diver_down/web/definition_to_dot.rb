@@ -18,16 +18,16 @@ module DiverDown
 
         # @param type [Symbol]
         # @param record [DiverDown::Definition::Source, DiverDown::Definition::Dependency, DiverDown::Definition::Modulee]
-        def issue_id(record)
-          metadata = case record
-                     when DiverDown::Definition::Source
+        def issue_id(type, record)
+          metadata = case type
+                     when :source
                        source_to_metadata(record)
-                     when DiverDown::Definition::Dependency
+                     when :dependency
                        dependency_to_metadata(record)
-                     when DiverDown::Definition::Modulee
+                     when :module
                        module_to_metadata(record)
                      else
-                       raise NotImplementedError, "not implemented yet #{record.class}"
+                       raise NotImplementedError, "not implemented yet #{type}"
                      end
 
           id = "#{@prefix}#{@to_a.length + 1}"
@@ -64,16 +64,18 @@ module DiverDown
         def module_to_metadata(record)
           {
             type: 'module',
-            module_name: record.module_name,
+            module_name: record,
           }
         end
       end
 
       # @param definition [DiverDown::Definition]
+      # @param module_store [DiverDown::ModuleStore]
       # @param compound [Boolean]
       # @param concentrate [Boolean] https://graphviz.org/docs/attrs/concentrate/
-      def initialize(definition, compound: false, concentrate: false)
+      def initialize(definition, module_store, compound: false, concentrate: false)
         @definition = definition
+        @module_store = module_store
         @io = DiverDown::IndentedStringIo.new
         @indent = 0
         @compound = compound
@@ -105,21 +107,21 @@ module DiverDown
 
       private
 
-      attr_reader :definition, :io
+      attr_reader :definition, :module_store, :io
 
       def insert_source(source)
-        if source.modules.empty?
-          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_id(source))})
+        if module_store.get(source.source_name).empty?
+          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_id(:source, source))})
         else
           insert_modules(source)
         end
 
         source.dependencies.each do
           attributes = {
-            id: @metadata_store.issue_id(_1),
+            id: @metadata_store.issue_id(:dependency, _1),
           }
-          ltail = module_label(*source.modules)
-          lhead = module_label(*definition.source(_1.source_name).modules)
+          ltail = module_label(*module_store.get(source.source_name))
+          lhead = module_label(*module_store.get(_1.source_name))
           skip_rendering = false
 
           if @compound && (ltail || lhead)
@@ -145,14 +147,14 @@ module DiverDown
 
       def insert_modules(source)
         buf = swap_io do
-          *modules, last_module = *source.modules
+          *module_names, last_module_name = *module_store.get(source.source_name)
 
           # last subgraph
           last_module_writer = proc do
-            io.puts %(#{' ' unless modules.empty?}subgraph "#{module_label(last_module)}" {), indent: false
+            io.puts %(#{' ' unless module_names.empty?}subgraph "#{module_label(last_module_name)}" {), indent: false
             io.indented do
-              module_attributes = build_attributes(label: last_module.module_name, id: @metadata_store.issue_id(last_module), _wrap: false)
-              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_id(source))
+              module_attributes = build_attributes(label: last_module_name, id: @metadata_store.issue_id(:module, last_module_name), _wrap: false)
+              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_id(:source, source))
 
               io.puts %(#{module_attributes} "#{source.source_name}" #{source_attributes})
             end
@@ -160,11 +162,11 @@ module DiverDown
           end
 
           # wrapper subgraph
-          modules_writer = modules.inject(last_module_writer) do |next_writer, mod|
+          modules_writer = module_names.inject(last_module_writer) do |next_writer, module_name|
             proc do
-              io.puts %(subgraph "#{module_label(mod)}" {)
+              io.puts %(subgraph "#{module_label(module_name)}" {)
               io.indented do
-                attributes = build_attributes(label: mod.module_name, id: @metadata_store.issue_id(mod), _wrap: false)
+                attributes = build_attributes(label: module_name, id: @metadata_store.issue_id(:module, module_name), _wrap: false)
                 io.write attributes
                 next_writer.call
               end
@@ -213,7 +215,7 @@ module DiverDown
       def module_label(*modules)
         return if modules.empty?
 
-        "cluster_#{modules[0].module_name}"
+        "cluster_#{modules[0]}"
       end
     end
   end
