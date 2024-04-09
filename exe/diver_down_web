@@ -2,11 +2,17 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
+require 'rack/contrib'
 require 'webrick'
 require 'diver_down'
 require 'diver_down-web'
 
-app = DiverDown::Web.new(definition_dir: ENV.fetch('DIVER_DOWN_DIR'))
+definition_dir = ENV.fetch('DIVER_DOWN_DIR')
+module_store = DiverDown::Web::ModuleStore.new(ENV.fetch('DIVER_DOWN_MODULE_STORE'))
+
+app = Rack::JSONBodyParser.new(
+  DiverDown::Web.new(definition_dir:, module_store:)
+)
 
 begin
   # Rack 2.0
