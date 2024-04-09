@@ -6,6 +6,9 @@ module DiverDown
   class Web
     class ModuleStore
       BLANK_ARRAY = [].freeze
+      BLANK_RE = /\A\s*\z/
+
+      private_constant(:BLANK_RE)
 
       def initialize(path)
         @path = path
@@ -15,7 +18,9 @@ module DiverDown
       # @param source_name [String]
       # @param modules [Array<DiverDown::Web::Modulee>]
       def set(source_name, modules)
-        @store[source_name] = modules.dup.freeze
+        @store[source_name] = modules.dup.reject do
+          BLANK_RE.match?(_1)
+        end.freeze
       end
 
       # @param source_name [String]

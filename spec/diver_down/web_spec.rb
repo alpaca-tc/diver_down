@@ -484,5 +484,23 @@ RSpec.describe DiverDown::Web do
 
       expect(module_store.get('a.rb')).to eq(['A', 'B'])
     end
+
+    it 'ignores blank modules' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/modules.json', { modules: ['', 'B'] }
+
+      expect(last_response.status).to eq(200)
+
+      expect(module_store.get('a.rb')).to eq(['B'])
+    end
   end
 end
