@@ -75,8 +75,8 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb" id="graph_1"]
-              "a.rb" -> "b.rb"
-              "b.rb" [label="b.rb" id="graph_2"]
+              "a.rb" -> "b.rb" [id="graph_2"]
+              "b.rb" [label="b.rb" id="graph_3"]
             }
           DOT
 
@@ -88,6 +88,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 source_name: 'a.rb',
               }, {
                 id: 'graph_2',
+                type: 'dependency',
+                source_name: 'b.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_3',
                 type: 'source',
                 source_name: 'b.rb',
               },
@@ -118,8 +123,8 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               subgraph "cluster_A" {
-                label="A" subgraph "cluster_B" {
-                  label="B" "a.rb" [label="a.rb" id="graph_1"]
+                label="A" id="graph_1" subgraph "cluster_B" {
+                  label="B" id="graph_2" "a.rb" [label="a.rb" id="graph_3"]
                 }
               }
             }
@@ -129,6 +134,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             [
               {
                 id: 'graph_1',
+                type: 'module',
+                module_name: 'A',
+              }, {
+                id: 'graph_2',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_3',
                 type: 'source',
                 source_name: 'a.rb',
               },
@@ -178,14 +191,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               compound=true
               subgraph "cluster_A" {
-                label="A" "a.rb" [label="a.rb" id="graph_1"]
+                label="A" id="graph_1" "a.rb" [label="a.rb" id="graph_2"]
               }
-              "a.rb" -> "b.rb" [ltail="cluster_A" lhead="cluster_B" minlen="3"]
+              "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" "b.rb" [label="b.rb" id="graph_2"]
+                label="B" id="graph_5" "b.rb" [label="b.rb" id="graph_6"]
               }
               subgraph "cluster_B" {
-                label="B" "c.rb" [label="c.rb" id="graph_3"]
+                label="B" id="graph_7" "c.rb" [label="c.rb" id="graph_8"]
               }
             }
           DOT
@@ -194,14 +207,36 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             [
               {
                 id: 'graph_1',
-                type: 'source',
-                source_name: 'a.rb',
+                type: 'module',
+                module_name: 'A',
               }, {
                 id: 'graph_2',
                 type: 'source',
-                source_name: 'b.rb',
+                source_name: 'a.rb',
               }, {
                 id: 'graph_3',
+                type: 'dependency',
+                source_name: 'b.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_4',
+                type: 'dependency',
+                source_name: 'c.rb',
+                method_ids: [],
+              }, {
+                id: 'graph_5',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_6',
+                type: 'source',
+                source_name: 'b.rb',
+              }, {
+                id: 'graph_7',
+                type: 'module',
+                module_name: 'B',
+              }, {
+                id: 'graph_8',
                 type: 'source',
                 source_name: 'c.rb',
               },
