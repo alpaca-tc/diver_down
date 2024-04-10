@@ -132,7 +132,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               subgraph "cluster_A" {
                 id="graph_1"
                 label="A"
-                subgraph "cluster_B" {
+                subgraph "cluster_A::B" {
                   id="graph_2"
                   label="B"
                   "a.rb" [label="a.rb" id="graph_3"]
@@ -400,6 +400,109 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   { module_name: 'B' },
                 ],
               },
+            ]
+          )
+        end
+
+        it 'returns compound module digraph with multiple method_ids if only_module = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [
+                      {
+                        name: 'call_b',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [
+                      {
+                        name: 'call_c',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  }, {
+                    source_name: 'd.rb',
+                    method_ids: [
+                      {
+                        name: 'call_d',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  },
+                ],
+              }, {
+                source_name: 'b.rb',
+              }, {
+                source_name: 'c.rb',
+              }, {
+                source_name: 'd.rb',
+              },
+            ]
+          )
+
+          module_store.set('a.rb', ['A'])
+          module_store.set('b.rb', ['B'])
+          module_store.set('c.rb', ['B'])
+          module_store.set('d.rb', ['B', 'C'])
+          module_store.set('unknown.rb', ['Unknown'])
+
+          instance = described_class.new(definition, module_store, only_module: true)
+          expect(instance.to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              compound=true
+              subgraph "cluster_A" {
+                id="graph_1"
+                label="A"
+                "A" [label="A" id="graph_1"]
+              }
+              subgraph "cluster_B" {
+                id="graph_2"
+                label="B"
+                "B" [label="B" id="graph_2"]
+                subgraph "cluster_B::C" {
+                  id="graph_3"
+                  label="C"
+                  "C" [label="C" id="graph_3"]
+                }
+              }
+              "A" -> "B" [id="graph_4" ltail="cluster_A" lhead="cluster_B" minlen="3"]
+              "A" -> "C" [id="graph_5" ltail="cluster_A" lhead="cluster_B::C" minlen="3"]
+            }
+          DOT
+
+          expect(instance.metadata).to eq(
+            [
+              { id: 'graph_1', type: 'module', modules: [{ module_name: 'A' }] },
+              { id: 'graph_2', type: 'module', modules: [{ module_name: 'B' }] },
+              { id: 'graph_3', type: 'module', modules: [{ module_name: 'B' }, { module_name: 'C' }] },
+              {
+                id: 'graph_4',
+                type: 'dependency',
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [
+                      { name: 'call_b', context: 'class' },
+                    ],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [
+                      { name: 'call_c', context: 'class' },
+                    ],
+
+                  },
+                ],
+              },
+              { id: 'graph_5', type: 'dependency', dependencies: [{ source_name: 'd.rb', method_ids: [{ name: 'call_d', context: 'class' }] }] },
             ]
           )
         end
