@@ -17,7 +17,7 @@ RSpec.describe DiverDown::Trace::Tracer do
     describe 'when tracing script' do
       # @param path [String]
       # @return [DiverDown::Definition]
-      def trace_fixture(path, module_set: [], target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, module_finder: nil, definition_group: nil)
+      def trace_fixture(path, module_set: [], target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, definition_group: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -27,8 +27,7 @@ RSpec.describe DiverDown::Trace::Tracer do
           module_set:,
           target_files:,
           ignored_method_ids:,
-          filter_method_id_path:,
-          module_finder:
+          filter_method_id_path:
         )
 
         tracer.trace(
@@ -46,7 +45,6 @@ RSpec.describe DiverDown::Trace::Tracer do
         hash[:sources] ||= []
         hash[:sources].each do |source|
           source[:dependencies] ||= []
-          source[:modules] ||= []
 
           source[:dependencies].each do |dependency|
             dependency[:method_ids] ||= []
@@ -105,78 +103,6 @@ RSpec.describe DiverDown::Trace::Tracer do
                       ],
                     },
                   ],
-                },
-              ],
-            }, {
-              source_name: 'AntipollutionModule::C',
-            },
-          ]
-        ))
-      end
-
-      it 'traces tracer_module.rb with module_finder' do
-        definition = trace_fixture(
-          'tracer_module.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-          ],
-          module_finder: ->(source) {
-            case source.source_name
-            when 'AntipollutionModule::A'
-              ['A', 'B']
-            when 'AntipollutionModule::B'
-              ['C']
-            end
-          }
-        )
-
-        expect(definition.to_h).to match(fill_default(
-          title: 'title',
-          sources: [
-            {
-              source_name: 'AntipollutionModule::A',
-              dependencies: [
-                {
-                  source_name: 'AntipollutionModule::B',
-                  method_ids: [
-                    {
-                      context: 'class',
-                      name: 'call_c',
-                      paths: [
-                        match('tracer_module.rb:8'),
-                      ],
-                    },
-                  ],
-                },
-              ],
-              modules: [
-                {
-                  module_name: 'A',
-                }, {
-                  module_name: 'B',
-                },
-              ],
-            }, {
-              source_name: 'AntipollutionModule::B',
-              dependencies: [
-                {
-                  source_name: 'AntipollutionModule::C',
-                  method_ids: [
-                    {
-                      context: 'class',
-                      name: 'call_d',
-                      paths: [
-                        match('tracer_module.rb:14'),
-                      ],
-                    },
-                  ],
-                },
-              ],
-              modules: [
-                {
-                  module_name: 'C',
                 },
               ],
             }, {
@@ -607,7 +533,7 @@ RSpec.describe DiverDown::Trace::Tracer do
                 },
               ],
             }, {
-              source_name: 'AntipollutionModule::D', dependencies: [], modules: [],
+              source_name: 'AntipollutionModule::D', dependencies: [],
             },
           ]
         ))

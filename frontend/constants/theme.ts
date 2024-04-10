@@ -40,4 +40,13 @@ export const GlobalStyle = createGlobalStyle`
     font-size: ${fontSize.S};
     color: ${color.TEXT_BLACK};
   }
+
+  /* for smarthr-ui */
+  .smarthr-ui-ComboBox-dropdownList {
+    /* Fixed a bug that hover changes the size of item. */
+    button {
+      font-size: ${fontSize.S};
+      line-height: ${leading.NORMAL};
+    }
+  }
 `

@@ -7,6 +7,7 @@ type BaseDotMetadata = {
 type DotSourceMetadata = {
   type: 'source'
   sourceName: string
+  modules: Module[]
 } & BaseDotMetadata
 
 type DotDependencyMetadata = {
@@ -21,7 +22,7 @@ type DotDependencyMetadata = {
 
 type DotModuleMetadata = {
   type: 'module'
-  moduleName: string
+  modules: Module[]
 } & BaseDotMetadata
 
 export type DotMetadata = DotSourceMetadata | DotDependencyMetadata | DotModuleMetadata

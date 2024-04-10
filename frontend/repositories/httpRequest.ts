@@ -37,12 +37,12 @@ export const get = async <T>(url: string): Promise<T> => {
 
 export const post = async <T>(url: string, data: Record<string, any> | FormData): Promise<T> => {
   const body = data instanceof FormData ? data : JSON.stringify(data)
-  const headers = data instanceof FormData ? {} : { 'Content-Type': 'application/json; charset=utf-8' }
+  const headers: RequestInit['headers'] = data instanceof FormData ? {} : { 'Content-Type': 'application/json; charset=utf-8' }
 
   const response = await fetch(url, {
     method: 'POST',
     body,
-    ...headers,
+    headers,
   })
 
   return parseResponse(response)

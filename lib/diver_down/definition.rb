@@ -6,7 +6,6 @@ module DiverDown
   class Definition
     require 'diver_down/definition/source'
     require 'diver_down/definition/dependency'
-    require 'diver_down/definition/modulee'
     require 'diver_down/definition/method_id'
 
     # @param hash [Hash]

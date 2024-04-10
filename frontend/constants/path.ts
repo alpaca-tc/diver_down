@@ -11,7 +11,7 @@ export const path = {
   },
   modules: {
     index: () => '/modules',
-    show: (moduleName: string) => `/modules/${moduleName}`,
+    show: (moduleNames: string[]) => `/modules/${moduleNames.join('/')}`,
   },
   licenses: {
     index: () => '/licenses',
@@ -26,10 +26,13 @@ export const path = {
     sources: {
       index: () => '/api/sources.json',
       show: (sourceName: string) => `/api/sources/${sourceName}.json`,
+      modules: {
+        update: (sourceName: string) => `/api/sources/${sourceName}/modules.json`,
+      },
     },
     modules: {
       index: () => '/api/modules.json',
-      show: (moduleName: string) => `/api/modules/${moduleName}.json`,
+      show: (moduleNames: string[]) => `/api/modules/${moduleNames.join('/')}.json`,
     },
   },
 }

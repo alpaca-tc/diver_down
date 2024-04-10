@@ -13,9 +13,11 @@ module DiverDown
       )
 
       # @param store [DiverDown::Definition::Store]
+      # @param module_store [DiverDown::Web::ModuleStore]
       # @param request [Rack::Request]
-      def initialize(store:, request:)
+      def initialize(store:, module_store:, request:)
         @store = store
+        @module_store = module_store
         @request = request
       end
 
@@ -43,30 +45,31 @@ module DiverDown
       # GET /api/modules.json
       def modules
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
-        modules = Set.new
+        module_set = Set.new
 
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            source.modules.each do |modulee|
-              modules.add(modulee)
-            end
+            modules = @module_store.get(source.source_name)
+            module_set.add(modules) unless modules.empty?
           end
         end
         # rubocop:enable Style/HashEachMethods
 
         json(
-          modules: modules.sort.map do |modulee|
-            {
-              module_name: modulee.module_name,
-            }
+          modules: module_set.sort.map do
+            _1.map do |module_name|
+              {
+                module_name:,
+              }
+            end
           end
         )
       end
 
       # GET /api/modules/:module_name.json
-      # @param module_name [String]
-      def module(module_name)
+      # @param module_names [Array<String>]
+      def module(module_names)
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
         related_definition_store_ids = Set.new
         source_names = Set.new
@@ -74,7 +77,9 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            next if source.modules.none? { _1.module_name == module_name }
+            source_module_names = @module_store.get(source.source_name)
+
+            next unless source_module_names[0..module_names.size - 1] == module_names
 
             source_names.add(source.source_name)
             related_definition_store_ids.add(definition.store_id)
@@ -89,7 +94,11 @@ module DiverDown
         related_definitions = related_definition_store_ids.map { @store.get(_1) }
 
         json(
-          module_name:,
+          modules: module_names.map do
+            {
+              module_name: _1,
+            }
+          end,
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
@@ -166,7 +175,7 @@ module DiverDown
                              end
 
         if definition
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, compound:, concentrate:)
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @module_store, compound:, concentrate:)
 
           json(
             titles:,
@@ -176,8 +185,8 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
-                modules: _1.modules.map do |modulee|
-                  { module_name: modulee.module_name }
+                modules: @module_store.get(_1.source_name).map do |module_name|
+                  { module_name: }
                 end,
               }
             end
@@ -223,15 +232,18 @@ module DiverDown
 
         return not_found if related_definitions.empty?
 
-        modules = if found_sources.empty?
-                    []
-                  else
-                    DiverDown::Definition::Source.combine(*found_sources).modules
-                  end
+        module_names = if found_sources.empty?
+                         []
+                       else
+                         source = DiverDown::Definition::Source.combine(*found_sources)
+                         @module_store.get(source.source_name)
+                       end
 
         json(
           source_name:,
-          modules: modules.map(&:to_h),
+          modules: module_names.map do
+            { module_name: _1 }
+          end,
           related_definitions: related_definitions.map do |id, definition|
             {
               id:,
@@ -251,6 +263,27 @@ module DiverDown
             }
           }
         )
+      end
+
+      # POST /api/sources/:source_name/modules.json
+      #
+      # @param source_name [String]
+      # @param modules [Array<String>]
+      def set_modules(source_name, modules)
+        found_source = @store.any? do |_, definition|
+          definition.sources.any? do |source|
+            source.source_name == source_name
+          end
+        end
+
+        if found_source
+          @module_store.set(source_name, modules)
+          @module_store.flush
+
+          json({})
+        else
+          not_found
+        end
       end
 
       # @return [Array[Integer, Hash, Array]]

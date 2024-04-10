@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path={path.sources.index()} element={<SourceIndex />} />
           <Route path={path.sources.show(':sourceName')} element={<SourceShow />} />
           <Route path={path.modules.index()} element={<ModuleIndex />} />
-          <Route path={path.modules.show(':moduleName')} element={<ModuleShow />} />
+          <Route path={path.modules.show(['*'])} element={<ModuleShow />} />
           <Route path={path.licenses.index()} element={<LicenseIndex />} />
           <Route path="*" element={<NotFound />} />
         </Route>

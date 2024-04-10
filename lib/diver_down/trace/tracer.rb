@@ -24,8 +24,7 @@ module DiverDown
       # @param ignored_method_ids [Array<String>]
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
-      # @param module_finder [#call] find module from source
-      def initialize(module_set: [], target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil, module_finder: nil)
+      def initialize(module_set: [], target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil)
         if target_files && !target_files.all? { Pathname.new(_1).absolute? }
           raise ArgumentError, "target_files must be absolute path(#{target_files})"
         end
@@ -46,7 +45,6 @@ module DiverDown
 
         @target_file_set = target_files&.to_set
         @filter_method_id_path = filter_method_id_path
-        @module_finder = module_finder
       end
 
       # Trace the call stack of the block and build the definition
@@ -76,10 +74,6 @@ module DiverDown
 
             if !source_name.nil? && !(already_ignored || current_ignored)
               source = definition.find_or_build_source(source_name)
-
-              # Determine module name from source
-              module_names = @module_finder&.call(source)
-              source.set_modules(module_names) if module_names
 
               # If the call stack contains a call to a module to be traced
               # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored

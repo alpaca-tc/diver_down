@@ -3,13 +3,30 @@ import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
 import { Loading } from '@/components/Loading'
-import { EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
+import { Cluster, EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
+import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 
+const ModuleRow: FC<{ modules: Module[] }> = ({ modules }) => (
+  <Cluster>
+    {modules.map((module, index) => {
+      const current = modules.slice(0, index + 1)
+      const moduleNames: string[] = current.map((mod) => mod.moduleName)
+
+      return (
+        <Text key={index}>
+          {index > 0 && ' / '}
+          <Link to={path.modules.show(moduleNames)}>{module.moduleName}</Link>
+        </Text>
+      )
+    })}
+  </Cluster>
+)
+
 export const List: FC = () => {
-  const { modules, isLoading } = useModules()
+  const { data, isLoading } = useModules()
 
   return (
     <StyledSection>
@@ -23,12 +40,12 @@ export const List: FC = () => {
                 <Th>Source name</Th>
               </tr>
             </thead>
-            {modules && modules.length > 0 ? (
+            {data && data.length > 0 ? (
               <tbody>
-                {modules.map((module) => (
-                  <tr key={module.moduleName}>
+                {data.map((modules, index) => (
+                  <tr key={index}>
                     <Td>
-                      <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
+                      <ModuleRow modules={modules} />
                     </Td>
                   </tr>
                 ))}

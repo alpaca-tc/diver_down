@@ -11,6 +11,9 @@ type DotSourceMetadataResponse = {
   id: string
   type: 'source'
   source_name: string
+  modules: Array<{
+    module_name: string
+  }>
 }
 
 type DotDependencyMetadataResponse = {
@@ -26,7 +29,9 @@ type DotDependencyMetadataResponse = {
 type DotModuleMetadataResponse = {
   id: string
   type: 'module'
-  module_name: string
+  modules: Array<{
+    module_name: string
+  }>
 }
 
 type DotMetadataResponse = DotSourceMetadataResponse | DotDependencyMetadataResponse | DotModuleMetadataResponse
@@ -51,6 +56,9 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
         id: metadata.id,
         type: metadata.type,
         sourceName: metadata.source_name,
+        modules: metadata.modules.map((module) => ({
+          moduleName: module.module_name,
+        })),
       }
     }
     case 'dependency': {
@@ -69,7 +77,9 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
       return {
         id: metadata.id,
         type: metadata.type,
-        moduleName: metadata.module_name,
+        modules: metadata.modules.map((module) => ({
+          moduleName: module.module_name,
+        })),
       }
     }
   }
@@ -101,7 +111,7 @@ export const useCombinedDefinition = (ids: number[], compound: boolean, concentr
   }
   const requestPath = `${path.api.definitions.show(ids)}?${stringify(params)}`
   const shouldFetch = ids.length > 0
-  const { data, isLoading } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
+  const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
 
-  return { data, isLoading }
+  return { data, isLoading, mutate }
 }

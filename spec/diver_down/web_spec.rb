@@ -4,7 +4,7 @@ RSpec.describe DiverDown::Web do
   include Rack::Test::Methods
 
   def app
-    @app ||= described_class.new(definition_dir:, store:)
+    @app ||= described_class.new(definition_dir:, module_store:, store:)
   end
 
   let(:definition_dir) do
@@ -13,6 +13,11 @@ RSpec.describe DiverDown::Web do
 
   let(:store) do
     DiverDown::DefinitionStore.new
+  end
+
+  let(:module_store) do
+    module_store_path = Tempfile.new(['test', '.yaml']).path
+    DiverDown::Web::ModuleStore.new(module_store_path)
   end
 
   describe 'GET /' do
@@ -273,47 +278,38 @@ RSpec.describe DiverDown::Web do
         title: 'title',
         sources: [
           DiverDown::Definition::Source.new(
-            source_name: 'a.rb',
-            modules: [
-              DiverDown::Definition::Modulee.new(
-                module_name: 'A'
-              ),
-              DiverDown::Definition::Modulee.new(
-                module_name: 'B'
-              ),
-            ]
+            source_name: 'a.rb'
           ),
           DiverDown::Definition::Source.new(
-            source_name: 'b.rb',
-            modules: [
-              DiverDown::Definition::Modulee.new(
-                module_name: 'B'
-              ),
-              DiverDown::Definition::Modulee.new(
-                module_name: 'C'
-              ),
-            ]
+            source_name: 'b.rb'
           ),
           DiverDown::Definition::Source.new(
-            source_name: 'c.rb',
-            modules: []
+            source_name: 'c.rb'
           ),
         ]
       )
       store.set(definition)
+      module_store.set('a.rb', ['A', 'B'])
+      module_store.set('b.rb', ['B', 'C'])
 
       get '/api/modules.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
         'modules' => [
-          {
-            'module_name' => 'A',
-          }, {
-            'module_name' => 'B',
-          }, {
-            'module_name' => 'C',
-          },
+          [
+            {
+              'module_name' => 'A',
+            }, {
+              'module_name' => 'B',
+            },
+          ], [
+            {
+              'module_name' => 'B',
+            }, {
+              'module_name' => 'C',
+            },
+          ],
         ],
       })
     end
@@ -331,15 +327,7 @@ RSpec.describe DiverDown::Web do
         title: 'title',
         sources: [
           DiverDown::Definition::Source.new(
-            source_name: 'a.rb',
-            modules: [
-              DiverDown::Definition::Modulee.new(
-                module_name: 'A'
-              ),
-              DiverDown::Definition::Modulee.new(
-                module_name: 'B'
-              ),
-            ]
+            source_name: 'a.rb'
           ),
         ]
       )
@@ -347,28 +335,64 @@ RSpec.describe DiverDown::Web do
         title: 'title 2',
         sources: [
           DiverDown::Definition::Source.new(
-            source_name: 'a.rb',
-            modules: []
+            source_name: 'b.rb'
           ),
         ]
       )
 
       ids = store.set(definition_1, definition_2)
+      module_store.set('a.rb', ['A'])
+      module_store.set('b.rb', ['A', 'B'])
 
       get '/api/modules/A.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'module_name' => 'A',
+        'modules' => [
+          {
+            'module_name' => 'A',
+          },
+        ],
         'sources' => [
           {
             'source_name' => 'a.rb',
+          },
+          {
+            'source_name' => 'b.rb',
           },
         ],
         'related_definitions' => [
           {
             'id' => ids[0],
             'title' => 'title',
+          },
+          {
+            'id' => ids[1],
+            'title' => 'title 2',
+          },
+        ],
+      })
+
+      get '/api/modules/A/B.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'modules' => [
+          {
+            'module_name' => 'A',
+          }, {
+            'module_name' => 'B',
+          },
+        ],
+        'sources' => [
+          {
+            'source_name' => 'b.rb',
+          },
+        ],
+        'related_definitions' => [
+          {
+            'id' => ids[1],
+            'title' => 'title 2',
           },
         ],
       })
@@ -475,6 +499,50 @@ RSpec.describe DiverDown::Web do
       get '/api/sources/a.rb.json'
 
       expect(last_response.status).to eq(200)
+    end
+  end
+
+  describe 'POST /api/sources/:source/modules.json' do
+    it 'returns 404 if source is not found' do
+      post '/api/sources/unknown/modules.json'
+
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'set modules if source is found' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/modules.json', { modules: ['A', 'B'] }
+
+      expect(last_response.status).to eq(200)
+
+      expect(module_store.get('a.rb')).to eq(['A', 'B'])
+    end
+
+    it 'ignores blank modules' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/modules.json', { modules: ['', 'B'] }
+
+      expect(last_response.status).to eq(200)
+
+      expect(module_store.get('a.rb')).to eq(['B'])
     end
   end
 end
