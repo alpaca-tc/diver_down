@@ -12,7 +12,7 @@ RSpec.describe DiverDown::Web do
   end
 
   let(:store) do
-    DiverDown::DefinitionStore.new
+    DiverDown::Web::DefinitionStore.new
   end
 
   let(:module_store) do

@@ -22,8 +22,8 @@ module DiverDown
 
     # @param definition_dir [String]
     # @param module_store [DiverDown::ModuleStore]
-    # @param store [DiverDown::DefinitionStore]
-    def initialize(definition_dir:, module_store:, store: DiverDown::DefinitionStore.new)
+    # @param store [DiverDown::Web::DefinitionStore]
+    def initialize(definition_dir:, module_store:, store: DiverDown::Web::DefinitionStore.new)
       @store = store
       @module_store = module_store
       @files_server = Rack::Files.new(File.join(WEB_DIR))
@@ -84,7 +84,7 @@ module DiverDown
     private
 
     def load_definition_files_on_thread(definition_files)
-      definition_loader = DiverDown::DefinitionLoader.new
+      definition_loader = DiverDown::Web::DefinitionLoader.new
 
       Thread.new do
         loop do

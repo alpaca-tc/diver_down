@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DiverDown::DefinitionStore do
+RSpec.describe DiverDown::Web::DefinitionStore do
   describe 'InstanceMethods' do
     describe '#load_file' do
       it 'loads yaml' do
@@ -10,7 +10,7 @@ RSpec.describe DiverDown::DefinitionStore do
         definition = DiverDown::Definition.new(title: 'a')
         File.write(path, definition.to_h.to_yaml)
 
-        loader = DiverDown::DefinitionLoader.new
+        loader = DiverDown::Web::DefinitionLoader.new
 
         expect(loader.load_file(path)).to eq(definition)
       end
@@ -22,7 +22,7 @@ RSpec.describe DiverDown::DefinitionStore do
         definition = DiverDown::Definition.new(title: 'a')
         File.write(path, definition.to_h.to_yaml)
 
-        loader = DiverDown::DefinitionLoader.new
+        loader = DiverDown::Web::DefinitionLoader.new
 
         expect(loader.load_file(path)).to eq(definition)
       end
@@ -34,7 +34,7 @@ RSpec.describe DiverDown::DefinitionStore do
         definition = DiverDown::Definition.new(title: 'a')
         File.write(path, JSON.dump(definition.to_h))
 
-        loader = DiverDown::DefinitionLoader.new
+        loader = DiverDown::Web::DefinitionLoader.new
 
         expect(loader.load_file(path)).to eq(definition)
       end
@@ -46,7 +46,7 @@ RSpec.describe DiverDown::DefinitionStore do
         definition = DiverDown::Definition.new(title: 'a')
         File.write(path, definition.to_h.to_msgpack)
 
-        loader = DiverDown::DefinitionLoader.new
+        loader = DiverDown::Web::DefinitionLoader.new
 
         expect(loader.load_file(path)).to eq(definition)
       end

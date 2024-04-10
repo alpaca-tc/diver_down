@@ -39,8 +39,8 @@ module DiverDown
 
     attr_reader :definition_group, :title
 
-    # ID issued when stored in DefinitionStore
-    # I want to manage ID in DefinitionStore, but for performance reasons, I have to set Definition#id to determine its identity
+    # ID issued when stored in DiverDown::Web::DefinitionStore
+    # I want to manage ID in DiverDown::Web::DefinitionStore, but for performance reasons, I have to set Definition#id to determine its identity
     # because naive comparing the identity by instance variables of Definitions is slow.
     # @attr_accessor [Integer]
     attr_accessor :store_id

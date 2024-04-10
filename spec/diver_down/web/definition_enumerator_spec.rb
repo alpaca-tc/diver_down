@@ -4,7 +4,7 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
   describe 'InstanceMethods' do
     describe '#each' do
       it 'returns definitions sorted by definition_group' do
-        store = DiverDown::DefinitionStore.new
+        store = DiverDown::Web::DefinitionStore.new
         definition_1 = DiverDown::Definition.new
         definition_2 = DiverDown::Definition.new(definition_group: 'b', title: 'definition_2')
         definition_3 = DiverDown::Definition.new(definition_group: 'c', title: 'definition_3')
@@ -37,7 +37,7 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
         end
 
         it 'filters by title' do
-          store = DiverDown::DefinitionStore.new
+          store = DiverDown::Web::DefinitionStore.new
 
           definition_1 = DiverDown::Definition.new(
             title: '01234',
@@ -83,7 +83,7 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
         end
 
         it 'filters by source' do
-          store = DiverDown::DefinitionStore.new
+          store = DiverDown::Web::DefinitionStore.new
 
           definition_1 = DiverDown::Definition.new(
             title: '01234',

@@ -1,35 +1,37 @@
 # frozen_string_literal: true
 
 module DiverDown
-  class DefinitionLoader
-    # @param path [String]
-    def load_file(path)
-      hash = case File.extname(path)
-             when '.yaml', '.yml'
-               from_yaml(path)
-             when '.msgpack'
-               from_msgpack(path)
-             when '.json'
-               from_json(path)
-             else
-               raise ArgumentError, "Unsupported file type: #{path}"
-             end
+  class Web
+    class DefinitionLoader
+      # @param path [String]
+      def load_file(path)
+        hash = case File.extname(path)
+               when '.yaml', '.yml'
+                 from_yaml(path)
+               when '.msgpack'
+                 from_msgpack(path)
+               when '.json'
+                 from_json(path)
+               else
+                 raise ArgumentError, "Unsupported file type: #{path}"
+               end
 
-      DiverDown::Definition.from_hash(hash)
-    end
+        DiverDown::Definition.from_hash(hash)
+      end
 
-    private
+      private
 
-    def from_json(path)
-      JSON.parse(File.read(path))
-    end
+      def from_json(path)
+        JSON.parse(File.read(path))
+      end
 
-    def from_yaml(path)
-      YAML.load_file(path)
-    end
+      def from_yaml(path)
+        YAML.load_file(path)
+      end
 
-    def from_msgpack(path)
-      MessagePack.unpack(File.binread(path))
+      def from_msgpack(path)
+        MessagePack.unpack(File.binread(path))
+      end
     end
   end
 end
