@@ -9,75 +9,122 @@ module DiverDown
       ATTRIBUTE_DELIMITER = ' '
 
       class MetadataStore
-        attr_reader :to_a
+        Metadata = Data.define(:id, :type, :data, :module_store) do
+          # @return [Hash]
+          def to_h
+            case type
+            when :source
+              source_to_h
+            when :dependency
+              dependency_to_h
+            when :module
+              module_to_h
+            else
+              raise NotImplementedError, "not implemented yet #{type}"
+            end
+          end
+
+          private
+
+          def source_to_h
+            modules = module_store.get(data.source_name).map do
+              {
+                module_name: _1,
+              }
+            end
+
+            {
+              id:,
+              type: 'source',
+              source_name: data.source_name,
+              modules:,
+            }
+          end
+
+          def dependency_to_h
+            {
+              id:,
+              type: 'dependency',
+              dependencies: data.map do |dependency|
+                {
+                  source_name: dependency.source_name,
+                  method_ids: dependency.method_ids.sort.map do
+                    {
+                      name: _1.name,
+                      context: _1.context,
+                    }
+                  end,
+                }
+              end,
+            }
+          end
+
+          def module_to_h
+            {
+              id:,
+              type: 'module',
+              modules: data.map do
+                {
+                  module_name: _1,
+                }
+              end,
+            }
+          end
+        end
 
         def initialize(module_store)
           @prefix = 'graph_'
           @module_store = module_store
-          @to_a = []
+
+          # Hash{ id => Metadata }
+          @to_h = {}
         end
 
         # @param type [Symbol]
-        # @param record [DiverDown::Definition::Source, DiverDown::Definition::Dependency, Array<String>]
-        def issue_id(type, record)
-          metadata = case type
-                     when :source
-                       source_to_metadata(record)
-                     when :dependency
-                       dependency_to_metadata(record)
-                     when :module
-                       module_to_metadata(record)
-                     else
-                       raise NotImplementedError, "not implemented yet #{type}"
-                     end
+        # @param record [DiverDown::Definition::Source]
+        # @return [String]
+        def issue_source_id(source)
+          build_metadata_and_return_id(:source, source)
+        end
 
-          id = "#{@prefix}#{@to_a.length + 1}"
-          @to_a.push(metadata.merge(id:))
-          id
+        # @param dependency [DiverDown::Definition::Dependency]
+        # @return [String]
+        def issue_dependency_id(dependency)
+          build_metadata_and_return_id(:dependency, [dependency])
+        end
+
+        # @param module_names [Array<String>]
+        # @return [String]
+        def issue_modules_id(module_names)
+          build_metadata_and_return_id(:module, module_names)
+        end
+
+        # @param id [String]
+        # @param dependency [DiverDown::Definition::Dependency]
+        def append_dependency(id, dependency)
+          metadata = @to_h.fetch(id)
+          dependencies = metadata.data
+          combined_dependencies = DiverDown::Definition::Dependency.combine(*dependencies, dependency)
+          metadata.data.replace(combined_dependencies)
+        end
+
+        # @return [Array<Hash>]
+        def to_a
+          @to_h.values.map(&:to_h)
         end
 
         private
 
+        def build_metadata_and_return_id(type, data)
+          id = "#{@prefix}#{length + 1}"
+          metadata = Metadata.new(id:, type:, data:, module_store: @module_store)
+          @to_h[id] = metadata
+
+          id
+        end
+
         def length
-          @to_a.length
-        end
-
-        def source_to_metadata(record)
-          modules = @module_store.get(record.source_name).map do
-            {
-              module_name: _1,
-            }
-          end
-
-          {
-            type: 'source',
-            source_name: record.source_name,
-            modules:,
-          }
-        end
-
-        def dependency_to_metadata(record)
-          {
-            type: 'dependency',
-            source_name: record.source_name,
-            method_ids: record.method_ids.sort.map do
-              {
-                name: _1.name,
-                context: _1.context,
-              }
-            end,
-          }
-        end
-
-        def module_to_metadata(record)
-          {
-            type: 'module',
-            modules: record.map do
-              {
-                module_name: _1,
-              }
-            end,
-          }
+          @to_h.length
         end
       end
 
@@ -91,7 +138,7 @@ module DiverDown
         @io = DiverDown::IndentedStringIo.new
         @indent = 0
         @compound = compound
-        @compound_map = Hash.new { |h, k| h[k] = Set.new } # { ltail => Set<lhead> }
+        @compound_map = Hash.new { |h, k| h[k] = {} } # Hash{ ltail => Hash{ lhead => issued id } }
         @concentrate = concentrate
         @metadata_store = MetadataStore.new(module_store)
       end
@@ -123,33 +170,42 @@ module DiverDown
 
       def insert_source(source)
         if module_store.get(source.source_name).empty?
-          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_id(:source, source))})
+          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
         else
           insert_modules(source)
         end
 
         source.dependencies.each do
-          attributes = {
-            id: @metadata_store.issue_id(:dependency, _1),
-          }
+          attributes = {}
           ltail = module_label(*module_store.get(source.source_name))
           lhead = module_label(*module_store.get(_1.source_name))
-          skip_rendering = false
 
           if @compound && (ltail || lhead)
             # Rendering of dependencies between modules is done only once
             between_modules = ltail != lhead
-            skip_rendering ||= @compound_map[ltail].include?(lhead) if between_modules
-            @compound_map[ltail].add(lhead)
+
+            # Already rendered dependencies between modules
+            # Add the dependency to the edge of the compound
+            if between_modules && @compound_map[ltail].include?(lhead)
+              compound_id = @compound_map[ltail][lhead]
+              @metadata_store.append_dependency(compound_id, _1)
+              next
+            end
+
+            compound_id = @metadata_store.issue_dependency_id(_1)
+            @compound_map[ltail][lhead] = compound_id
 
             attributes.merge!(
+              id: compound_id,
               ltail:,
               lhead:,
               minlen: (between_modules ? 3 : nil) # Between modules is prominently distanced
             )
+          else
+            attributes.merge!(
+              id: @metadata_store.issue_dependency_id(_1)
+            )
           end
-
-          next if skip_rendering
 
           io.write(%("#{source.source_name}" -> "#{_1.source_name}"))
           io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
@@ -169,8 +225,8 @@ module DiverDown
 
             io.puts %(#{' ' unless head_module_indexes.empty?}subgraph "#{module_label(module_name)}" {), indent: false
             io.indented do
-              module_attributes = build_attributes(label: module_name, id: @metadata_store.issue_id(:module, module_names), _wrap: false)
-              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_id(:source, source))
+              module_attributes = build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names), _wrap: false)
+              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))
 
               io.puts %(#{module_attributes} "#{source.source_name}" #{source_attributes})
             end
@@ -185,7 +241,7 @@ module DiverDown
 
               io.puts %(subgraph "#{module_label(module_name)}" {)
               io.indented do
-                attributes = build_attributes(label: module_name, id: @metadata_store.issue_id(:module, module_names), _wrap: false)
+                attributes = build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names), _wrap: false)
                 io.write attributes
                 next_writer.call
               end

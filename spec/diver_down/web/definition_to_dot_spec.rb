@@ -96,8 +96,12 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               }, {
                 id: 'graph_2',
                 type: 'dependency',
-                source_name: 'b.rb',
-                method_ids: [],
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [],
+                  },
+                ],
               }, {
                 id: 'graph_3',
                 type: 'source',
@@ -199,10 +203,10 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               }
               "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" id="graph_5" "b.rb" [label="b.rb" id="graph_6"]
+                label="B" id="graph_4" "b.rb" [label="b.rb" id="graph_5"]
               }
               subgraph "cluster_B" {
-                label="B" id="graph_7" "c.rb" [label="c.rb" id="graph_8"]
+                label="B" id="graph_6" "c.rb" [label="c.rb" id="graph_7"]
               }
             }
           DOT
@@ -227,15 +231,17 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               }, {
                 id: 'graph_3',
                 type: 'dependency',
-                source_name: 'b.rb',
-                method_ids: [],
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [],
+                  },
+                ],
               }, {
                 id: 'graph_4',
-                type: 'dependency',
-                source_name: 'c.rb',
-                method_ids: [],
-              }, {
-                id: 'graph_5',
                 type: 'module',
                 modules: [
                   {
@@ -243,14 +249,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   },
                 ],
               }, {
-                id: 'graph_6',
+                id: 'graph_5',
                 type: 'source',
                 source_name: 'b.rb',
                 modules: [
                   { module_name: 'B' },
                 ],
               }, {
-                id: 'graph_7',
+                id: 'graph_6',
                 type: 'module',
                 modules: [
                   {
@@ -258,7 +264,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                   },
                 ],
               }, {
-                id: 'graph_8',
+                id: 'graph_7',
                 type: 'source',
                 source_name: 'c.rb',
                 modules: [
@@ -268,6 +274,136 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
         end
+
+        it 'returns compound digraph with multiple method_ids if compound = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [
+                      {
+                        name: 'call_b',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [
+                      {
+                        name: 'call_c',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  },
+                ],
+              }, {
+                source_name: 'b.rb',
+              }, {
+                source_name: 'c.rb',
+              },
+            ]
+          )
+
+          module_store.set('a.rb', ['A'])
+          module_store.set('b.rb', ['B'])
+          module_store.set('c.rb', ['B'])
+
+          instance = described_class.new(definition, module_store, compound: true)
+          expect(instance.to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              compound=true
+              subgraph "cluster_A" {
+                label="A" id="graph_1" "a.rb" [label="a.rb" id="graph_2"]
+              }
+              "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
+              subgraph "cluster_B" {
+                label="B" id="graph_4" "b.rb" [label="b.rb" id="graph_5"]
+              }
+              subgraph "cluster_B" {
+                label="B" id="graph_6" "c.rb" [label="c.rb" id="graph_7"]
+              }
+            }
+          DOT
+
+          expect(instance.metadata).to eq(
+            [
+              {
+                id: 'graph_1',
+                type: 'module',
+                modules: [
+                  {
+                    module_name: 'A',
+                  },
+                ],
+              }, {
+                id: 'graph_2',
+                type: 'source',
+                source_name: 'a.rb',
+                modules: [
+                  { module_name: 'A' },
+                ],
+              }, {
+                id: 'graph_3',
+                type: 'dependency',
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [
+                      {
+                        name: 'call_b',
+                        context: 'class',
+                      },
+                    ],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [
+                      {
+                        name: 'call_c',
+                        context: 'class',
+                      },
+                    ],
+                  },
+                ],
+              }, {
+                id: 'graph_4',
+                type: 'module',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+              }, {
+                id: 'graph_5',
+                type: 'source',
+                source_name: 'b.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              }, {
+                id: 'graph_6',
+                type: 'module',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+              }, {
+                id: 'graph_7',
+                type: 'source',
+                source_name: 'c.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              },
+            ]
+          )
+        end
+
 
         it 'returns concentrate digraph if concentrate = true' do
           definition = build_definition(
