@@ -96,7 +96,13 @@ module DiverDown
         # @param module_names [Array<String>]
         # @return [String]
         def issue_modules_id(module_names)
-          build_metadata_and_return_id(:module, module_names)
+          issued_metadata = @to_h.values.find { _1.type == :module && _1.data == module_names }
+
+          if issued_metadata
+            issued_metadata.id
+          else
+            build_metadata_and_return_id(:module, module_names)
+          end
         end
 
         # @param id [String]

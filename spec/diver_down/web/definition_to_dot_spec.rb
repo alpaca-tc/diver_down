@@ -214,9 +214,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 "b.rb" [label="b.rb" id="graph_5"]
               }
               subgraph "cluster_B" {
-                id="graph_6"
+                id="graph_4"
                 label="B"
-                "c.rb" [label="c.rb" id="graph_7"]
+                "c.rb" [label="c.rb" id="graph_6"]
               }
             }
           DOT
@@ -267,14 +267,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 ],
               }, {
                 id: 'graph_6',
-                type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
-              }, {
-                id: 'graph_7',
                 type: 'source',
                 source_name: 'c.rb',
                 modules: [
@@ -339,9 +331,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 "b.rb" [label="b.rb" id="graph_5"]
               }
               subgraph "cluster_B" {
-                id="graph_6"
+                id="graph_4"
                 label="B"
-                "c.rb" [label="c.rb" id="graph_7"]
+                "c.rb" [label="c.rb" id="graph_6"]
               }
             }
           DOT
@@ -402,14 +394,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 ],
               }, {
                 id: 'graph_6',
-                type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
-              }, {
-                id: 'graph_7',
                 type: 'source',
                 source_name: 'c.rb',
                 modules: [
