@@ -13,6 +13,9 @@ module DiverDown
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
     require 'diver_down/web/module_store'
+    require 'diver_down/web/indented_string_io'
+    require 'diver_down/web/definition_store'
+    require 'diver_down/web/definition_loader'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
