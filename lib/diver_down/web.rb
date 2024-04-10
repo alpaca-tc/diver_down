@@ -49,9 +49,9 @@ module DiverDown
         action.sources
       in ['GET', %r{\A/api/modules\.json\z}]
         action.modules
-      in ['GET', %r{\A/api/modules/(?<module_name>.+)\.json\z}]
-        module_name = Regexp.last_match[:module_name]
-        action.module(module_name)
+      in ['GET', %r{\A/api/modules/(?<module_names>.+)\.json\z}]
+        module_names = Regexp.last_match[:module_names].split('/')
+        action.module(module_names)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'

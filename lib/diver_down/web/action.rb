@@ -68,8 +68,8 @@ module DiverDown
       end
 
       # GET /api/modules/:module_name.json
-      # @param module_name [String]
-      def module(module_name)
+      # @param module_names [Array<String>]
+      def module(module_names)
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
         related_definition_store_ids = Set.new
         source_names = Set.new
@@ -77,9 +77,9 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            modules = @module_store.get(source.source_name)
+            source_module_names = @module_store.get(source.source_name)
 
-            next if modules.none? { _1 == module_name }
+            next unless source_module_names[0..module_names.size - 1] == module_names
 
             source_names.add(source.source_name)
             related_definition_store_ids.add(definition.store_id)
@@ -94,7 +94,11 @@ module DiverDown
         related_definitions = related_definition_store_ids.map { @store.get(_1) }
 
         json(
-          module_name:,
+          modules: module_names.map do
+            {
+              module_name: _1,
+            }
+          end,
           sources: source_names.sort.map do |source_name|
             {
               source_name:,

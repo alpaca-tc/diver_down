@@ -341,22 +341,58 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition_1, definition_2)
-      module_store.set('a.rb', ['A', 'B'])
+      module_store.set('a.rb', ['A'])
+      module_store.set('b.rb', ['A', 'B'])
 
       get '/api/modules/A.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'module_name' => 'A',
+        'modules' => [
+          {
+            'module_name' => 'A',
+          },
+        ],
         'sources' => [
           {
             'source_name' => 'a.rb',
+          },
+          {
+            'source_name' => 'b.rb',
           },
         ],
         'related_definitions' => [
           {
             'id' => ids[0],
             'title' => 'title',
+          },
+          {
+            'id' => ids[1],
+            'title' => 'title 2',
+          },
+        ],
+      })
+
+      get '/api/modules/A/B.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'modules' => [
+          {
+            'module_name' => 'A',
+          }, {
+            'module_name' => 'B',
+          },
+        ],
+        'sources' => [
+          {
+            'source_name' => 'b.rb',
+          },
+        ],
+        'related_definitions' => [
+          {
+            'id' => ids[1],
+            'title' => 'title 2',
           },
         ],
       })

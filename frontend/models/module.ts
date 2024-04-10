@@ -3,7 +3,9 @@ export type Module = {
 }
 
 export type SpecificModule = {
-  moduleName: string
+  modules: Array<{
+    moduleName: string
+  }>
   sources: Array<{
     sourceName: string
   }>

@@ -19,7 +19,9 @@ export const useModules = () => {
 }
 
 type SpecificModuleResponse = {
-  module_name: string
+  modules: Array<{
+    module_name: string
+  }>
   related_definitions: Array<{
     id: number
     title: string
@@ -29,16 +31,18 @@ type SpecificModuleResponse = {
   }>
 }
 
-export const useModule = (moduleName: string) => {
-  const { data, isLoading } = useSWR<SpecificModule>(path.api.modules.show(moduleName), async (): Promise<SpecificModule> => {
-    const response = await get<SpecificModuleResponse>(path.api.modules.show(moduleName))
+export const useModule = (moduleNames: string[]) => {
+  const { data, isLoading } = useSWR<SpecificModule>(path.api.modules.show(moduleNames), async (): Promise<SpecificModule> => {
+    const response = await get<SpecificModuleResponse>(path.api.modules.show(moduleNames))
 
     return {
-      moduleName: response.module_name,
+      modules: response.modules.map((mod) => ({
+        moduleName: mod.module_name,
+      })),
       sources: response.sources.map((source) => ({ sourceName: source.source_name })),
       relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
     }
   })
 
-  return { specificModule: data, isLoading }
+  return { data, isLoading }
 }

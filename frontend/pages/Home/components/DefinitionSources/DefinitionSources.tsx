@@ -2,26 +2,12 @@ import { FC, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import {
-  Aside,
-  Button,
-  Cluster,
-  EmptyTableBody,
-  FaPencilIcon,
-  FaXmarkIcon,
-  Table,
-  TableReel,
-  Td,
-  Text,
-  Th,
-} from '@/components/ui'
+import { Aside, Button, Cluster, EmptyTableBody, FaPencilIcon, Table, TableReel, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
 import { SourceModulesComboBox } from '../SourceModulesComboBox'
-
-import type { DialogProps } from '../dialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition

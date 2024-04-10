@@ -32,7 +32,7 @@ export const path = {
     },
     modules: {
       index: () => '/api/modules.json',
-      show: (moduleName: string) => `/api/modules/${moduleName}.json`,
+      show: (moduleNames: string[]) => `/api/modules/${moduleNames.join('/')}.json`,
     },
   },
 }

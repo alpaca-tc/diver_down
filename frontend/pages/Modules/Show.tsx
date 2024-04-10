@@ -13,8 +13,8 @@ import { encode, idsToBitId } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 
 export const Show: React.FC = () => {
-  const moduleName = useParams().moduleName ?? ''
-  const { specificModule, isLoading } = useModule(moduleName)
+  const pathModules = (useParams()['*'] ?? '').split('/')
+  const { data: specificModule, isLoading } = useModule(pathModules)
 
   const relatedDefinitionIds = useMemo(() => {
     if (specificModule) {
@@ -27,7 +27,18 @@ export const Show: React.FC = () => {
   return (
     <StyledSection>
       <Stack>
-        <Heading type="screenTitle">{moduleName}</Heading>
+        <Heading type="screenTitle">
+          <Cluster>
+            <Link to={path.modules.index()}>Module List</Link>
+            &gt;
+            {pathModules.map((moduleName, index) => (
+              <React.Fragment key={index}>
+                {index !== 0 && <Text> / </Text>}
+                <Link to={path.modules.show(pathModules.slice(0, index + 1))}>{moduleName}</Link>
+              </React.Fragment>
+            ))}
+          </Cluster>
+        </Heading>
 
         <Section>
           {specificModule && !isLoading ? (
