@@ -4,23 +4,25 @@ type BaseDotMetadata = {
   id: string
 }
 
-type DotSourceMetadata = {
+export type DotSourceMetadata = {
   type: 'source'
   sourceName: string
   modules: Module[]
 } & BaseDotMetadata
 
-type DotDependencyMetadata = {
+export type DotDependencyMetadata = {
   type: 'dependency'
-  sourceName: string
-  methodIds: Array<{
-    name: string
-    context: 'class' | 'instance'
-    human: string
+  dependencies: Array<{
+    sourceName: string
+    methodIds: Array<{
+      name: string
+      context: 'class' | 'instance'
+      human: string
+    }>
   }>
 } & BaseDotMetadata
 
-type DotModuleMetadata = {
+export type DotModuleMetadata = {
   type: 'module'
   modules: Module[]
 } & BaseDotMetadata

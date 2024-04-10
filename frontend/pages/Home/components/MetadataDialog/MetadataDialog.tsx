@@ -1,11 +1,11 @@
-import { ComponentProps, FC, useState } from 'react'
+import { ComponentProps, FC, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Button, Cluster, DefinitionList, FaPencilIcon, Heading, ModelessDialog, Stack } from '@/components/ui'
+import { Button, Cluster, DefinitionList, FaPencilIcon, Heading, ModelessDialog, Stack, Table, Td, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
-import { DotMetadata } from '@/models/combinedDefinition'
+import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
 import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { DialogProps } from '../dialog'
@@ -20,82 +20,114 @@ type Props = {
   left: number
 }
 
-export const MetadataDialog: FC<Props> = ({ dotMetadata, isOpen, onClose, top, left, mutateCombinedDefinition }) => {
+const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props, 'mutateCombinedDefinition'>> = ({
+  metadata,
+  mutateCombinedDefinition,
+}) => {
   const [editingModules, setEditingModules] = useState<boolean>(false)
-  const items: ComponentProps<typeof DefinitionList>['items'] = []
-
-  switch (dotMetadata?.type) {
-    case 'source': {
-      items.push({
-        term: 'Source Name',
-        description: <Link to={path.sources.show(dotMetadata.sourceName)}>{dotMetadata.sourceName}</Link>,
-      })
-
-      items.push({
-        term: 'Modules',
-        description: (
-          <Cluster>
-            {editingModules ? (
-              <SourceModulesComboBox
-                sourceName={dotMetadata.sourceName}
-                initialModules={dotMetadata.modules}
-                onUpdate={() => {
-                  setEditingModules(false)
-                  mutateCombinedDefinition()
+  const items: ComponentProps<typeof DefinitionList>['items'] = [
+    {
+      term: 'Source Name',
+      description: <Link to={path.sources.show(metadata.sourceName)}>{metadata.sourceName}</Link>,
+    },
+    {
+      term: 'Modules',
+      description: (
+        <Cluster>
+          {editingModules ? (
+            <SourceModulesComboBox
+              sourceName={metadata.sourceName}
+              initialModules={metadata.modules}
+              onUpdate={() => {
+                setEditingModules(false)
+                mutateCombinedDefinition()
+              }}
+              onClose={() => {
+                setEditingModules(false)
+              }}
+            />
+          ) : (
+            <>
+              <div>
+                {metadata.modules.map((module) => (
+                  <p key={module.moduleName}>{module.moduleName}</p>
+                ))}
+              </div>
+              <Button
+                square={true}
+                onClick={() => {
+                  setEditingModules(true)
                 }}
-                onClose={() => {
-                  setEditingModules(false)
-                }}
-              />
-            ) : (
-              <>
-                <div>
-                  {dotMetadata.modules.map((module) => (
-                    <p key={module.moduleName}>{module.moduleName}</p>
-                  ))}
-                </div>
-                <Button
-                  square={true}
-                  onClick={() => {
-                    setEditingModules(true)
-                  }}
-                  size="s"
-                >
-                  <FaPencilIcon alt="編集" />
-                </Button>
-              </>
-            )}
-          </Cluster>
-        ),
-      })
+                size="s"
+              >
+                <FaPencilIcon alt="編集" />
+              </Button>
+            </>
+          )}
+        </Cluster>
+      ),
+    },
+  ]
 
-      break
+  return <DefinitionList items={items} />
+}
+
+const DependencyDotMetadataContent: FC<{ metadata: DotDependencyMetadata }> = ({ metadata }) => (
+  <Stack gap={0.5}>
+    <div style={{ overflow: 'clip' }}>
+      <Table fixedHead>
+        <thead>
+          <tr>
+            <Th>Source Name</Th>
+            <Th>Method Id</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {metadata.dependencies.map((dependency) =>
+            dependency.methodIds.map((methodId, index) => (
+              <tr key={`${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
+                <Td>
+                  {index === 0 ? <Link to={`${path.sources.show(dependency.sourceName)}`}>{dependency.sourceName}</Link> : null}
+                </Td>
+                <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
+              </tr>
+            )),
+          )}
+        </tbody>
+      </Table>
+    </div>
+  </Stack>
+)
+
+const ModuleDotMetadataContent: FC<{ metadata: DotModuleMetadata }> = ({ metadata }) => {
+  const items: ComponentProps<typeof DefinitionList>['items'] = [
+    {
+      term: 'Module Name',
+      description: (
+        <Link to={path.modules.show(metadata.modules.map((module) => module.moduleName))}>
+          {metadata.modules.map((module) => module.moduleName).join(' / ')}
+        </Link>
+      ),
+    },
+  ]
+
+  return <DefinitionList items={items} />
+}
+
+export const MetadataDialog: FC<Props> = ({ dotMetadata, isOpen, onClose, top, left, mutateCombinedDefinition }) => {
+  const content = useMemo(() => {
+    switch (dotMetadata?.type) {
+      case 'source': {
+        return <SourceDotMetadataContent metadata={dotMetadata} mutateCombinedDefinition={mutateCombinedDefinition} />
+      }
+      case 'dependency': {
+        return <DependencyDotMetadataContent metadata={dotMetadata} />
+      }
+      case 'module': {
+        return <ModuleDotMetadataContent metadata={dotMetadata} />
+      }
     }
-    case 'dependency': {
-      items.push({
-        term: 'Dependency Name',
-        description: <Link to={path.sources.show(dotMetadata.sourceName)}>{dotMetadata.sourceName}</Link>,
-      })
-      items.push({
-        term: 'Method ID',
-        description: dotMetadata.methodIds.map((methodId) => (
-          <p key={`${methodId.context}-${methodId.name}`}>{methodId.human}</p>
-        )),
-      })
-      break
-    }
-    case 'module': {
-      items.push({
-        term: 'Module Name',
-        description: (
-          <Link to={path.modules.show(dotMetadata.modules.map((module) => module.moduleName))}>
-            {dotMetadata.modules.map((module) => module.moduleName).join(' / ')}
-          </Link>
-        ),
-      })
-      break
-    }
-  }
+  }, [dotMetadata, mutateCombinedDefinition])
 
   return (
     <ModelessDialog
@@ -107,9 +139,9 @@ export const MetadataDialog: FC<Props> = ({ dotMetadata, isOpen, onClose, top, l
       left={left}
     >
       <Wrapper>
-        <Stack gap={0.5} as="section">
-          <DefinitionList items={items} />
-        </Stack>
+        <ScrollableStack gap={0.5} as="section">
+          {content}
+        </ScrollableStack>
       </Wrapper>
     </ModelessDialog>
   )
@@ -123,4 +155,10 @@ const ModelessHeading = styled(Heading)`
 
 const Wrapper = styled.div`
   padding: ${spacing.XS};
+  overflow: hidden;
+`
+
+const ScrollableStack = styled(Stack)`
+  overflow-y: auto;
+  max-height: 350px;
 `

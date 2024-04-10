@@ -127,11 +127,6 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
               ) ?? null
             )
           case 'dependency':
-            return (
-              combinedDefinition.dotMetadata.find(
-                (metadata) => metadata.type === 'dependency' && metadata.sourceName === prev.sourceName,
-              ) ?? null
-            )
           case 'module':
             // Can't find previous module
             return prev
