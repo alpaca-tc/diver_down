@@ -145,7 +145,7 @@ module DiverDown
       def initialize(definition, module_store, compound: false, concentrate: false, only_module: false)
         @definition = definition
         @module_store = module_store
-        @io = DiverDown::IndentedStringIo.new
+        @io = DiverDown::Web::IndentedStringIo.new
         @indent = 0
         @compound = compound || only_module # When only-module is enabled, dependencies between modules are displayed as compound.
         @compound_map = Hash.new { |h, k| h[k] = {} } # Hash{ ltail => Hash{ lhead => issued id } }

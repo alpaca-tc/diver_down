@@ -13,14 +13,17 @@ module DiverDown
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
     require 'diver_down/web/module_store'
+    require 'diver_down/web/indented_string_io'
+    require 'diver_down/web/definition_store'
+    require 'diver_down/web/definition_loader'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
 
     # @param definition_dir [String]
     # @param module_store [DiverDown::ModuleStore]
-    # @param store [DiverDown::DefinitionStore]
-    def initialize(definition_dir:, module_store:, store: DiverDown::DefinitionStore.new)
+    # @param store [DiverDown::Web::DefinitionStore]
+    def initialize(definition_dir:, module_store:, store: DiverDown::Web::DefinitionStore.new)
       @store = store
       @module_store = module_store
       @files_server = Rack::Files.new(File.join(WEB_DIR))
@@ -81,7 +84,7 @@ module DiverDown
     private
 
     def load_definition_files_on_thread(definition_files)
-      definition_loader = DiverDown::DefinitionLoader.new
+      definition_loader = DiverDown::Web::DefinitionLoader.new
 
       Thread.new do
         loop do

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DiverDown::DefinitionStore do
+RSpec.describe DiverDown::Web::DefinitionStore do
   describe 'InstanceMethods' do
     describe '#get' do
       it 'raises KeyError if key not found' do
