@@ -5,15 +5,16 @@ import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/compone
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
-import { ConfigureGraphOptionsDialog, GraphOptions } from './ConfigureGraphOptionsDialog'
+import { ConfigureGraphOptionsDialog, GraphOptions } from '../ConfigureGraphOptionsDialog'
+
 import { ScrollableSvg } from './ScrollableSvg'
 
-import type { DialogType } from '../dialog'
+import type { DialogProps } from '../dialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition
-  visibleDialog: DialogType | null
-  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogType | null>>
+  visibleDialog: DialogProps | null
+  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogProps | null>>
   graphOptions: GraphOptions
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
@@ -32,7 +33,7 @@ export const DefinitionGraph: FC<Props> = ({
   return (
     <WrapperSection>
       <ConfigureGraphOptionsDialog
-        isOpen={visibleDialog === 'configureGraphOptionsDiaglog'}
+        isOpen={visibleDialog?.type === 'configureGraphOptionsDialog'}
         onClickClose={onClickCloseDialog}
         graphOptions={graphOptions}
         setGraphOptions={setGraphOptions}
@@ -48,14 +49,14 @@ export const DefinitionGraph: FC<Props> = ({
         <Button
           size="s"
           square
-          onClick={() => setVisibleDialog('configureGraphOptionsDiaglog')}
+          onClick={() => setVisibleDialog({ type: 'configureGraphOptionsDialog' })}
           prefix={<FaGearIcon alt="Open Options" />}
         >
           Open Graph Options
         </Button>
       </FixedHeightHeading>
       <FlexHeightSvgWrapper>
-        <ScrollableSvg combinedDefinition={combinedDefinition} />
+        <ScrollableSvg combinedDefinition={combinedDefinition} setVisibleDialog={setVisibleDialog} />
       </FlexHeightSvgWrapper>
     </WrapperSection>
   )

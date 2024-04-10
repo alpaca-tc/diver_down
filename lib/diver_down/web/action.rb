@@ -51,18 +51,18 @@ module DiverDown
         @store.each do |_, definition|
           definition.sources.each do |source|
             modules = @module_store.get(source.source_name)
-            modules.each do |modulee|
-              module_set.add(modulee)
-            end
+            module_set.add(modules) unless modules.empty?
           end
         end
         # rubocop:enable Style/HashEachMethods
 
         json(
           modules: module_set.sort.map do
-            {
-              module_name: _1,
-            }
+            _1.map do |module_name|
+              {
+                module_name:,
+              }
+            end
           end
         )
       end
@@ -228,16 +228,18 @@ module DiverDown
 
         return not_found if related_definitions.empty?
 
-        modules = if found_sources.empty?
-                    []
-                  else
-                    source = DiverDown::Definition::Source.combine(*found_sources)
-                    @module_store.get(source.source_name)
-                  end
+        module_names = if found_sources.empty?
+                         []
+                       else
+                         source = DiverDown::Definition::Source.combine(*found_sources)
+                         @module_store.get(source.source_name)
+                       end
 
         json(
           source_name:,
-          modules: modules.map(&:to_h),
+          modules: module_names.map do
+            { module_name: _1 }
+          end,
           related_definitions: related_definitions.map do |id, definition|
             {
               id:,

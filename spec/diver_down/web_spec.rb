@@ -297,13 +297,19 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
         'modules' => [
-          {
-            'module_name' => 'A',
-          }, {
-            'module_name' => 'B',
-          }, {
-            'module_name' => 'C',
-          },
+          [
+            {
+              'module_name' => 'A',
+            }, {
+              'module_name' => 'B',
+            },
+          ], [
+            {
+              'module_name' => 'B',
+            }, {
+              'module_name' => 'C',
+            },
+          ],
         ],
       })
     end

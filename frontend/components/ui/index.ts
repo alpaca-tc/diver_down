@@ -12,6 +12,8 @@ export {
   FaCirclePlusIcon,
   FaGearIcon,
   FaPencilIcon,
+  FaTrashIcon,
+  FaXmarkIcon,
   FormControl,
   Heading,
   Input,
@@ -23,8 +25,10 @@ export {
   Section,
   SideNav,
   Sidebar,
+  SingleComboBox,
   Stack,
   Table,
+  TableReel,
   Td,
   Text,
   Th,
@@ -39,7 +43,6 @@ export {
   defaultRadius,
   defaultSpacing,
   useTheme,
-  FaTrashIcon,
 } from 'smarthr-ui'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'

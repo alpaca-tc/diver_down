@@ -2,19 +2,29 @@ import { FC, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Aside, Button, EmptyTableBody, FaPencilIcon, Table, Td, Text, Th } from '@/components/ui'
+import {
+  Aside,
+  Button,
+  Cluster,
+  EmptyTableBody,
+  FaPencilIcon,
+  FaXmarkIcon,
+  Table,
+  TableReel,
+  Td,
+  Text,
+  Th,
+} from '@/components/ui'
 import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
-import { UpdateSourceModulesDialog } from './UpdateSourceModulesDialog'
+import { SourceModulesComboBox } from '../SourceModulesComboBox'
 
-import type { DialogType } from '../dialog'
+import type { DialogProps } from '../dialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition
-  visibleDialog: DialogType | null
-  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogType | null>>
   mutateCombinedDefinition: () => void
 }
 
@@ -27,14 +37,9 @@ type SortState = {
   sort: SortTypes
 }
 
-export const DefinitionSources: FC<Props> = ({
-  combinedDefinition,
-  visibleDialog,
-  setVisibleDialog,
-  mutateCombinedDefinition,
-}) => {
+export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombinedDefinition }) => {
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
-  const [editingSource, setEditingSource] = useState<{ sourceName: string; moduleNames: string[] } | null>(null)
+  const [editingSourceNames, setEditingSourceNames] = useState<string[]>([])
 
   const setNextSortType = useCallback(
     (key: SortState['key']) => {
@@ -89,68 +94,75 @@ export const DefinitionSources: FC<Props> = ({
 
   return (
     <WrapperAside>
-      <UpdateSourceModulesDialog
-        isOpen={visibleDialog === 'updateSourceModulesDialog'}
-        sourceName={editingSource?.sourceName ?? ''}
-        initialModuleNames={editingSource?.moduleNames ?? []}
-        onClose={() => setVisibleDialog(null)}
-        onSave={() => {
-          mutateCombinedDefinition()
-          setVisibleDialog(null)
-        }}
-      />
       <TableWrapper>
-        <StyledTable fixedHead>
-          <thead>
-            <tr>
-              <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
-                Source name
-              </Th>
-              <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
-                Modules
-              </Th>
-              <Th></Th>
-            </tr>
-          </thead>
-          {sources.length === 0 ? (
-            <EmptyTableBody>
-              <Text>お探しの条件に該当する項目はありません。</Text>
-              <Text>別の条件をお試しください。</Text>
-            </EmptyTableBody>
-          ) : (
-            <tbody>
-              {sources.map((source) => (
-                <tr key={source.sourceName}>
-                  <Td>
-                    <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-                  </Td>
-                  <Td>
-                    {source.modules.map((module) => (
-                      <Text key={module.moduleName} as="div" whiteSpace="nowrap">
-                        <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
-                      </Text>
-                    ))}
-                  </Td>
-                  <Td>
-                    <Button
-                      square={true}
-                      onClick={() => {
-                        setEditingSource({
-                          sourceName: source.sourceName,
-                          moduleNames: source.modules.map((module) => module.moduleName),
-                        })
-                        setVisibleDialog('updateSourceModulesDialog')
-                      }}
-                      size="s"
-                    >
-                      <FaPencilIcon alt="編集" />
-                    </Button>
-                  </Td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </StyledTable>
+        <TableReel>
+          <StyledTable fixedHead>
+            <thead>
+              <tr>
+                <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
+                  Source name
+                </Th>
+                <Th fixed sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
+                  Modules
+                </Th>
+              </tr>
+            </thead>
+            {sources.length === 0 ? (
+              <EmptyTableBody>
+                <Text>お探しの条件に該当する項目はありません。</Text>
+                <Text>別の条件をお試しください。</Text>
+              </EmptyTableBody>
+            ) : (
+              <tbody>
+                {sources.map((source) => (
+                  <tr key={source.sourceName}>
+                    <Td>
+                      <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                    </Td>
+                    {editingSourceNames.includes(source.sourceName) ? (
+                      <Td fixed colSpan={2}>
+                        <SourceModulesComboBox
+                          sourceName={source.sourceName}
+                          initialModules={source.modules}
+                          onUpdate={() => {
+                            setEditingSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                            mutateCombinedDefinition()
+                          }}
+                          onClose={() => {
+                            setEditingSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                          }}
+                        />
+                      </Td>
+                    ) : (
+                      <Td fixed>
+                        <Cluster align="center">
+                          <div>
+                            {source.modules.map((module, index) => (
+                              <Text key={index} as="div" whiteSpace="nowrap">
+                                <Link to={path.modules.show(source.modules.slice(0, index + 1).map((mod) => mod.moduleName))}>
+                                  {module.moduleName}
+                                </Link>
+                              </Text>
+                            ))}
+                          </div>
+                          <div>
+                            <Button
+                              square={true}
+                              onClick={() => setEditingSourceNames((prev) => [...prev, source.sourceName])}
+                              size="s"
+                            >
+                              <FaPencilIcon alt="Edit" />
+                            </Button>
+                          </div>
+                        </Cluster>
+                      </Td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </StyledTable>
+        </TableReel>
       </TableWrapper>
     </WrapperAside>
   )

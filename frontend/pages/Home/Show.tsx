@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
@@ -8,15 +8,17 @@ import { useBitIdHash } from '@/hooks/useBitIdHash'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
 
-import { DefinitionGraph, GraphOptions } from './components/DefinitionGraph'
+import { GraphOptions } from './components/ConfigureGraphOptionsDialog'
+import { DefinitionGraph } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'
 import { DefinitionSources } from './components/DefinitionSources'
+import { MetadataDialog } from './components/MetadataDialog'
 
-import type { DialogType } from './components/dialog'
+import type { DialogProps } from './components/dialog'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
-  const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
+  const [visibleDialog, setVisibleDialog] = useState<DialogProps | null>(null)
   const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', {
     compound: false,
     concentrate: false,
@@ -27,6 +29,10 @@ export const Show: React.FC = () => {
     mutate: mutateCombinedDefinition,
   } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate)
 
+  const onCloseDialog = useCallback(() => {
+    setVisibleDialog(null)
+  }, [setVisibleDialog])
+
   return (
     <Wrapper>
       <StyledSidebar contentsMinWidth="0px" gap={0}>
@@ -34,6 +40,15 @@ export const Show: React.FC = () => {
           <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
         </StyledAside>
         <StyledSection>
+          <MetadataDialog
+            isOpen={visibleDialog?.type === 'metadataDialog'}
+            dotMetadata={visibleDialog?.type === 'metadataDialog' ? visibleDialog.metadata : null}
+            top={visibleDialog?.type === 'metadataDialog' ? visibleDialog.top : 0}
+            left={visibleDialog?.type === 'metadataDialog' ? visibleDialog.left : 0}
+            onClose={onCloseDialog}
+            setVisibleDialog={setVisibleDialog}
+            mutateCombinedDefinition={mutateCombinedDefinition}
+          />
           {isLoading ? (
             <CenterStack>
               <Loading text="Loading..." alt="Loading" />
@@ -53,8 +68,6 @@ export const Show: React.FC = () => {
               />
               <StyledDefinitionSources
                 combinedDefinition={combinedDefinition}
-                visibleDialog={visibleDialog}
-                setVisibleDialog={setVisibleDialog}
                 mutateCombinedDefinition={mutateCombinedDefinition}
               />
             </StyledStack>

@@ -11,7 +11,7 @@ export const path = {
   },
   modules: {
     index: () => '/modules',
-    show: (moduleName: string) => `/modules/${moduleName}`,
+    show: (moduleNames: string[]) => `/modules/${moduleNames.join('/')}`,
   },
   licenses: {
     index: () => '/licenses',

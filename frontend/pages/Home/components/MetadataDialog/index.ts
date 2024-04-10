@@ -1,0 +1,1 @@
+export { MetadataDialog } from './MetadataDialog'

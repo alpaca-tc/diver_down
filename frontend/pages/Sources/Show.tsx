@@ -48,10 +48,14 @@ export const Show: React.FC = () => {
                         </EmptyTableBody>
                       ) : (
                         <tbody>
-                          {specificSource.modules.map((module) => (
+                          {specificSource.modules.map((module, index) => (
                             <tr key={module.moduleName}>
                               <Td>
-                                <Link to={path.modules.show(module.moduleName)}>{module.moduleName}</Link>
+                                <Link
+                                  to={path.modules.show(specificSource.modules.slice(0, index + 1).map((mod) => mod.moduleName))}
+                                >
+                                  {module.moduleName}
+                                </Link>
                               </Td>
                             </tr>
                           ))}

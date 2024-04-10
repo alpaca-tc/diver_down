@@ -16,9 +16,9 @@ module DiverDown
       end
 
       # @param source_name [String]
-      # @param modules [Array<DiverDown::Web::Modulee>]
-      def set(source_name, modules)
-        @store[source_name] = modules.dup.reject do
+      # @param module_names [Array<String>]
+      def set(source_name, module_names)
+        @store[source_name] = module_names.dup.reject do
           BLANK_RE.match?(_1)
         end.freeze
       end
