@@ -56,7 +56,8 @@ module DiverDown
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
-        action.combine_definitions(bit_id, compound, concentrate)
+        only_module = request.params['only_module'] == '1'
+        action.combine_definitions(bit_id, compound, concentrate, only_module)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)

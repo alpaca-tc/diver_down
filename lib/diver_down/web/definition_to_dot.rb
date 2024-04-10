@@ -7,6 +7,10 @@ module DiverDown
   class Web
     class DefinitionToDot
       ATTRIBUTE_DELIMITER = ' '
+      MODULE_DELIMITER = '::'
+
+      # Between modules is prominently distanced
+      MODULE_MINLEN = 3
 
       class MetadataStore
         Metadata = Data.define(:id, :type, :data, :module_store) do
@@ -96,7 +100,13 @@ module DiverDown
         # @param module_names [Array<String>]
         # @return [String]
         def issue_modules_id(module_names)
-          build_metadata_and_return_id(:module, module_names)
+          issued_metadata = @to_h.values.find { _1.type == :module && _1.data == module_names }
+
+          if issued_metadata
+            issued_metadata.id
+          else
+            build_metadata_and_return_id(:module, module_names)
+          end
         end
 
         # @param id [String]
@@ -132,14 +142,15 @@ module DiverDown
       # @param module_store [DiverDown::ModuleStore]
       # @param compound [Boolean]
       # @param concentrate [Boolean] https://graphviz.org/docs/attrs/concentrate/
-      def initialize(definition, module_store, compound: false, concentrate: false)
+      def initialize(definition, module_store, compound: false, concentrate: false, only_module: false)
         @definition = definition
         @module_store = module_store
         @io = DiverDown::IndentedStringIo.new
         @indent = 0
-        @compound = compound
+        @compound = compound || only_module # When only-module is enabled, dependencies between modules are displayed as compound.
         @compound_map = Hash.new { |h, k| h[k] = {} } # Hash{ ltail => Hash{ lhead => issued id } }
         @concentrate = concentrate
+        @only_module = only_module
         @metadata_store = MetadataStore.new(module_store)
       end
 
@@ -150,14 +161,17 @@ module DiverDown
 
       # @return [String]
       def to_s
-        sources = definition.sources.sort_by(&:source_name)
-
         io.puts %(strict digraph "#{definition.title}" {)
         io.indented do
           io.puts('compound=true') if @compound
           io.puts('concentrate=true') if @concentrate
-          sources.each do
-            insert_source(_1)
+
+          if @only_module
+            render_only_modules
+          else
+            definition.sources.sort_by(&:source_name).each do
+              insert_source(_1)
+            end
           end
         end
         io.puts '}'
@@ -167,6 +181,92 @@ module DiverDown
       private
 
       attr_reader :definition, :module_store, :io
+
+      def render_only_modules
+        # Hash{ from_module => { to_module => Array<DiverDown::Definition::Dependency> } }
+        dependency_map = Hash.new { |h, k| h[k] = Hash.new { |hi, ki| hi[ki] = [] } }
+
+        definition.sources.sort_by(&:source_name).each do |source|
+          source_modules = module_store.get(source.source_name)
+          next if source_modules.empty?
+
+          source.dependencies.each do |dependency|
+            dependency_modules = module_store.get(dependency.source_name)
+            next if dependency_modules.empty?
+
+            dependency_map[source_modules][dependency_modules].push(dependency)
+          end
+        end
+
+        # Remove duplicated prefix modules
+        # from [["A"], ["A", "B"]] to [["A", "B"]]
+        uniq_modules = [*dependency_map.keys, *dependency_map.values.map(&:keys).flatten(1)].uniq
+        uniq_modules.reject! do |modules|
+          modules.empty? ||
+            uniq_modules.any? { _1[0..modules.size - 1] == modules && _1.length > modules.size }
+        end
+
+        uniq_modules.each do |specific_module_names|
+          buf = swap_io do
+            indexes = (0..(specific_module_names.length - 1)).to_a
+
+            chain_yield(indexes) do |index, next_proc|
+              module_names = specific_module_names[0..index]
+              module_name = specific_module_names[index]
+
+              io.puts %(subgraph "#{module_label(module_names)}" {)
+              io.indented do
+                io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+                io.puts %(label="#{module_name}")
+                io.puts %("#{module_name}" #{build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names))})
+
+                next_proc&.call
+              end
+              io.puts '}'
+            end
+          end
+
+          io.write buf.string
+        end
+
+        dependency_map.each do |from_modules, h|
+          h.each do |to_modules, all_dependencies|
+            # Do not render standalone source
+            # Do not render self-dependency
+            next if from_modules.empty? || to_modules.empty? || from_modules == to_modules
+
+            dependencies = DiverDown::Definition::Dependency.combine(*all_dependencies)
+
+            dependencies.each do
+              attributes = {}
+              ltail = module_label(*from_modules)
+              lhead = module_label(*to_modules)
+
+              # Already rendered dependencies between modules
+              # Add the dependency to the edge of the compound
+              if @compound_map[ltail].include?(lhead)
+                compound_id = @compound_map[ltail][lhead]
+                @metadata_store.append_dependency(compound_id, _1)
+                next
+              end
+
+              compound_id = @metadata_store.issue_dependency_id(_1)
+              @compound_map[ltail][lhead] = compound_id
+
+              attributes.merge!(
+                id: compound_id,
+                ltail:,
+                lhead:,
+                minlen: MODULE_MINLEN
+              )
+
+              io.write(%("#{from_modules[-1]}" -> "#{to_modules[-1]}"))
+              io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
+              io.write("\n")
+            end
+          end
+        end
+      end
 
       def insert_source(source)
         if module_store.get(source.source_name).empty?
@@ -199,7 +299,7 @@ module DiverDown
               id: compound_id,
               ltail:,
               lhead:,
-              minlen: (between_modules ? 3 : nil) # Between modules is prominently distanced
+              minlen: MODULE_MINLEN
             )
           else
             attributes.merge!(
@@ -216,42 +316,45 @@ module DiverDown
       def insert_modules(source)
         buf = swap_io do
           all_module_names = module_store.get(source.source_name)
-          *head_module_indexes, _tail_module_index = (0..(all_module_names.length - 1)).to_a
+          indexes = (0..(all_module_names.length - 1)).to_a
 
-          # last subgraph
-          last_module_writer = proc do
-            module_names = all_module_names
+          chain_yield(indexes) do |index, next_proc|
+            module_names = all_module_names[0..index]
             module_name = module_names[-1]
 
-            io.puts %(subgraph "#{module_label(module_name)}" {)
+            io.puts %(subgraph "#{module_label(module_names)}" {)
             io.indented do
               io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
               io.puts %(label="#{module_name}")
-              io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
+
+              if next_proc
+                next_proc.call
+              else
+                # last. equals indexes[-1] == index
+                io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
+              end
             end
             io.puts '}'
           end
-
-          # wrapper subgraph
-          modules_writer = head_module_indexes.inject(last_module_writer) do |next_writer, module_index|
-            proc do
-              module_names = all_module_names[0..module_index]
-              module_name = module_names[-1]
-
-              io.puts %(subgraph "#{module_label(module_name)}" {)
-              io.indented do
-                io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
-                io.puts %(label="#{module_name}")
-                next_writer.call
-              end
-              io.puts '}'
-            end
-          end
-
-          modules_writer.call
         end
 
         io.write buf.string
+      end
+
+      def chain_yield(values, &block)
+        *head, tail = values
+
+        last_proc = proc do
+          block.call(tail, nil)
+        end
+
+        chain_proc = head.inject(last_proc) do |next_proc, value|
+          proc do
+            block.call(value, next_proc)
+          end
+        end
+
+        chain_proc.call
       end
 
       # rubocop:disable Lint/UnderscorePrefixedVariableName
@@ -289,7 +392,7 @@ module DiverDown
       def module_label(*modules)
         return if modules.empty?
 
-        "cluster_#{modules[0]}"
+        "cluster_#{modules.join(MODULE_DELIMITER)}"
       end
     end
   end

@@ -155,7 +155,8 @@ module DiverDown
       # @param bit_id [Integer]
       # @param compound [Boolean]
       # @param concentrate [Boolean]
-      def combine_definitions(bit_id, compound, concentrate)
+      # @param only_module [Boolean]
+      def combine_definitions(bit_id, compound, concentrate, only_module)
         ids = DiverDown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
@@ -175,7 +176,7 @@ module DiverDown
                              end
 
         if definition
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @module_store, compound:, concentrate:)
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @module_store, compound:, concentrate:, only_module:)
 
           json(
             titles:,

@@ -108,10 +108,11 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
 
 const toBooleanFlag = (value: boolean) => (value ? '1' : null)
 
-export const useCombinedDefinition = (ids: number[], compound: boolean, concentrate: boolean) => {
+export const useCombinedDefinition = (ids: number[], compound: boolean, concentrate: boolean, onlyModule: boolean) => {
   const params = {
     compound: toBooleanFlag(compound),
     concentrate: toBooleanFlag(concentrate),
+    only_module: toBooleanFlag(onlyModule),
   }
   const requestPath = `${path.api.definitions.show(ids)}?${stringify(params)}`
   const shouldFetch = ids.length > 0

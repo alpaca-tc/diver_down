@@ -7,6 +7,7 @@ import { spacing } from '@/constants/theme'
 export type GraphOptions = {
   compound: boolean
   concentrate: boolean
+  onlyModule: boolean
 }
 
 type Props = {
@@ -45,6 +46,13 @@ export const ConfigureGraphOptionsDialog: React.FC<Props> = ({ isOpen, onClickCl
     [setTemporaryViewOptions],
   )
 
+  const onChangeOnlyModule = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTemporaryViewOptions((prev) => ({ ...prev, onlyModule: event.target.checked }))
+    },
+    [setTemporaryViewOptions],
+  )
+
   return (
     <ActionDialog
       title="Configure Graph Options"
@@ -72,6 +80,13 @@ export const ConfigureGraphOptionsDialog: React.FC<Props> = ({ isOpen, onClickCl
                 helpMessage="This merges multiedges into a single edge and causes partially parallel edges to share part of their paths."
               >
                 <CheckBox name="compound" onChange={onChangeConcentrate} checked={temporaryViewOptions.concentrate} />
+              </FormControl>
+
+              <FormControl
+                title="Render only modules"
+                helpMessage="Displays only the dependencies between modules, not individual sources."
+              >
+                <CheckBox name="only_module" onChange={onChangeOnlyModule} checked={temporaryViewOptions.onlyModule} />
               </FormControl>
             </Stack>
           </Stack>

@@ -22,12 +22,13 @@ export const Show: React.FC = () => {
   const [graphOptions, setGraphOptions] = useLocalStorage<GraphOptions>('HomeShow-GraphOptions', {
     compound: false,
     concentrate: false,
+    onlyModule: false,
   })
   const {
     data: combinedDefinition,
     isLoading,
     mutate: mutateCombinedDefinition,
-  } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate)
+  } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate, graphOptions.onlyModule)
 
   const onCloseDialog = useCallback(() => {
     setVisibleDialog(null)
