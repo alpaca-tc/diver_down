@@ -19,10 +19,12 @@ type DotSourceMetadataResponse = {
 type DotDependencyMetadataResponse = {
   id: string
   type: 'dependency'
-  source_name: string
-  method_ids: Array<{
-    name: string
-    context: 'class' | 'instance'
+  dependencies: Array<{
+    source_name: string
+    method_ids: Array<{
+      name: string
+      context: 'class' | 'instance'
+    }>
   }>
 }
 
@@ -65,11 +67,13 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
       return {
         id: metadata.id,
         type: metadata.type,
-        sourceName: metadata.source_name,
-        methodIds: metadata.method_ids.map((methodId) => ({
-          name: methodId.name,
-          context: methodId.context,
-          human: `${methodId.context === 'class' ? '.' : '#'}${methodId.name}`,
+        dependencies: metadata.dependencies.map((dependency) => ({
+          sourceName: dependency.source_name,
+          methodIds: dependency.method_ids.map((methodId) => ({
+            name: methodId.name,
+            context: methodId.context,
+            human: `${methodId.context === 'class' ? '.' : '#'}${methodId.name}`,
+          })),
         })),
       }
     }
