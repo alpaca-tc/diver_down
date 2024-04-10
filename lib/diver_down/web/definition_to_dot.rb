@@ -223,12 +223,11 @@ module DiverDown
             module_names = all_module_names
             module_name = module_names[-1]
 
-            io.puts %(#{' ' unless head_module_indexes.empty?}subgraph "#{module_label(module_name)}" {), indent: false
+            io.puts %(subgraph "#{module_label(module_name)}" {)
             io.indented do
-              module_attributes = build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names), _wrap: false)
-              source_attributes = build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))
-
-              io.puts %(#{module_attributes} "#{source.source_name}" #{source_attributes})
+              io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+              io.puts %(label="#{module_name}")
+              io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
             end
             io.puts '}'
           end
@@ -241,8 +240,8 @@ module DiverDown
 
               io.puts %(subgraph "#{module_label(module_name)}" {)
               io.indented do
-                attributes = build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names), _wrap: false)
-                io.write attributes
+                io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+                io.puts %(label="#{module_name}")
                 next_writer.call
               end
               io.puts '}'

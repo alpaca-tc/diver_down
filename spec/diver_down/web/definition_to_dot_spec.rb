@@ -130,8 +130,12 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               subgraph "cluster_A" {
-                label="A" id="graph_1" subgraph "cluster_B" {
-                  label="B" id="graph_2" "a.rb" [label="a.rb" id="graph_3"]
+                id="graph_1"
+                label="A"
+                subgraph "cluster_B" {
+                  id="graph_2"
+                  label="B"
+                  "a.rb" [label="a.rb" id="graph_3"]
                 }
               }
             }
@@ -199,14 +203,20 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               compound=true
               subgraph "cluster_A" {
-                label="A" id="graph_1" "a.rb" [label="a.rb" id="graph_2"]
+                id="graph_1"
+                label="A"
+                "a.rb" [label="a.rb" id="graph_2"]
               }
               "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" id="graph_4" "b.rb" [label="b.rb" id="graph_5"]
+                id="graph_4"
+                label="B"
+                "b.rb" [label="b.rb" id="graph_5"]
               }
               subgraph "cluster_B" {
-                label="B" id="graph_6" "c.rb" [label="c.rb" id="graph_7"]
+                id="graph_6"
+                label="B"
+                "c.rb" [label="c.rb" id="graph_7"]
               }
             }
           DOT
@@ -318,14 +328,20 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               compound=true
               subgraph "cluster_A" {
-                label="A" id="graph_1" "a.rb" [label="a.rb" id="graph_2"]
+                id="graph_1"
+                label="A"
+                "a.rb" [label="a.rb" id="graph_2"]
               }
               "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
-                label="B" id="graph_4" "b.rb" [label="b.rb" id="graph_5"]
+                id="graph_4"
+                label="B"
+                "b.rb" [label="b.rb" id="graph_5"]
               }
               subgraph "cluster_B" {
-                label="B" id="graph_6" "c.rb" [label="c.rb" id="graph_7"]
+                id="graph_6"
+                label="B"
+                "c.rb" [label="c.rb" id="graph_7"]
               }
             }
           DOT
@@ -403,7 +419,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
         end
-
 
         it 'returns concentrate digraph if concentrate = true' do
           definition = build_definition(
