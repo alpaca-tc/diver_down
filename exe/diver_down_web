@@ -6,12 +6,48 @@ require 'rack/contrib'
 require 'webrick'
 require 'diver_down'
 require 'diver_down-web'
+require 'optparse'
 
-definition_dir = ENV.fetch('DIVER_DOWN_DIR')
-module_store = DiverDown::Web::ModuleStore.new(ENV.fetch('DIVER_DOWN_MODULE_STORE'))
+options = {}
+option_parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Usage: diver_down_web [options]
+
+    Example:
+      diver_down_web --definition-dir /path/to/definitions --module-store /path/to/module_store.yml
+
+    Options:
+  BANNER
+
+  opts.on('--definition-dir PATH', 'Path to the definition directory') do |path|
+    options[:definition_dir] = path
+  end
+
+  opts.on('--module-store PATH', 'Path to the module store') do |path|
+    options[:module_store] = path
+  end
+end
+option_parser.parse!(ARGV)
+
+unless options[:definition_dir]
+  puts 'Missing --definition-dir'
+  puts
+  puts option_parser.help
+  exit 1
+end
+
+unless options[:module_store]
+  puts 'Missing --module-store'
+  puts
+  puts option_parser.help
+  exit 1
+end
 
 app = Rack::JSONBodyParser.new(
-  DiverDown::Web.new(definition_dir:, module_store:)
+  DiverDown::Web.new(
+    definition_dir: options.fetch(:definition_dir),
+    module_store: DiverDown::Web::ModuleStore.new(options[:module_store])
+  )
 )
 
 begin
