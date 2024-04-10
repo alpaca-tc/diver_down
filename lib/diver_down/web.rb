@@ -9,7 +9,6 @@ module DiverDown
 
     require 'diver_down/web/action'
     require 'diver_down/web/definition_to_dot'
-    require 'diver_down/web/concurrency_worker'
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
     require 'diver_down/web/module_store'
