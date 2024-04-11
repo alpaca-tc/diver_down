@@ -1,6 +1,5 @@
 {
   "name": "diver_down",
-  "version": "0.1.0",
   "prettier": "prettier-config-smarthr",
   "engines": {
     "node": ">= 20.0.0"
