@@ -8,7 +8,7 @@ module DiverDown
       require 'diver_down/trace/module_set/const_source_location_module_set'
 
       # @param [Array<Module, String>, Set<Module, String>, nil] modules
-      # @param [Array<String>] include
+      # @param [Array<String>, Set<String>, nil] include
       def initialize(modules: nil, paths: nil)
         @cache = {}
         @array_module_set = DiverDown::Trace::ModuleSet::ArrayModuleSet.new(modules) unless modules.nil?
@@ -41,6 +41,8 @@ module DiverDown
       private
 
       def _include?(mod)
+        return true if @array_module_set.nil? && @const_source_location_module_set.nil?
+
         @array_module_set&.include?(mod) ||
           @const_source_location_module_set&.include?(mod)
       end

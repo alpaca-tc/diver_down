@@ -3,6 +3,18 @@
 RSpec.describe DiverDown::Trace::ModuleSet do
   describe 'InstanceMethods' do
     describe '#include?' do
+      context 'without options' do
+        it 'always returns true' do
+          stub_const('A', Module.new)
+          stub_const('B', Module.new)
+
+          set = described_class.new
+
+          expect(set.include?(A)).to be(true)
+          expect(set.include?(B)).to be(true)
+        end
+      end
+
       context 'with modules' do
         it 'checks module or module name' do
           stub_const('A', Module.new)
