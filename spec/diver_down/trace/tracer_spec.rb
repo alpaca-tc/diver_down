@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
 RSpec.describe DiverDown::Trace::Tracer do
+  # fill default values
+  def fill_default(hash)
+    hash[:title] ||= ''
+    hash[:definition_group] ||= nil
+    hash[:sources] ||= []
+    hash[:sources].each do |source|
+      source[:dependencies] ||= []
+
+      source[:dependencies].each do |dependency|
+        dependency[:method_ids] ||= []
+      end
+    end
+    hash
+  end
+
   describe '#initialize' do
     describe 'with relative path target_files' do
       it 'raises ArgumentError' do
@@ -20,6 +35,64 @@ RSpec.describe DiverDown::Trace::Tracer do
           )
         }.to raise_error(ArgumentError, /Given invalid module_set/)
       end
+    end
+  end
+
+  describe '#new_session' do
+    it 'provides session for tracing ruby code without block' do
+      klass_a = Class.new do
+        def self.call_b
+          B.call
+        end
+      end
+
+      klass_b = Class.new do
+        def self.call
+          nil
+        end
+      end
+
+      stub_const('A', klass_a)
+      stub_const('B', klass_b)
+
+      tracer = DiverDown::Trace::Tracer.new
+
+      definition_1 = tracer.trace(title: 'title') do
+        A.call_b
+      end
+
+      session = tracer.new_session(title: 'title')
+      session.start
+      A.call_b
+      session.stop
+      definition_2 = session.definition
+
+      expect(definition_1.to_h).to match(fill_default(
+        title: 'title',
+        sources: [
+          {
+            source_name: 'A',
+            dependencies: [
+              {
+                source_name: 'B',
+                method_ids: [
+                  {
+                    context: 'class',
+                    name: 'call',
+                    paths: [
+                      include(__FILE__),
+                    ],
+                  },
+                ],
+              },
+            ],
+          }, {
+            source_name: 'B',
+          },
+        ]
+      ))
+
+      expect(definition_1).to eq(definition_2)
     end
   end
 
@@ -46,21 +119,6 @@ RSpec.describe DiverDown::Trace::Tracer do
         ) do
           antipollution_environment.send(:run)
         end
-      end
-
-      # fill default values
-      def fill_default(hash)
-        hash[:title] ||= ''
-        hash[:definition_group] ||= nil
-        hash[:sources] ||= []
-        hash[:sources].each do |source|
-          source[:dependencies] ||= []
-
-          source[:dependencies].each do |dependency|
-            dependency[:method_ids] ||= []
-          end
-        end
-        hash
       end
 
       before do
