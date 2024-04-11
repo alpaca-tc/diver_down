@@ -55,7 +55,11 @@ RSpec.describe DiverDown::Trace::Tracer do
       stub_const('A', klass_a)
       stub_const('B', klass_b)
 
-      tracer = DiverDown::Trace::Tracer.new
+      tracer = DiverDown::Trace::Tracer.new(
+        module_set: {
+          modules: [A, B],
+        }
+      )
 
       definition_1 = tracer.trace(title: 'title') do
         A.call_b
