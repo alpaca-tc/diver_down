@@ -24,7 +24,7 @@ module DiverDown
       # @param ignored_method_ids [Array<String>]
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
-      def initialize(module_set: [], target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil)
+      def initialize(module_set: {}, target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil)
         if target_files && !target_files.all? { Pathname.new(_1).absolute? }
           raise ArgumentError, "target_files must be absolute path(#{target_files})"
         end
@@ -34,7 +34,16 @@ module DiverDown
                       elsif module_set.is_a?(Hash)
                         DiverDown::Trace::ModuleSet.new(**module_set)
                       else
-                        DiverDown::Trace::ModuleSet.new(modules: module_set)
+                        raise ArgumentError, <<~MSG
+                          Given invalid module_set. #{module_set}"
+
+                          Available types are:
+
+                          Hash{
+                            modules: Array<Module, String> | Set<Module, String> | nil
+                            paths: Array<String> | Set<String> | nil
+                          } | DiverDown::Trace::ModuleSet
+                        MSG
                       end
 
         @ignored_method_ids = if ignored_method_ids.is_a?(DiverDown::Trace::IgnoredMethodIds)

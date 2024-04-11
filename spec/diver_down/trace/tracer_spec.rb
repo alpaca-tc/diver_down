@@ -11,13 +11,23 @@ RSpec.describe DiverDown::Trace::Tracer do
         }.to raise_error(ArgumentError, /target_files must be absolute path/)
       end
     end
+
+    context 'given invalid module_set' do
+      it 'raises ArgumentError' do
+        expect {
+          described_class.new(
+            module_set: []
+          )
+        }.to raise_error(ArgumentError, /Given invalid module_set/)
+      end
+    end
   end
 
   describe '#trace' do
     describe 'when tracing script' do
       # @param path [String]
       # @return [DiverDown::Definition]
-      def trace_fixture(path, module_set: [], target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, definition_group: nil)
+      def trace_fixture(path, module_set: {}, target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, definition_group: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -63,11 +73,13 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_module.rb' do
         definition = trace_fixture(
           'tracer_module.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-          ]
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+            ],
+          }
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -115,11 +127,13 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_module.rb with definition_group' do
         definition = trace_fixture(
           'tracer_module.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-          ],
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+            ],
+          },
           definition_group: 'x'
         )
 
@@ -169,11 +183,13 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_module.rb with target_files' do
         definition = trace_fixture(
           'tracer_module.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-          ],
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+            ],
+          },
           target_files: []
         )
 
@@ -196,12 +212,14 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_class.rb' do
         definition = trace_fixture(
           'tracer_class.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-            'AntipollutionModule::D',
-          ]
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+              'AntipollutionModule::D',
+            ],
+          }
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -268,12 +286,14 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_class.rb with filter path' do
         definition = trace_fixture(
           'tracer_class.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-            'AntipollutionModule::D',
-          ],
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+              'AntipollutionModule::D',
+            ],
+          },
           filter_method_id_path: ->(path) {
             path.gsub(fixture_path(''), '')
           }
@@ -286,12 +306,14 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_instance.rb' do
         definition = trace_fixture(
           'tracer_instance.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-            'AntipollutionModule::D',
-          ]
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+              'AntipollutionModule::D',
+            ],
+          }
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -372,10 +394,12 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_subclass.rb' do
         definition = trace_fixture(
           'tracer_subclass.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::D',
-          ]
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::D',
+            ],
+          }
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -460,10 +484,12 @@ RSpec.describe DiverDown::Trace::Tracer do
 
         definition = trace_fixture(
           'tracer_separated_file.rb',
-          module_set: [
-            '::A',
-            '::C',
-          ],
+          module_set: {
+            modules: [
+              '::A',
+              '::C',
+            ],
+          },
           target_files: [
             fixture_path('tracer_separated_file.rb'),
           ]
@@ -502,12 +528,14 @@ RSpec.describe DiverDown::Trace::Tracer do
           ignored_method_ids: [
             'AntipollutionModule::B.class_call',
           ],
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::B',
-            'AntipollutionModule::C',
-            'AntipollutionModule::D',
-          ],
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+              'AntipollutionModule::D',
+            ],
+          },
           target_files: [
             fixture_path('tracer_ignored_call_stack.rb'),
           ]
@@ -542,10 +570,12 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_deep_stack.rb' do
         definition = trace_fixture(
           'tracer_deep_stack.rb',
-          module_set: [
-            'AntipollutionModule::A',
-            'AntipollutionModule::D',
-          ]
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::D',
+            ],
+          }
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -595,10 +625,12 @@ RSpec.describe DiverDown::Trace::Tracer do
       #
       #     tracer = described_class.new(
       #       title: 'title',
-      #       module_set: [
-      #         AntipollutionModule::A,
-      #         AntipollutionModule::D,
-      #       ]
+      #       module_set: {
+      #         modules: [
+      #           AntipollutionModule::A,
+      #           AntipollutionModule::D,
+      #         ]
+      #       }
       #     )
       #
       #     tracer.trace(title: '') do
