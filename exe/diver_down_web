@@ -36,17 +36,10 @@ unless options[:definition_dir]
   exit 1
 end
 
-unless options[:module_store]
-  puts 'Missing --module-store'
-  puts
-  puts option_parser.help
-  exit 1
-end
-
 app = Rack::JSONBodyParser.new(
   DiverDown::Web.new(
     definition_dir: options.fetch(:definition_dir),
-    module_store: DiverDown::Web::ModuleStore.new(options[:module_store])
+    module_store: DiverDown::Web::ModuleStore.new(options[:module_store] || Tempfile.new(['module_store', '.yaml']))
   )
 )
 
