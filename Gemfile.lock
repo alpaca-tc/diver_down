@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    diver_down (0.1.0)
+    diver_down (0.0.1.alpha1)
       activesupport (>= 7.0.0)
       msgpack (>= 1.7.0)
       rack-contrib (>= 2.3.0)
