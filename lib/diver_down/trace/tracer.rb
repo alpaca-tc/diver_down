@@ -69,7 +69,7 @@ module DiverDown
           title:
         )
 
-        @ignored_stack_size = nil
+        ignored_stack_size = nil
 
         tracer = TracePoint.new(*self.class.trace_events) do |tp|
           case tp.event
@@ -77,7 +77,7 @@ module DiverDown
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
             mod = DiverDown::Helper.resolve_module(tp.self)
             source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
-            already_ignored = !@ignored_stack_size.nil? # If the current method_id is ignored
+            already_ignored = !ignored_stack_size.nil? # If the current method_id is ignored
             current_ignored = !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
             pushed = false
 
@@ -124,10 +124,10 @@ module DiverDown
             # If a value is already stored, it means that call stack already determined to be ignored at the shallower call stack size.
             # Since stacks deeper than the shallowest stack size are ignored, priority is given to already stored values.
             if !already_ignored && current_ignored
-              @ignored_stack_size = call_stack.stack_size
+              ignored_stack_size = call_stack.stack_size
             end
           when :return, :c_return
-            @ignored_stack_size = nil if @ignored_stack_size == call_stack.stack_size
+            ignored_stack_size = nil if ignored_stack_size == call_stack.stack_size
             call_stack.pop
           end
         end
