@@ -26,6 +26,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activesupport', '>= 7.0.0'
-  spec.add_dependency 'msgpack', '>= 1.7.0'
   spec.add_dependency 'rack-contrib', '>= 2.3.0'
 end

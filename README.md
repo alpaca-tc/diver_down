@@ -58,7 +58,7 @@ end
 ```
 
 The analysis results should be output to a specific directory.
-Files saved in `.msgpack`, `.json`, or `.yaml` can be read by `DiverDown::Web`.
+Files saved in `.json` or `.yaml` can be read by `DiverDown::Web`.
 
 ```ruby
 dir = 'tmp/diver_down'
@@ -67,7 +67,6 @@ definition = tracer.trace do
   # do something
 end
 
-File.binwrite(File.join(dir, "#{definition.title}.msgpack"), definition.to_msgpack)
 File.write(File.join(dir, "#{definition.title}.json"), definition.to_h.to_json)
 File.write(File.join(dir, "#{definition.title}.yaml"), definition.to_h.to_yaml)
 ```

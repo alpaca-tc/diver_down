@@ -8,8 +8,6 @@ module DiverDown
         hash = case File.extname(path)
                when '.yaml', '.yml'
                  from_yaml(path)
-               when '.msgpack'
-                 from_msgpack(path)
                when '.json'
                  from_json(path)
                else
@@ -27,10 +25,6 @@ module DiverDown
 
       def from_yaml(path)
         YAML.load_file(path)
-      end
-
-      def from_msgpack(path)
-        MessagePack.unpack(File.binread(path))
       end
     end
   end

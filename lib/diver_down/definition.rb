@@ -79,11 +79,6 @@ module DiverDown
       }
     end
 
-    # @return [String]
-    def to_msgpack
-      MessagePack.pack(to_h)
-    end
-
     # @param other [Object, DiverDown::Definition::Source]
     # @return [Boolean]
     def ==(other)

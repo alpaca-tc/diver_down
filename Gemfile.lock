@@ -3,7 +3,6 @@ PATH
   specs:
     diver_down (0.0.1.alpha1)
       activesupport (>= 7.0.0)
-      msgpack (>= 1.7.0)
       rack-contrib (>= 2.3.0)
 
 GEM
@@ -32,7 +31,6 @@ GEM
     json (2.7.2)
     language_server-protocol (3.17.0.3)
     minitest (5.22.3)
-    msgpack (1.7.2)
     mutex_m (0.2.0)
     nio4r (2.7.1)
     parallel (1.24.0)
