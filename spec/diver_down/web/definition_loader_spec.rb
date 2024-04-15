@@ -38,18 +38,6 @@ RSpec.describe DiverDown::Web::DefinitionStore do
 
         expect(loader.load_file(path)).to eq(definition)
       end
-
-      it 'loads msgpack' do
-        dir = Dir.mktmpdir
-        path = File.join(dir, 'a.msgpack')
-
-        definition = DiverDown::Definition.new(title: 'a')
-        File.write(path, definition.to_h.to_msgpack)
-
-        loader = DiverDown::Web::DefinitionLoader.new
-
-        expect(loader.load_file(path)).to eq(definition)
-      end
     end
   end
 end

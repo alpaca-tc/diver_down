@@ -159,66 +159,6 @@ RSpec.describe DiverDown::Definition do
       end
     end
 
-    describe '#to_msgpack' do
-      it 'converts definition to message-pack' do
-        definition = described_class.new(
-          title: 'title',
-          sources: [
-            DiverDown::Definition::Source.new(
-              source_name: 'a.rb',
-              dependencies: [
-                DiverDown::Definition::Dependency.new(
-                  source_name: 'b.rb',
-                  method_ids: [
-                    DiverDown::Definition::MethodId.new(
-                      name: 'A',
-                      context: 'class',
-                      paths: ['a.rb']
-                    ),
-                  ]
-                ),
-                DiverDown::Definition::Dependency.new(
-                  source_name: 'c.rb'
-                ),
-              ]
-            ),
-          ]
-        )
-
-        expect(definition.to_msgpack).to eq(MessagePack.pack(definition.to_h))
-      end
-
-      it 'can be loaded' do
-        definition = described_class.new(
-          title: 'title',
-          sources: [
-            DiverDown::Definition::Source.new(
-              source_name: 'a.rb',
-              dependencies: [
-                DiverDown::Definition::Dependency.new(
-                  source_name: 'b.rb',
-                  method_ids: [
-                    DiverDown::Definition::MethodId.new(
-                      name: 'A',
-                      context: 'class',
-                      paths: ['a.rb']
-                    ),
-                  ]
-                ),
-                DiverDown::Definition::Dependency.new(
-                  source_name: 'c.rb'
-                ),
-              ]
-            ),
-          ]
-        )
-
-        msgpack = definition.to_msgpack
-        hash = DiverDown::Helper.deep_symbolize_keys(MessagePack.unpack(msgpack))
-        expect(described_class.from_hash(hash)).to eq(definition)
-      end
-    end
-
     describe '#hash' do
       it 'returns a hash' do
         definition = described_class.new(

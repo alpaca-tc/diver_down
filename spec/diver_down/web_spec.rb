@@ -206,7 +206,7 @@ RSpec.describe DiverDown::Web do
           ),
         ]
       )
-      File.binwrite(File.join(definition_dir, '1.msgpack'), definition.to_h.to_msgpack)
+      File.write(File.join(definition_dir, '1.yaml'), definition.to_h.to_yaml)
 
       get '/api/initialization_status.json'
 
