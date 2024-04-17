@@ -141,3 +141,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# C-lang
+*.bundle
+*.so
+*.o
+*.a
+mkmf.log
