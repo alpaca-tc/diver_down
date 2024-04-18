@@ -31,9 +31,8 @@ module DiverDown
         call_stack = DiverDown::Trace::CallStack.new
 
         TracePoint.new(*DiverDown::Trace::Tracer.trace_events) do |tp|
-          # Skip the trace of the library itself
-          next if tp.path&.start_with?(DiverDown::LIB_DIR)
-          next if TracePoint == tp.defined_class || tp.defined_class == self.class
+          # Skip the trace of the itself
+          next if DiverDown::Trace::Session == tp.defined_class
 
           case tp.event
           when :call, :c_call
