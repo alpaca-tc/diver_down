@@ -786,7 +786,7 @@ RSpec.describe DiverDown::Trace::Tracer do
       #       }
       #     )
       #
-      #     tracer.trace(title: '') do
+      #     tracer.trace do
       #       antipollution_environment.send(:run)
       #     end
       #   end
