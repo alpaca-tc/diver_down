@@ -25,16 +25,6 @@ module DiverDown
         @trace_point = build_trace_point
       end
 
-      # @return [void]
-      def start
-        @trace_point.enable
-      end
-
-      # @return [void]
-      def stop
-        @trace_point.disable
-      end
-
       private
 
       def build_trace_point
@@ -43,7 +33,7 @@ module DiverDown
         TracePoint.new(*DiverDown::Trace::Tracer.trace_events) do |tp|
           # Skip the trace of the library itself
           next if tp.path&.start_with?(DiverDown::LIB_DIR)
-          next if TracePoint == tp.defined_class
+          next if TracePoint == tp.defined_class || tp.defined_class == self.class
 
           case tp.event
           when :call, :c_call
