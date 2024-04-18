@@ -8,6 +8,7 @@ export type SearchDefinitionsOptions = {
   title: string
   source: string
   folding: boolean
+  definitionGroup: string
 }
 
 type Props = {
@@ -37,6 +38,13 @@ export const ConfigureSearchOptionsDialog: React.FC<Props> = ({
     setSearchDefinitionsOptions(temporarySearchDefinitionsOptions)
     onClickClose()
   }
+
+  const onChangeDefinitionGroup = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTemporarySearchDefinitionsOptions((prev) => ({ ...prev, definitionGroup: event.target.value }))
+    },
+    [setTemporarySearchDefinitionsOptions],
+  )
 
   const onChangeTitle = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +85,15 @@ export const ConfigureSearchOptionsDialog: React.FC<Props> = ({
             <p>Configure settings related to the display of definitions.</p>
 
             <Stack gap={1.5}>
+              <FormControl title="Filtering definition group" helpMessage="Refine the definition with a definition group">
+                <Input
+                  name="definitionGroup"
+                  type="text"
+                  onChange={onChangeDefinitionGroup}
+                  value={temporarySearchDefinitionsOptions.definitionGroup}
+                />
+              </FormControl>
+
               <FormControl title="Filtering title" helpMessage="Refine the definition with a title">
                 <Input name="title" type="text" onChange={onChangeTitle} value={temporarySearchDefinitionsOptions.title} />
               </FormControl>

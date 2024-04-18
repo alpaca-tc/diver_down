@@ -20,12 +20,13 @@ type DialogType = 'configureSearchOptionsDiaglog'
 export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDefinitionIds }) => {
   const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
   const [searchDefinitionsOptions, setSearchDefinitionsOptions] = useLocalStorage<SearchDefinitionsOptions>(
-    'Home-DefinitionList-SearchDefinitionOptions',
-    { title: '', source: '', folding: false },
+    'Home-DefinitionList-SearchDefinitionOptions-v1',
+    { definitionGroup: '', title: '', source: '', folding: false },
   )
   const [foldingSection, setFoldingSection] = useState<boolean>(false)
 
   const { isLoading, definitions, isValidating, setSize, isReachingEnd } = useDefinitionList({
+    definitionGroup: searchDefinitionsOptions.definitionGroup,
     title: searchDefinitionsOptions.title,
     source: searchDefinitionsOptions.source,
   })
