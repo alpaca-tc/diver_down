@@ -45,7 +45,8 @@ module DiverDown
           page: request.params['page']&.to_i || 1,
           per: request.params['per']&.to_i || 100,
           title: request.params['title'] || '',
-          source: request.params['source'] || ''
+          source: request.params['source'] || '',
+          definition_group: request.params['definition_group'] || ''
         )
       in ['GET', %r{\A/api/sources\.json\z}]
         action.sources

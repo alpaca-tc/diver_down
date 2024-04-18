@@ -26,6 +26,45 @@ RSpec.describe DiverDown::Web::DefinitionEnumerator do
         )
       end
 
+      describe 'with definition_group' do
+        def assert_query(store, definition_group, expected)
+          actual = described_class.new(store, definition_group:).each.to_a
+          expect(actual).to eq(expected), -> {
+            "definition_group: #{definition_group.inspect}\n" \
+            "expected: #{expected.inspect}\n" \
+            "actual: #{actual.inspect}"
+          }
+        end
+
+        it 'filters by definition_group' do
+          store = DiverDown::Web::DefinitionStore.new
+
+          definition_1 = DiverDown::Definition.new(
+            definition_group: 'group_1',
+            sources: [
+              DiverDown::Definition::Source.new(
+                source_name: 'a.rb'
+              ),
+            ]
+          )
+          definition_2 = DiverDown::Definition.new(
+            definition_group: 'group_2',
+            sources: [
+              DiverDown::Definition::Source.new(
+                source_name: 'b.rb'
+              ),
+            ]
+          )
+
+          store.set(definition_1, definition_2)
+
+          assert_query store, 'unknown', []
+          assert_query store, 'group', [definition_1, definition_2]
+          assert_query store, 'group_1', [definition_1]
+          assert_query store, 'group_2', [definition_2]
+        end
+      end
+
       describe 'with title' do
         def assert_query(store, title, expected)
           actual = described_class.new(store, title:).each.to_a

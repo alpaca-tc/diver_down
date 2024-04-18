@@ -119,8 +119,9 @@ module DiverDown
       # @param per [Integer]
       # @param title [String]
       # @param source [String]
-      def definitions(page:, per:, title:, source:)
-        definition_enumerator = DiverDown::Web::DefinitionEnumerator.new(@store, title:, source:)
+      # @param definition_group [String]
+      def definitions(page:, per:, title:, source:, definition_group:)
+        definition_enumerator = DiverDown::Web::DefinitionEnumerator.new(@store, title:, source:, definition_group:)
         definitions, pagination = paginate(definition_enumerator, page, per)
 
         json(

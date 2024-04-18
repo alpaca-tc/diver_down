@@ -184,6 +184,47 @@ RSpec.describe DiverDown::Web do
         assert_source 'b.', [definition_2_id]
       end
     end
+
+    describe 'definition_group' do
+      def assert_definition_group(definition_group, expected_ids)
+        get "/api/definitions.json?definition_group=#{definition_group}"
+
+        definitions = JSON.parse(last_response.body)['definitions']
+        ids = definitions.map { _1['id'] }
+
+        expect(ids).to match_array(expected_ids), -> {
+          "definition_group: #{definition_group.inspect}\n" \
+          "expected_ids: #{expected_ids.inspect}\n" \
+          "actual_ids: #{ids.inspect}"
+        }
+      end
+
+      it 'filters definitions by definition_group=value' do
+        definition_1 = DiverDown::Definition.new(
+          definition_group: 'group_1',
+          sources: [
+            DiverDown::Definition::Source.new(
+              source_name: 'a.rb'
+            ),
+          ]
+        )
+        definition_2 = DiverDown::Definition.new(
+          definition_group: 'group_2',
+          sources: [
+            DiverDown::Definition::Source.new(
+              source_name: 'b.rb'
+            ),
+          ]
+        )
+
+        definition_1_id, definition_2_id = store.set(definition_1, definition_2)
+
+        assert_definition_group 'unknown', []
+        assert_definition_group 'group', [definition_1_id, definition_2_id]
+        assert_definition_group 'group_1', [definition_1_id]
+        assert_definition_group 'group_2', [definition_2_id]
+      end
+    end
   end
 
   describe 'GET /api/initialization_status.json' do
