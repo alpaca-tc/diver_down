@@ -7,10 +7,12 @@ module DiverDown
 
       # @param store [DiverDown::Definition::Store]
       # @param query [String]
-      def initialize(store, title: '', source: '')
+      # @param definition_group [String]
+      def initialize(store, title: '', source: '', definition_group: '')
         @store = store
         @title = title
         @source = source
+        @definition_group = definition_group
       end
 
       # @yield [parent_bit_id, bit_id, definition]
@@ -45,6 +47,10 @@ module DiverDown
 
         unless @source.empty?
           matched &&= definition.sources.any? { _1.source_name.include?(@source) }
+        end
+
+        unless @definition_group.empty?
+          matched &&= definition.definition_group.to_s.include?(@definition_group)
         end
 
         matched
