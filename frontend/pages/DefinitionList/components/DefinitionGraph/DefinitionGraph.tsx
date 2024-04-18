@@ -67,6 +67,7 @@ const WrapperSection = styled(Section)`
   flex-direction: column;
   height: inherit;
   flex-grow: 1;
+  width: 1px; /* flex width */
 `
 
 const FixedHeightHeading = styled(Heading)`

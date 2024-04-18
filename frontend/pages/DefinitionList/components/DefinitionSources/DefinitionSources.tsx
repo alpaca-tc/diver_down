@@ -159,6 +159,7 @@ const WrapperAside = styled(Aside)`
   padding: 0;
   height: inherit;
   overflow-y: scroll;
+  max-width: 400px;
 
   &&& {
     margin-top: 0;
