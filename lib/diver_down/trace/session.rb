@@ -14,7 +14,7 @@ module DiverDown
 
       # @param [DiverDown::Trace::ModuleSet, nil] module_set
       # @param [DiverDown::Trace::IgnoredMethodIds, nil] ignored_method_ids
-      # @param [Set<String>, nil] target_file_set
+      # @param [Set<String>, nil] List of paths to finish traversing when searching for a caller. If nil, all paths are finished.
       # @param [#call, nil] filter_method_id_path
       def initialize(module_set: DiverDown::Trace::ModuleSet.new, ignored_method_ids: nil, target_file_set: nil, filter_method_id_path: nil, definition: DiverDown::Definition.new)
         @module_set = module_set
