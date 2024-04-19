@@ -10,7 +10,7 @@ module DiverDown
     require 'diver_down/trace/module_set'
     require 'diver_down/trace/redefine_ruby_methods'
     require 'diver_down/trace/ignored_method_ids'
-    require_relative './trace_ext'
+    require 'diver_down/trace/diver_down_trace_ext'
 
     @trace_events = %i[
       call c_call return c_return

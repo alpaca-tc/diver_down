@@ -23,7 +23,7 @@ dd_trace_session_stop(VALUE session)
 
 
 void
-Init_trace_ext(void) 
+Init_diver_down_trace_ext(void) 
 {
 	VALUE rb_mDiverDown = rb_const_get(rb_cObject, rb_intern("DiverDown"));
 	VALUE rb_mDiverDownTrace = rb_const_get(rb_mDiverDown, rb_intern("Trace"));

@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
   end
   spec.bindir = 'exe'
   spec.executables = ['diver_down_web']
-  spec.require_paths = ['lib']
-  spec.extensions    = ['ext/diver_down/trace/extconf.rb']
+  spec.require_paths = ['lib', 'ext']
+  spec.extensions    = ['ext/diver_down/extconf.rb', 'ext/diver_down/trace/extconf.rb']
 
   spec.add_dependency 'activesupport', '>= 7.0.0'
   spec.add_dependency 'rack-contrib', '>= 2.3.0'

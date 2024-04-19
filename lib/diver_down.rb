@@ -9,4 +9,5 @@ module DiverDown
 
   require 'diver_down/definition'
   require 'diver_down/helper'
+  require 'diver_down/diver_down_ext'
 end
