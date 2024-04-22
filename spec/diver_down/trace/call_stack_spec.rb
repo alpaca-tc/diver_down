@@ -38,6 +38,24 @@ RSpec.describe DiverDown::Trace::CallStack do
 
         expect(stack.stack).to eq([])
       end
+
+      context 'with _ignored: true' do
+        it 'marks current stack as ignored' do
+          stack = described_class.new
+
+          stack.push
+          stack.push(ignored: true)
+          stack.push
+
+          expect(stack.ignored?).to be(true)
+          stack.pop
+          expect(stack.ignored?).to be(true)
+          stack.pop
+          expect(stack.ignored?).to be(false)
+          stack.pop
+          expect(stack.ignored?).to be(false)
+        end
+      end
     end
 
     describe '#empty?' do

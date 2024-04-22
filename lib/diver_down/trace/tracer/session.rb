@@ -35,7 +35,6 @@ module DiverDown
 
         def build_trace_point
           call_stack = DiverDown::Trace::CallStack.new
-          ignored_stack_size = nil
 
           TracePoint.new(*DiverDown::Trace::Tracer.trace_events) do |tp|
             # Skip the trace of the library itself
@@ -45,13 +44,23 @@ module DiverDown
             case tp.event
             when :call, :c_call
               # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
+              if call_stack.ignored?
+                call_stack.push
+                next
+              end
+
               mod = DiverDown::Helper.resolve_module(tp.self)
+
+              if !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
+                # If this method is ignored, the call stack is ignored until the method returns.
+                call_stack.push(ignored: true)
+                next
+              end
+
               source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
-              already_ignored = !ignored_stack_size.nil? # If the current method_id is ignored
-              current_ignored = !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
               pushed = false
 
-              if !source_name.nil? && !(already_ignored || current_ignored)
+              unless source_name.nil?
                 source = @definition.find_or_build_source(source_name)
 
                 # If the call stack contains a call to a module to be traced
@@ -90,14 +99,7 @@ module DiverDown
               end
 
               call_stack.push unless pushed
-
-              # If a value is already stored, it means that call stack already determined to be ignored at the shallower call stack size.
-              # Since stacks deeper than the shallowest stack size are ignored, priority is given to already stored values.
-              if !already_ignored && current_ignored
-                ignored_stack_size = call_stack.stack_size
-              end
             when :return, :c_return
-              ignored_stack_size = nil if ignored_stack_size == call_stack.stack_size
               call_stack.pop
             end
           rescue StandardError
