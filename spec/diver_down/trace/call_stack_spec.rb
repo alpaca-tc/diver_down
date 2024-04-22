@@ -12,7 +12,7 @@ RSpec.describe DiverDown::Trace::CallStack do
       end
     end
 
-    describe '#context_stack/push/pop' do
+    describe '#context_stack/#context_stack_size/push/pop' do
       it 'pushes and pops' do
         stack = described_class.new
 
@@ -24,19 +24,25 @@ RSpec.describe DiverDown::Trace::CallStack do
         stack.push('C')
 
         expect(stack.context_stack).to eq(['A', 'B', 'C'])
+        expect(stack.context_stack_size).to eq([2, 4, 6])
         stack.pop
 
         expect(stack.context_stack).to eq(['A', 'B'])
+        expect(stack.context_stack_size).to eq([2, 4])
         stack.pop
         expect(stack.context_stack).to eq(['A', 'B'])
+        expect(stack.context_stack_size).to eq([2, 4])
         stack.pop
 
         expect(stack.context_stack).to eq(['A'])
+        expect(stack.context_stack_size).to eq([2])
         stack.pop
         expect(stack.context_stack).to eq(['A'])
+        expect(stack.context_stack_size).to eq([2])
         stack.pop
 
         expect(stack.context_stack).to eq([])
+        expect(stack.context_stack_size).to eq([])
       end
 
       context 'with _ignored: true' do
