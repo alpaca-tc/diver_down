@@ -55,13 +55,18 @@ module DiverDown
 
             mod = DiverDown::Helper.resolve_module(tp.self)
 
+            if mod.nil?
+              call_stack.push
+              next
+            end
+
             if !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
               # If this method is ignored, the call stack is ignored until the method returns.
               call_stack.push(ignored: true)
               next
             end
 
-            source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            source_name = DiverDown::Helper.normalize_module_name(mod) if @module_set.include?(mod)
             pushed = false
 
             unless source_name.nil?
