@@ -65,8 +65,6 @@ module DiverDown
             pushed = false
 
             unless source_name.nil?
-              source = @definition.find_or_build_source(source_name)
-
               # If the call stack contains a call to a module to be traced
               # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored
               unless call_stack.empty?
@@ -91,6 +89,7 @@ module DiverDown
 
               if caller_location
                 pushed = true
+                source = @definition.find_or_build_source(source_name)
 
                 call_stack.push(
                   StackContext.new(
