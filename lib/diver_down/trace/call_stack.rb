@@ -22,6 +22,11 @@ module DiverDown
         @context_stack.empty?
       end
 
+      # @return [Array<Integer>]
+      def context_stack_size
+        @context_stack.keys
+      end
+
       # @return [Array<Object>]
       def context_stack
         @context_stack.values
