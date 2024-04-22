@@ -3,8 +3,6 @@
 module DiverDown
   module Trace
     class Session
-      class NotStarted < StandardError; end
-
       StackContext = Data.define(
         :source,
         :method_id,
