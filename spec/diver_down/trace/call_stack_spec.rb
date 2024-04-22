@@ -58,16 +58,16 @@ RSpec.describe DiverDown::Trace::CallStack do
       end
     end
 
-    describe '#empty?' do
+    describe '#empty_context_stack?' do
       it 'returns true if stack is not empty' do
         stack = described_class.new
-        expect(stack.empty?).to eq(true)
+        expect(stack.empty_context_stack?).to eq(true)
 
         stack.push
-        expect(stack.empty?).to eq(true)
+        expect(stack.empty_context_stack?).to eq(true)
 
         stack.push('A')
-        expect(stack.empty?).to eq(false)
+        expect(stack.empty_context_stack?).to eq(false)
       end
     end
   end
