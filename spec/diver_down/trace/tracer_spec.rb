@@ -257,17 +257,7 @@ RSpec.describe DiverDown::Trace::Tracer do
 
         expect(definition.to_h).to match(fill_default(
           title: 'title',
-          sources: [
-            {
-              source_name: 'AntipollutionModule::A',
-              dependencies: [],
-            }, {
-              source_name: 'AntipollutionModule::B',
-              dependencies: [],
-            }, {
-              source_name: 'AntipollutionModule::C',
-            },
-          ]
+          sources: []
         ))
       end
 
@@ -665,6 +655,108 @@ RSpec.describe DiverDown::Trace::Tracer do
             },
           ]
         ))
+      end
+
+      it 'traces wrapped in the module to be target before starting the trace' do
+        dir = Dir.mktmpdir
+        File.write(File.join(dir, 'a.rb'), <<~RUBY)
+          class A
+            def self.call
+              yield
+            end
+          end
+        RUBY
+
+        File.write(File.join(dir, 'b.rb'), <<~RUBY)
+          class B
+            def self.call
+              C.call
+            end
+          end
+        RUBY
+
+        File.write(File.join(dir, 'c.rb'), <<~RUBY)
+          class C
+            def self.call
+              nil
+            end
+          end
+        RUBY
+
+        load(File.join(dir, 'a.rb'))
+        load(File.join(dir, 'b.rb'))
+        load(File.join(dir, 'c.rb'))
+
+        tracer = DiverDown::Trace::Tracer.new(
+          module_set: {
+            modules: [A, B, C],
+          },
+          target_files: [File.join(dir, 'a.rb'), File.join(dir, 'c.rb')]
+        )
+
+        definition = A.call do
+          tracer.trace(title: 'title') do
+            B.call
+          end
+        end
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'C',
+            },
+          ]
+        ))
+      ensure
+        Object.send(:remove_const, :A) if defined?(A)
+        Object.send(:remove_const, :B) if defined?(B)
+        Object.send(:remove_const, :C) if defined?(C)
+      end
+
+      it 'traces modules when caller_location is not matched' do
+        dir = Dir.mktmpdir
+        File.write(File.join(dir, 'a.rb'), <<~RUBY)
+          class A
+            def self.call
+              B.call
+            end
+          end
+        RUBY
+
+        File.write(File.join(dir, 'b.rb'), <<~RUBY)
+          class B
+            def self.call
+              nil
+            end
+          end
+        RUBY
+
+        load(File.join(dir, 'a.rb'))
+        load(File.join(dir, 'b.rb'))
+
+        tracer = DiverDown::Trace::Tracer.new(
+          module_set: {
+            modules: [A, B],
+          },
+          target_files: [File.join(dir, 'b.rb')]
+        )
+
+        definition = tracer.trace(title: 'title') do
+          A.call
+        end
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'B',
+            },
+          ]
+        ))
+      ensure
+        Object.send(:remove_const, :A) if defined?(A)
+        Object.send(:remove_const, :B) if defined?(B)
       end
 
       # For optimize
