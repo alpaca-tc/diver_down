@@ -5,7 +5,7 @@ require 'active_support/inflector'
 module DiverDown
   module Trace
     require 'diver_down/trace/tracer'
-    require 'diver_down/trace/tracer/session'
+    require 'diver_down/trace/session'
     require 'diver_down/trace/call_stack'
     require 'diver_down/trace/module_set'
     require 'diver_down/trace/redefine_ruby_methods'

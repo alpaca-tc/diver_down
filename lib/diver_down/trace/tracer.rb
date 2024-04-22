@@ -3,12 +3,6 @@
 module DiverDown
   module Trace
     class Tracer
-      StackContext = Data.define(
-        :source,
-        :method_id,
-        :caller_location
-      )
-
       # @return [Array<Symbol>]
       def self.trace_events
         @trace_events || %i[call c_call return c_return]
@@ -80,7 +74,7 @@ module DiverDown
       #
       # @return [TracePoint]
       def new_session(title: SecureRandom.uuid, definition_group: nil)
-        DiverDown::Trace::Tracer::Session.new(
+        DiverDown::Trace::Session.new(
           module_set: @module_set,
           ignored_method_ids: @ignored_method_ids,
           target_file_set: @target_file_set,
