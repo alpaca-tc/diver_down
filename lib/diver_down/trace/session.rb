@@ -63,7 +63,7 @@ module DiverDown
               # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored
               unless call_stack.empty_context_stack?
                 # Add dependency to called source
-                called_stack_context = call_stack.stack[-1]
+                called_stack_context = call_stack.context_stack[-1]
                 called_source = called_stack_context.source
                 dependency = called_source.find_or_build_dependency(source_name)
 

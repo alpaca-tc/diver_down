@@ -23,7 +23,7 @@ module DiverDown
       end
 
       # @return [Array<Object>]
-      def stack
+      def context_stack
         @context_stack.values
       end
 
