@@ -2,4 +2,4 @@
 
 require 'mkmf'
 
-create_makefile 'diver_down/diver_down_trace_ext'
+create_makefile 'diver_down/trace/diver_down_trace_ext'
