@@ -87,7 +87,7 @@ module DiverDown
               end
 
               # `caller_location` is nil if it is filtered by target_files
-              caller_location = find_neast_caller_location
+              caller_location = find_neast_caller_location(call_stack.stack_size)
 
               if caller_location
                 pushed = true
@@ -113,11 +113,19 @@ module DiverDown
         end
       end
 
-      def find_neast_caller_location
-        return caller_locations(2, 2)[0] if @target_file_set.nil?
+      def find_neast_caller_location(stack_size)
+        excluded_frame_size = 1 # Ignore neast caller because it is stack of #find_neast_caller_location.
+        finished_frame_size = excluded_frame_size + stack_size + 1
+        frame_pos = 1
+
+        # If @target_file_set is nil, return the caller location.
+        return caller_locations(excluded_frame_size + 1, excluded_frame_size + 1)[0] if @target_file_set.nil?
 
         Thread.each_caller_location do
+          break if finished_frame_size < frame_pos
           return _1 if @target_file_set.include?(_1.path)
+
+          frame_pos += 1
         end
 
         nil
