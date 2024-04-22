@@ -6,7 +6,8 @@ module DiverDown
       StackContext = Data.define(
         :source,
         :method_id,
-        :caller_location
+        :path,
+        :lineno
       )
 
       attr_reader :definition
@@ -79,7 +80,7 @@ module DiverDown
                 if dependency
                   context = DiverDown::Helper.module?(tp.self) ? 'class' : 'instance'
                   method_id = dependency.find_or_build_method_id(name: tp.method_id, context:)
-                  method_id_path = "#{called_stack_context.caller_location.path}:#{called_stack_context.caller_location.lineno}"
+                  method_id_path = "#{called_stack_context.path}:#{called_stack_context.lineno}"
                   method_id_path = @filter_method_id_path.call(method_id_path) if @filter_method_id_path
                   method_id.add_path(method_id_path)
                 end
@@ -95,7 +96,8 @@ module DiverDown
                   StackContext.new(
                     source:,
                     method_id: tp.method_id,
-                    caller_location:
+                    path: caller_location.path,
+                    lineno: caller_location.lineno
                   )
                 )
               end
