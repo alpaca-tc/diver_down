@@ -686,12 +686,11 @@ RSpec.describe DiverDown::Trace::Tracer do
       #     antipollution_environment = AntipollutionKlass.allocate
       #
       #     tracer = described_class.new(
-      #       title: 'title',
       #       module_set: {
       #         modules: [
       #           AntipollutionModule::A,
       #           AntipollutionModule::D,
-      #         ]
+      #         ],
       #       }
       #     )
       #

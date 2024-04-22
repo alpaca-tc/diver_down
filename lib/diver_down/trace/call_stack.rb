@@ -12,6 +12,7 @@ module DiverDown
       attr_reader :stack_size
 
       def initialize
+        @ignored_stack_size = nil
         @stack_size = 0
         @stack = {}
       end
@@ -28,9 +29,17 @@ module DiverDown
 
       # @param context [Object, nil] User defined stack context.
       # @return [void]
-      def push(context = nil)
+      def push(context = nil, ignored: false)
         @stack_size += 1
         @stack[@stack_size] = context unless context.nil?
+        @ignored_stack_size ||= @stack_size if ignored
+      end
+
+      # If a stack is not already a tracing target, some conditions are unnecessary so that it can be easily ignored.
+      #
+      # @return [Boolean]
+      def ignored?
+        !@ignored_stack_size.nil?
       end
 
       # @return [void]
@@ -38,6 +47,7 @@ module DiverDown
         raise StackEmptyError if @stack_size.zero?
 
         @stack.delete(@stack_size) if @stack.key?(@stack_size)
+        @ignored_stack_size = nil if @ignored_stack_size && @ignored_stack_size == @stack_size
         @stack_size -= 1
       end
     end
