@@ -21,7 +21,6 @@ RSpec.describe DiverDown::Helper do
         end
 
         expect(described_class.normalize_module_name(klass)).to eq('X')
-        expect(described_class.normalize_module_name(klass.new)).to eq('X')
       end
 
       it 'returns string given proxied class' do
@@ -40,7 +39,6 @@ RSpec.describe DiverDown::Helper do
         end
 
         expect(described_class.normalize_module_name(klass)).to eq('X')
-        expect(described_class.normalize_module_name(klass.new)).to eq('X')
       end
 
       it 'returns nil if argument is anonymous module' do

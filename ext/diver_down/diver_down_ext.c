@@ -30,8 +30,7 @@ dd_helper_resolve_singleton_class(VALUE helper, VALUE klass) {
 }
 
 static VALUE
-dd_helper_normalize_module_name(VALUE helper, VALUE mod) {
-	VALUE resolved_mod = rb_funcall(helper, rb_intern("resolve_module"), 1, mod);
+dd_helper_normalize_module_name(VALUE helper, VALUE resolved_mod) {
 	VALUE mod_name = rb_mod_name(resolved_mod);
 
 	if (mod_name == Qnil) {
