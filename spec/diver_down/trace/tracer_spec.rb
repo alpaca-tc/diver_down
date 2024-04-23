@@ -760,39 +760,39 @@ RSpec.describe DiverDown::Trace::Tracer do
       end
 
       # For optimize
-      # it 'traces tracer_deep_stack.rb fast' do
-      #   require 'benchmark'
-      #
-      #   without_trace = Benchmark.realtime do
-      #     mod = Module.new
-      #     k = Class.new
-      #     k.include(mod)
-      #     load(fixture_path('tracer_deep_stack.rb'), mod)
-      #     k.allocate.send(:run)
-      #   end
-      #
-      #   with_trace = Benchmark.realtime do
-      #     # NOTE: Script need to define .run method
-      #     script = fixture_path('tracer_deep_stack.rb')
-      #     load script, AntipollutionModule
-      #     antipollution_environment = AntipollutionKlass.allocate
-      #
-      #     tracer = described_class.new(
-      #       module_set: {
-      #         modules: [
-      #           AntipollutionModule::A,
-      #           AntipollutionModule::D,
-      #         ],
-      #       }
-      #     )
-      #
-      #     tracer.trace do
-      #       antipollution_environment.send(:run)
-      #     end
-      #   end
-      #
-      #   puts "#{with_trace / without_trace} times slower"
-      # end
+      it 'traces tracer_deep_stack.rb fast' do
+        require 'benchmark'
+
+        without_trace = Benchmark.realtime do
+          mod = Module.new
+          k = Class.new
+          k.include(mod)
+          load(fixture_path('tracer_deep_stack.rb'), mod)
+          k.allocate.send(:run)
+        end
+
+        with_trace = Benchmark.realtime do
+          # NOTE: Script need to define .run method
+          script = fixture_path('tracer_deep_stack.rb')
+          load script, AntipollutionModule
+          antipollution_environment = AntipollutionKlass.allocate
+
+          tracer = described_class.new(
+            module_set: {
+              modules: [
+                AntipollutionModule::A,
+                AntipollutionModule::D,
+              ],
+            }
+          )
+
+          tracer.trace do
+            antipollution_environment.send(:run)
+          end
+        end
+
+        puts "#{with_trace / without_trace} times slower"
+      end
     end
   end
 end

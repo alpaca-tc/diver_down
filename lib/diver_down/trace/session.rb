@@ -22,18 +22,16 @@ module DiverDown
         @target_file_set = target_file_set
         @filter_method_id_path = filter_method_id_path
         @definition = definition
-        @trace_point = build_trace_point
+        @trace_point_proc = build_trace_point_proc
+        @call_stack = DiverDown::Trace::CallStack.new
       end
 
       private
 
-      def build_trace_point
-        call_stack = DiverDown::Trace::CallStack.new
+      attr_reader :call_stack
 
-        TracePoint.new(*DiverDown::Trace::Tracer.trace_events) do |tp|
-          # Skip the trace of the itself
-          next if DiverDown::Trace::Session == tp.defined_class
-
+      def build_trace_point_proc
+        proc do |tp|
           case tp.event
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
@@ -105,8 +103,6 @@ module DiverDown
             end
 
             call_stack.push unless pushed
-          when :return, :c_return
-            call_stack.pop
           end
         rescue StandardError
           tp.disable
