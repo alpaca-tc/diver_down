@@ -17,13 +17,13 @@ RSpec.describe DiverDown::Trace::Tracer do
   end
 
   describe '#initialize' do
-    describe 'with relative path target_files' do
+    describe 'with relative path caller_paths' do
       it 'raises ArgumentError' do
         expect {
           described_class.new(
-            target_files: ['relative/path']
+            caller_paths: ['relative/path']
           )
-        }.to raise_error(ArgumentError, /target_files must be absolute path/)
+        }.to raise_error(ArgumentError, /caller_paths must be absolute path/)
       end
     end
 
@@ -104,7 +104,7 @@ RSpec.describe DiverDown::Trace::Tracer do
     describe 'when tracing script' do
       # @param path [String]
       # @return [DiverDown::Definition]
-      def trace_fixture(path, module_set: {}, target_files: nil, ignored_method_ids: [], filter_method_id_path: nil, definition_group: nil)
+      def trace_fixture(path, module_set: {}, caller_paths: nil, ignored_method_ids: [], filter_method_id_path: nil, definition_group: nil)
         # NOTE: Script need to define .run method
         script = fixture_path(path)
         load script, AntipollutionModule
@@ -112,7 +112,7 @@ RSpec.describe DiverDown::Trace::Tracer do
 
         tracer = described_class.new(
           module_set:,
-          target_files:,
+          caller_paths:,
           ignored_method_ids:,
           filter_method_id_path:
         )
@@ -242,7 +242,7 @@ RSpec.describe DiverDown::Trace::Tracer do
         ))
       end
 
-      it 'traces tracer_module.rb with target_files' do
+      it 'traces tracer_module.rb with caller_paths' do
         definition = trace_fixture(
           'tracer_module.rb',
           module_set: {
@@ -252,7 +252,7 @@ RSpec.describe DiverDown::Trace::Tracer do
               'AntipollutionModule::C',
             ],
           },
-          target_files: []
+          caller_paths: []
         )
 
         expect(definition.to_h).to match(fill_default(
@@ -542,7 +542,7 @@ RSpec.describe DiverDown::Trace::Tracer do
               '::C',
             ],
           },
-          target_files: [
+          caller_paths: [
             fixture_path('tracer_separated_file.rb'),
           ]
         )
@@ -588,7 +588,7 @@ RSpec.describe DiverDown::Trace::Tracer do
               'AntipollutionModule::D',
             ],
           },
-          target_files: [
+          caller_paths: [
             fixture_path('tracer_ignored_call_stack.rb'),
           ]
         )
@@ -691,7 +691,7 @@ RSpec.describe DiverDown::Trace::Tracer do
           module_set: {
             modules: [A, B, C],
           },
-          target_files: [File.join(dir, 'a.rb'), File.join(dir, 'c.rb')]
+          caller_paths: [File.join(dir, 'a.rb'), File.join(dir, 'c.rb')]
         )
 
         definition = A.call do
@@ -739,7 +739,7 @@ RSpec.describe DiverDown::Trace::Tracer do
           module_set: {
             modules: [A, B],
           },
-          target_files: [File.join(dir, 'b.rb')]
+          caller_paths: [File.join(dir, 'b.rb')]
         )
 
         definition = tracer.trace(title: 'title') do

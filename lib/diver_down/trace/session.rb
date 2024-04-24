@@ -16,10 +16,10 @@ module DiverDown
       # @param [DiverDown::Trace::IgnoredMethodIds, nil] ignored_method_ids
       # @param [Set<String>, nil] List of paths to finish traversing when searching for a caller. If nil, all paths are finished.
       # @param [#call, nil] filter_method_id_path
-      def initialize(module_set: DiverDown::Trace::ModuleSet.new, ignored_method_ids: nil, target_file_set: nil, filter_method_id_path: nil, definition: DiverDown::Definition.new)
+      def initialize(module_set: DiverDown::Trace::ModuleSet.new, ignored_method_ids: nil, caller_paths: nil, filter_method_id_path: nil, definition: DiverDown::Definition.new)
         @module_set = module_set
         @ignored_method_ids = ignored_method_ids
-        @target_file_set = target_file_set
+        @caller_paths = caller_paths
         @filter_method_id_path = filter_method_id_path
         @definition = definition
         @trace_point = build_trace_point
@@ -99,7 +99,7 @@ module DiverDown
 
               caller_location = find_neast_caller_location(maximum_back_stack_size)
 
-              # `caller_location` is nil if it is filtered by target_files
+              # `caller_location` is nil if it is filtered by caller_paths
               if caller_location
                 pushed = true
                 source = @definition.find_or_build_source(source_name)
@@ -130,12 +130,12 @@ module DiverDown
         finished_frame_size = excluded_frame_size + stack_size + 1
         frame_pos = 1
 
-        # If @target_file_set is nil, return the caller location.
-        return caller_locations(excluded_frame_size + 1, excluded_frame_size + 1)[0] if @target_file_set.nil?
+        # If @caller_paths is nil, return the caller location.
+        return caller_locations(excluded_frame_size + 1, excluded_frame_size + 1)[0] if @caller_paths.nil?
 
         Thread.each_caller_location do
           break if finished_frame_size < frame_pos
-          return _1 if @target_file_set.include?(_1.path)
+          return _1 if @caller_paths.include?(_1.path)
 
           frame_pos += 1
         end
