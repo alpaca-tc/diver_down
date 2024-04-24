@@ -14,13 +14,13 @@ module DiverDown
       end
 
       # @param module_set [DiverDown::Trace::ModuleSet, Array<Module, String>]
-      # @param target_files [Array<String>, nil] if nil, trace all files
+      # @param caller_paths [Array<String>, nil] if nil, trace all files
       # @param ignored_method_ids [Array<String>]
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
-      def initialize(module_set: {}, target_files: nil, ignored_method_ids: nil, filter_method_id_path: nil)
-        if target_files && !target_files.all? { Pathname.new(_1).absolute? }
-          raise ArgumentError, "target_files must be absolute path(#{target_files})"
+      def initialize(module_set: {}, caller_paths: nil, ignored_method_ids: nil, filter_method_id_path: nil)
+        if caller_paths && !caller_paths.all? { Pathname.new(_1).absolute? }
+          raise ArgumentError, "caller_paths must be absolute path(#{caller_paths})"
         end
 
         @module_set = if module_set.is_a?(DiverDown::Trace::ModuleSet)
@@ -46,7 +46,7 @@ module DiverDown
                                 DiverDown::Trace::IgnoredMethodIds.new(ignored_method_ids)
                               end
 
-        @target_file_set = target_files&.to_set
+        @caller_paths = caller_paths&.to_set
         @filter_method_id_path = filter_method_id_path
       end
 
@@ -77,7 +77,7 @@ module DiverDown
         DiverDown::Trace::Session.new(
           module_set: @module_set,
           ignored_method_ids: @ignored_method_ids,
-          target_file_set: @target_file_set,
+          caller_paths: @caller_paths,
           filter_method_id_path: @filter_method_id_path,
           definition: DiverDown::Definition.new(
             title:,

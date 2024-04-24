@@ -1,11 +1,13 @@
 # DiverDown
 
-`divertdown` is a tool that dynamically analyzes application dependencies and creates a dependency map.
-This tool was created to analyze Ruby applications for use in large-scale refactoring such as moduler monolith.
+`DiverDown` is a tool designed to dynamically analyze application dependencies and generate a comprehensive dependency map. It is particularly useful for analyzing Ruby applications, aiding significantly in large-scale refactoring projects or transitions towards a modular monolith architecture.
 
-The results of the analysis can be viewed the dependency map graph, and and since the file-by-file association can be categorized into specific groups, you can deepen your architectural consideration.
+## Features
 
-## Installation
+- **Dependency Mapping**: Analyze and generate an application dependencies.
+- **Module Categorization**: Organizes file-by-file associations into specific groups, facilitating deeper modular monolith architectural analysis and understanding.
+
+## Getting Started
 
 Add this line to your application's Gemfile:
 
@@ -27,7 +29,7 @@ Or install it yourself as:
 
 ### `DiverDown::Trace`
 
-Analyzes the processing of ruby code and outputs the analysis results as `DiverDown::Definition`.
+The `DiverDown::Trace` module analyzes the execution of Ruby code and outputs the results as `DiverDown::Definition` objects.
 
 ```ruby
 tracer = DiverDown::Trace::Tracer.new
@@ -57,8 +59,49 @@ tracer.trace(title: 'title', definition_group: 'group name') do
 end
 ```
 
-The analysis results should be output to a specific directory.
-Files saved in `.json` or `.yaml` can be read by `DiverDown::Web`.
+**Options**
+
+When analyzing user applications, it is recommended to specify the option.
+
+|name|type|description|example|default|
+| --- | --- | --- | --- | --- |
+| `module_set` | Hash{ <br>  modules: Array<Module, String> \| Set<Module, String> \| nil,<br>  paths: Array\<String> \| Set\<String> \| nil <br>}<br>\| DiverDown::Trace::ModuleSet | Specify the class/module to be included in the analysis results.<br><br>If you know the module name:<br>`{ modules: [ModA, ModB] }`<br><br>If you know module path:<br>`{ paths: ['/path/to/rails/app/models/mod_a.rb'] }` | `{ paths: Dir["app/**/*.rb"] }` | `nil`. All class/modul are target. |
+| `caller_paths` | `Array<String> \| nil` | Specifies a list of allowed paths as caller paths. By specifying the user application path in this list of paths and excluding paths under the gem, the caller path is identified back to the user application path. | `Dir["app/**/*.rb"]` | `nil`. All paths are target. |
+| `filter_method_id_path` | `#call \| nil` | lambda to convert the caller path. | `->(path) { path.remove(Rails.root) }` | `nil`. No conversion. |
+
+**Example**
+
+```ruby
+# Your rails application paths
+application_paths = [
+  *Dir['app/**/*.rb'], 
+  *Dir['lib/**/*.rb'],
+].map { File.expand_path(_1) }
+
+ignored_application_paths = [
+  'app/models/application_record.rb',
+].map { File.expand_path(_1) }
+
+module_set = DiverDown::Trace::ModuleSet.new(modules: modules - ignored_modules)
+
+filter_method_id_path = ->(path) { path.remove("#{Rails.root}/") }
+
+tracer = DiverDown::Trace::Tracer.new(
+  caller_paths: application_paths,
+  module_set: {
+    paths: (application_paths - ignored_application_paths)
+  },
+  filter_method_id_path:
+)
+
+definition = tracer.trace do
+  # do something
+end
+```
+
+#### Output Results
+
+The analysis results are intended to be saved to a specific directory in either `.json` or `.yaml` format. These files are compatible with `DiverDown::Web`, which can read and display the results.
 
 ```ruby
 dir = 'tmp/diver_down'
@@ -71,19 +114,14 @@ File.write(File.join(dir, "#{definition.title}.json"), definition.to_h.to_json)
 File.write(File.join(dir, "#{definition.title}.yaml"), definition.to_h.to_yaml)
 ```
 
-**Options**
-
-TODO
-
 ### `DiverDown::Web`
 
 View the analysis results in a browser.
 
-This gem is designed to consider large application with a modular monolithic architecture.
-Each file in the analysis can be specified to belong to a module you specify on the browser.
+This gem is specifically designed to analyze large applications with a modular monolithic architecture. It allows users to categorize each analyzed file into specified modules directly through the web interface.
 
-- `--definition-dir` specifies the directory where the analysis results are stored.
-- `--module-store-path` will store the results specifying which module each file belongs to. If not specified, the specified results are stored in tempfile.
+- `--definition-dir` Specifies the directory where the analysis results are stored.
+- `--module-store-path` Designates a path to save the results that include details on which module each file belongs to. If this option is not specified, the results will be temporarily stored in a default temporary file.
 
 ```sh
 bundle exec diver_down_web --definition-dir tmp/diver_down --module-store-path tmp/module_store.yml
@@ -102,7 +140,7 @@ open http://localhost:8080
   - Ruby: `bundle exec rspec`, `bundle exec rubocop`
   - TypeScript: `pnpm run test`, `pnpm run lint`
 
-### Development DiverDown::Web
+### Development `DiverDown::Web`
 
 If you want to develop `DiverDown::Web` locally, set up a server for development.
 
@@ -113,8 +151,6 @@ $ pnpm run dev
 
 # Start server for backend
 $ bundle install
-# DIVER_DOWN_DIR specifies the directory where the analysis results are stored.
-# DIVER_DOWN_MODULE_STORE specifies a yaml file that defines which module the file belongs to, but this file is newly created, so it works even if the file does not exist.
 $ DIVER_DOWN_DIR=/path/to/definitions_dir DIVER_DOWN_MODULE_STORE=/path/to/module_store.yml bundle exec puma
 ```
 
