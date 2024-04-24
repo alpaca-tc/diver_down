@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['alpaca-tc']
   spec.email = ['alpaca-tc@alpaca.tc']
 
-  spec.summary = 'Tool to dynamically analyze applications and create dependency maps'
-  spec.description = ''
+  spec.summary = 'dynamically analyze application dependencies and generate a comprehensive dependency map'
+  spec.description = 'DiverDown is a tool designed to dynamically analyze application dependencies and generate a comprehensive dependency map. It is particularly useful for analyzing Ruby applications, aiding significantly in large-scale refactoring projects or transitions towards a modular monolith architecture.'
   spec.homepage = 'https://github.com/alpaca-tc/diver_down'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.2.0'
