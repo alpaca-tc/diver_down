@@ -12,7 +12,7 @@ RSpec.describe DiverDown::Trace::CallStack do
       end
     end
 
-    describe '#stack/push/pop' do
+    describe '#context_stack/#context_stack_size/push/pop' do
       it 'pushes and pops' do
         stack = described_class.new
 
@@ -23,20 +23,26 @@ RSpec.describe DiverDown::Trace::CallStack do
         stack.push
         stack.push('C')
 
-        expect(stack.stack).to eq(['A', 'B', 'C'])
+        expect(stack.context_stack).to eq(['A', 'B', 'C'])
+        expect(stack.context_stack_size).to eq([2, 4, 6])
         stack.pop
 
-        expect(stack.stack).to eq(['A', 'B'])
+        expect(stack.context_stack).to eq(['A', 'B'])
+        expect(stack.context_stack_size).to eq([2, 4])
         stack.pop
-        expect(stack.stack).to eq(['A', 'B'])
-        stack.pop
-
-        expect(stack.stack).to eq(['A'])
-        stack.pop
-        expect(stack.stack).to eq(['A'])
+        expect(stack.context_stack).to eq(['A', 'B'])
+        expect(stack.context_stack_size).to eq([2, 4])
         stack.pop
 
-        expect(stack.stack).to eq([])
+        expect(stack.context_stack).to eq(['A'])
+        expect(stack.context_stack_size).to eq([2])
+        stack.pop
+        expect(stack.context_stack).to eq(['A'])
+        expect(stack.context_stack_size).to eq([2])
+        stack.pop
+
+        expect(stack.context_stack).to eq([])
+        expect(stack.context_stack_size).to eq([])
       end
 
       context 'with _ignored: true' do
@@ -58,16 +64,16 @@ RSpec.describe DiverDown::Trace::CallStack do
       end
     end
 
-    describe '#empty?' do
+    describe '#empty_context_stack?' do
       it 'returns true if stack is not empty' do
         stack = described_class.new
-        expect(stack.empty?).to eq(true)
+        expect(stack.empty_context_stack?).to eq(true)
 
         stack.push
-        expect(stack.empty?).to eq(true)
+        expect(stack.empty_context_stack?).to eq(true)
 
         stack.push('A')
-        expect(stack.empty?).to eq(false)
+        expect(stack.empty_context_stack?).to eq(false)
       end
     end
   end

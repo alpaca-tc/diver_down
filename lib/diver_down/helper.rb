@@ -62,20 +62,5 @@ module DiverDown
     def self.constantize(str)
       ::ActiveSupport::Inflector.constantize(str)
     end
-
-    # @param hash [Hash]
-    # @return [Hash]
-    def self.deep_symbolize_keys(object)
-      case object
-      when Hash
-        object.each_with_object({}) do |(key, value), memo|
-          memo[key.to_sym] = deep_symbolize_keys(value)
-        end
-      when Array
-        object.map { deep_symbolize_keys(_1) }
-      else
-        object
-      end
-    end
   end
 end

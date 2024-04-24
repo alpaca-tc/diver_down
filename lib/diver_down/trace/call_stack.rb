@@ -14,24 +14,29 @@ module DiverDown
       def initialize
         @ignored_stack_size = nil
         @stack_size = 0
-        @stack = {}
+        @context_stack = {}
       end
 
       # @return [Boolean]
-      def empty?
-        @stack.empty?
+      def empty_context_stack?
+        @context_stack.empty?
+      end
+
+      # @return [Array<Integer>]
+      def context_stack_size
+        @context_stack.keys
       end
 
       # @return [Array<Object>]
-      def stack
-        @stack.values
+      def context_stack
+        @context_stack.values
       end
 
       # @param context [Object, nil] User defined stack context.
       # @return [void]
       def push(context = nil, ignored: false)
         @stack_size += 1
-        @stack[@stack_size] = context unless context.nil?
+        @context_stack[@stack_size] = context unless context.nil?
         @ignored_stack_size ||= @stack_size if ignored
       end
 
@@ -46,7 +51,7 @@ module DiverDown
       def pop
         raise StackEmptyError if @stack_size.zero?
 
-        @stack.delete(@stack_size) if @stack.key?(@stack_size)
+        @context_stack.delete(@stack_size) if @context_stack.key?(@stack_size)
         @ignored_stack_size = nil if @ignored_stack_size && @ignored_stack_size == @stack_size
         @stack_size -= 1
       end

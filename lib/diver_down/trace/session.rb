@@ -14,7 +14,7 @@ module DiverDown
 
       # @param [DiverDown::Trace::ModuleSet, nil] module_set
       # @param [DiverDown::Trace::IgnoredMethodIds, nil] ignored_method_ids
-      # @param [Set<String>, nil] target_file_set
+      # @param [Set<String>, nil] List of paths to finish traversing when searching for a caller. If nil, all paths are finished.
       # @param [#call, nil] filter_method_id_path
       def initialize(module_set: DiverDown::Trace::ModuleSet.new, ignored_method_ids: nil, target_file_set: nil, filter_method_id_path: nil, definition: DiverDown::Definition.new)
         @module_set = module_set
@@ -55,21 +55,26 @@ module DiverDown
 
             mod = DiverDown::Helper.resolve_module(tp.self)
 
+            if mod.nil?
+              call_stack.push
+              next
+            end
+
             if !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
               # If this method is ignored, the call stack is ignored until the method returns.
               call_stack.push(ignored: true)
               next
             end
 
-            source_name = DiverDown::Helper.normalize_module_name(mod) if !mod.nil? && @module_set.include?(mod)
+            source_name = DiverDown::Helper.normalize_module_name(mod) if @module_set.include?(mod)
             pushed = false
 
             unless source_name.nil?
               # If the call stack contains a call to a module to be traced
               # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored
-              unless call_stack.empty?
+              unless call_stack.empty_context_stack?
                 # Add dependency to called source
-                called_stack_context = call_stack.stack[-1]
+                called_stack_context = call_stack.context_stack[-1]
                 called_source = called_stack_context.source
                 dependency = called_source.find_or_build_dependency(source_name)
 
@@ -84,9 +89,17 @@ module DiverDown
                 end
               end
 
-              # `caller_location` is nil if it is filtered by target_files
-              caller_location = find_neast_caller_location(call_stack.stack_size)
+              # Search is a heavy process and should be terminated early.
+              # The position of the most recently found caller or the start of trace is used as the maximum value.
+              maximum_back_stack_size = if call_stack.empty_context_stack?
+                                          call_stack.stack_size
+                                        else
+                                          call_stack.stack_size - call_stack.context_stack_size[-1]
+                                        end
 
+              caller_location = find_neast_caller_location(maximum_back_stack_size)
+
+              # `caller_location` is nil if it is filtered by target_files
               if caller_location
                 pushed = true
                 source = @definition.find_or_build_source(source_name)
