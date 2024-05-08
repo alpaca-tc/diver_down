@@ -28,7 +28,11 @@ module DiverDown
     # @return [Module, Class]
     def self.resolve_module(obj)
       if module?(obj) # Do not call method of this
-        resolve_singleton_class(obj)
+        if module_subclass?(obj)
+          obj.class
+        else
+          resolve_singleton_class(obj)
+        end
       else
         k = INSTANCE_CLASS_QUERY.bind_call(obj)
         resolve_singleton_class(k)
@@ -61,6 +65,13 @@ module DiverDown
     # @return [Module]
     def self.constantize(str)
       ::ActiveSupport::Inflector.constantize(str)
+    end
+
+    # FIXME: I don't know the best way to determine which class inherits from Module.
+    # @return [Boolean]
+    def self.module_subclass?(mod)
+      mod.ancestors.size == 1 &&
+        mod.class < Module
     end
   end
 end
