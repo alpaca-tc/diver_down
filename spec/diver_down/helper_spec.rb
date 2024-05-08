@@ -73,6 +73,19 @@ RSpec.describe DiverDown::Helper do
         expect(described_class.resolve_module(mod)).to eq(mod)
       end
 
+      it 'returns class given inherited module' do
+        class A < ::Module
+          # @return [nil]
+          def name
+            raise 'This method should not be called'
+          end
+        end
+
+        expect(described_class.resolve_module(A.new)).to eq(A)
+      ensure
+        Object.send(:remove_const, :A)
+      end
+
       it 'returns string given class' do
         klass = Class.new do
           def self.name

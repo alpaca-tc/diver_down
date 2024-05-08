@@ -55,7 +55,7 @@ module DiverDown
 
             mod = DiverDown::Helper.resolve_module(tp.self)
 
-            if mod.nil?
+            unless mod
               call_stack.push
               next
             end
