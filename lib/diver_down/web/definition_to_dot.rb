@@ -161,7 +161,7 @@ module DiverDown
 
       # @return [String]
       def to_s
-        io.puts %(strict digraph "#{definition.title}" {)
+        io.puts %(strict digraph "#{escape_quote(definition.title)}" {)
         io.indented do
           io.puts('compound=true') if @compound
           io.puts('concentrate=true') if @concentrate
@@ -212,11 +212,11 @@ module DiverDown
               module_names = specific_module_names[0..index]
               module_name = specific_module_names[index]
 
-              io.puts %(subgraph "#{module_label(module_names)}" {)
+              io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
               io.indented do
                 io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
-                io.puts %(label="#{module_name}")
-                io.puts %("#{module_name}" #{build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names))})
+                io.puts %(label="#{escape_quote(module_name)}")
+                io.puts %("#{escape_quote(module_name)}" #{build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names))})
 
                 next_proc&.call
               end
@@ -258,7 +258,7 @@ module DiverDown
                 minlen: MODULE_MINLEN
               )
 
-              io.write(%("#{from_modules[-1]}" -> "#{to_modules[-1]}"))
+              io.write(%("#{escape_quote(from_modules[-1])}" -> "#{escape_quote(to_modules[-1])}"))
               io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
               io.write("\n")
             end
@@ -295,10 +295,10 @@ module DiverDown
                 module_names = full_modules[0..index]
                 module_name = module_names[-1]
 
-                io.puts %(subgraph "#{module_label(module_names)}" {)
+                io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
                 io.indented do
                   io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
-                  io.puts %(label="#{module_name}")
+                  io.puts %(label="#{escape_quote(module_name)}")
 
                   sources = (by_modules[module_names] || []).sort_by(&:source_name)
                   sources.each do |source|
@@ -318,7 +318,7 @@ module DiverDown
       end
 
       def insert_source(source)
-        io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
+        io.puts %("#{escape_quote(source.source_name)}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
       end
 
       def insert_dependencies(source)
@@ -354,7 +354,7 @@ module DiverDown
             )
           end
 
-          io.write(%("#{source.source_name}" -> "#{_1.source_name}"))
+          io.write(%("#{escape_quote(source.source_name)}" -> "#{escape_quote(_1.source_name)}"))
           io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
           io.write("\n")
         end
@@ -382,7 +382,7 @@ module DiverDown
         attrs = attrs.reject { _2.nil? || _2 == '' }
         return if attrs.empty?
 
-        attrs_str = attrs.map { %(#{_1}="#{_2}") }.join(ATTRIBUTE_DELIMITER)
+        attrs_str = attrs.map { %(#{_1}="#{escape_quote(_2)}") }.join(ATTRIBUTE_DELIMITER)
 
         if _wrap
           "#{_wrap[0]}#{attrs_str}#{_wrap[1]}"
@@ -412,6 +412,10 @@ module DiverDown
         return if modules.empty?
 
         "cluster_#{modules.join(MODULE_DELIMITER)}"
+      end
+
+      def escape_quote(string)
+        string.to_s.gsub(/"/, '\"')
       end
     end
   end

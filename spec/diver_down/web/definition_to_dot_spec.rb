@@ -29,6 +29,19 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
         end
       end
 
+      context 'when definition title contains double-quote' do
+        it 'returns escaped title' do
+          definition = build_definition(
+            title: '"title"'
+          )
+
+          expect(described_class.new(definition, module_store).to_s).to eq(<<~DOT)
+            strict digraph "\\"title\\"" {
+            }
+          DOT
+        end
+      end
+
       context 'with single source' do
         it 'returns digraph' do
           definition = build_definition(
