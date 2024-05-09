@@ -46,6 +46,38 @@ RSpec.describe DiverDown::Web::ModuleStore do
           described_class.new(tempfile.path).get('a.rb')
         }.from([]).to(['A', 'B'])
       end
+
+      it 'sorts by source name' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        sources = ['a.rb', 'b.rb', 'c.rb']
+
+        sources.shuffle.each do |source|
+          instance.set(source, ['A'])
+        end
+
+        expect {
+          instance.flush
+        }.to change {
+          described_class.new(tempfile.path).instance_variable_get(:@store).keys
+        }.from([]).to(sources)
+      end
+    end
+
+    describe '#to_h' do
+      it 'returns sorted hash' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        sources = ['a.rb', 'b.rb', 'c.rb']
+
+        sources.shuffle.each do |source|
+          instance.set(source, ['A'])
+        end
+
+        expect(instance.to_h.keys).to eq(sources)
+      end
     end
   end
 end
