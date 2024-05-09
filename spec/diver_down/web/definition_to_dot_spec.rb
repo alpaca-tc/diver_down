@@ -206,16 +206,12 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_1"
                 label="A"
                 "a.rb" [label="a.rb" id="graph_2"]
+                "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               }
-              "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
                 id="graph_4"
                 label="B"
                 "b.rb" [label="b.rb" id="graph_5"]
-              }
-              subgraph "cluster_B" {
-                id="graph_4"
-                label="B"
                 "c.rb" [label="c.rb" id="graph_6"]
               }
             }
@@ -323,16 +319,12 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_1"
                 label="A"
                 "a.rb" [label="a.rb" id="graph_2"]
+                "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               }
-              "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               subgraph "cluster_B" {
                 id="graph_4"
                 label="B"
                 "b.rb" [label="b.rb" id="graph_5"]
-              }
-              subgraph "cluster_B" {
-                id="graph_4"
-                label="B"
                 "c.rb" [label="c.rb" id="graph_6"]
               }
             }
@@ -532,6 +524,64 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 source_name: 'a.rb',
                 modules: [],
               },
+            ]
+          )
+        end
+
+        it 'returns concentrate digraph with multiple modules if concentrate = true' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+              },
+              {
+                source_name: 'b.rb',
+              },
+              {
+                source_name: 'c.rb',
+              },
+              {
+                source_name: 'd.rb',
+              },
+            ]
+          )
+
+          module_store.set('b.rb', ['A'])
+          module_store.set('c.rb', ['A', 'C'])
+          module_store.set('d.rb', ['B'])
+
+          instance = described_class.new(definition, module_store, concentrate: true)
+          expect(instance.to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              concentrate=true
+              "a.rb" [label="a.rb" id="graph_1"]
+              subgraph "cluster_A" {
+                id="graph_2"
+                label="A"
+                "b.rb" [label="b.rb" id="graph_3"]
+                subgraph "cluster_A::C" {
+                  id="graph_4"
+                  label="C"
+                  "c.rb" [label="c.rb" id="graph_5"]
+                }
+              }
+              subgraph "cluster_B" {
+                id="graph_6"
+                label="B"
+                "d.rb" [label="d.rb" id="graph_7"]
+              }
+            }
+          DOT
+
+          expect(instance.metadata).to eq(
+            [
+              { id: 'graph_1', type: 'source', source_name: 'a.rb', modules: [] },
+              { id: 'graph_2', type: 'module', modules: [{ module_name: 'A' }] },
+              { id: 'graph_3', type: 'source', source_name: 'b.rb', modules: [{ module_name: 'A' }] },
+              { id: 'graph_4', type: 'module', modules: [{ module_name: 'A' }, { module_name: 'C' }] },
+              { id: 'graph_5', type: 'source', source_name: 'c.rb', modules: [{ module_name: 'A' }, { module_name: 'C' }] },
+              { id: 'graph_6', type: 'module', modules: [{ module_name: 'B' }] },
+              { id: 'graph_7', type: 'source', source_name: 'd.rb', modules: [{ module_name: 'B' }] },
             ]
           )
         end
