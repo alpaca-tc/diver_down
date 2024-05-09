@@ -85,7 +85,7 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
 
           items.push({
             key: `definition-${definition.id}`,
-            title: definition.title,
+            title: `(${definition.sourcesCount}) ${definition.title}`,
             isSelected,
             onClick: onClickDefinition,
             prefix: (

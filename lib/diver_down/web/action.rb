@@ -130,6 +130,7 @@ module DiverDown
               id: definition.store_id,
               definition_group: definition.definition_group,
               title: definition.title,
+              sources_count: definition.sources.size,
             }
           end,
           pagination: pagination.to_h

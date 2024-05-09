@@ -78,6 +78,7 @@ RSpec.describe DiverDown::Web do
             'id' => 1,
             'title' => 'title',
             'definition_group' => nil,
+            'sources_count' => 1,
           },
         ],
         'pagination' => {
