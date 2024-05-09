@@ -169,9 +169,7 @@ module DiverDown
           if @only_module
             render_only_modules
           else
-            definition.sources.sort_by(&:source_name).each do
-              insert_source(_1)
-            end
+            render_sources
           end
         end
         io.puts '}'
@@ -268,13 +266,62 @@ module DiverDown
         end
       end
 
-      def insert_source(source)
-        if module_store.get(source.source_name).empty?
-          io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
-        else
-          insert_modules(source)
+      def render_sources
+        by_modules = definition.sources.group_by do |source|
+          module_store.get(source.source_name)
         end
 
+        # Remove duplicated prefix modules
+        # from [["A"], ["A", "B"]] to [["A", "B"]]
+        uniq_modules = by_modules.keys.uniq
+        uniq_modules = uniq_modules.reject do |modules|
+          uniq_modules.any? { _1[0..modules.size - 1] == modules && _1.length > modules.size }
+        end
+
+        uniq_modules.each do |full_modules|
+          # Render module and source
+          if full_modules.empty?
+            sources = by_modules[full_modules].sort_by(&:source_name)
+
+            sources.each do |source|
+              insert_source(source)
+              insert_dependencies(source)
+            end
+          else
+            buf = swap_io do
+              indexes = (0..(full_modules.length - 1)).to_a
+
+              chain_yield(indexes) do |index, next_proc|
+                module_names = full_modules[0..index]
+                module_name = module_names[-1]
+
+                io.puts %(subgraph "#{module_label(module_names)}" {)
+                io.indented do
+                  io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+                  io.puts %(label="#{module_name}")
+
+                  sources = (by_modules[module_names] || []).sort_by(&:source_name)
+                  sources.each do |source|
+                    insert_source(source)
+                    insert_dependencies(source)
+                  end
+
+                  next_proc&.call
+                end
+                io.puts '}'
+              end
+            end
+
+            io.write buf.string
+          end
+        end
+      end
+
+      def insert_source(source)
+        io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
+      end
+
+      def insert_dependencies(source)
         source.dependencies.each do
           attributes = {}
           ltail = module_label(*module_store.get(source.source_name))
@@ -311,34 +358,6 @@ module DiverDown
           io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
           io.write("\n")
         end
-      end
-
-      def insert_modules(source)
-        buf = swap_io do
-          all_module_names = module_store.get(source.source_name)
-          indexes = (0..(all_module_names.length - 1)).to_a
-
-          chain_yield(indexes) do |index, next_proc|
-            module_names = all_module_names[0..index]
-            module_name = module_names[-1]
-
-            io.puts %(subgraph "#{module_label(module_names)}" {)
-            io.indented do
-              io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
-              io.puts %(label="#{module_name}")
-
-              if next_proc
-                next_proc.call
-              else
-                # last. equals indexes[-1] == index
-                io.puts %("#{source.source_name}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
-              end
-            end
-            io.puts '}'
-          end
-        end
-
-        io.write buf.string
       end
 
       def chain_yield(values, &block)
