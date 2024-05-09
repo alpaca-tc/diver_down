@@ -12,6 +12,7 @@ type DefinitionReponse = {
   id: number
   definition_group: string | null
   title: string
+  sources_count: number
 }
 
 type DefinitionsResponse = {
@@ -47,6 +48,7 @@ export const useDefinitionList = (
       id: definition.id,
       definitionGroup: definition.definition_group,
       title: definition.title,
+      sourcesCount: definition.sources_count,
     }))
   }, [])
 
