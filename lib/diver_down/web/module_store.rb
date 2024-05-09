@@ -31,7 +31,13 @@ module DiverDown
 
       # @return [Hash]
       def to_h
-        @store.dup
+        sorted_store = {}
+
+        @store.keys.sort.each do |key|
+          sorted_store[key] = @store[key]
+        end
+
+        sorted_store
       end
 
       # Write store to file
