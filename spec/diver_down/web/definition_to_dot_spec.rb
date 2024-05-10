@@ -94,8 +94,8 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb" id="graph_1"]
-              "a.rb" -> "b.rb" [id="graph_2"]
-              "b.rb" [label="b.rb" id="graph_3"]
+              "b.rb" [label="b.rb" id="graph_2"]
+              "a.rb" -> "b.rb" [id="graph_3"]
             }
           DOT
 
@@ -108,6 +108,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 modules: [],
               }, {
                 id: 'graph_2',
+                type: 'source',
+                source_name: 'b.rb',
+                modules: [],
+              }, {
+                id: 'graph_3',
                 type: 'dependency',
                 dependencies: [
                   {
@@ -115,11 +120,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                     method_ids: [],
                   },
                 ],
-              }, {
-                id: 'graph_3',
-                type: 'source',
-                source_name: 'b.rb',
-                modules: [],
               },
             ]
           )
@@ -219,14 +219,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_1"
                 label="A"
                 "a.rb" [label="a.rb" id="graph_2"]
-                "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               }
               subgraph "cluster_B" {
-                id="graph_4"
+                id="graph_3"
                 label="B"
-                "b.rb" [label="b.rb" id="graph_5"]
-                "c.rb" [label="c.rb" id="graph_6"]
+                "b.rb" [label="b.rb" id="graph_4"]
+                "c.rb" [label="c.rb" id="graph_5"]
               }
+              "a.rb" -> "b.rb" [id="graph_6" ltail="cluster_A" lhead="cluster_B" minlen="3"]
             }
           DOT
 
@@ -249,6 +249,28 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 ],
               }, {
                 id: 'graph_3',
+                type: 'module',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+              }, {
+                id: 'graph_4',
+                type: 'source',
+                source_name: 'b.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              }, {
+                id: 'graph_5',
+                type: 'source',
+                source_name: 'c.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              }, {
+                id: 'graph_6',
                 type: 'dependency',
                 dependencies: [
                   {
@@ -258,28 +280,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                     source_name: 'c.rb',
                     method_ids: [],
                   },
-                ],
-              }, {
-                id: 'graph_4',
-                type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
-              }, {
-                id: 'graph_5',
-                type: 'source',
-                source_name: 'b.rb',
-                modules: [
-                  { module_name: 'B' },
-                ],
-              }, {
-                id: 'graph_6',
-                type: 'source',
-                source_name: 'c.rb',
-                modules: [
-                  { module_name: 'B' },
                 ],
               },
             ]
@@ -332,14 +332,14 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_1"
                 label="A"
                 "a.rb" [label="a.rb" id="graph_2"]
-                "a.rb" -> "b.rb" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
               }
               subgraph "cluster_B" {
-                id="graph_4"
+                id="graph_3"
                 label="B"
-                "b.rb" [label="b.rb" id="graph_5"]
-                "c.rb" [label="c.rb" id="graph_6"]
+                "b.rb" [label="b.rb" id="graph_4"]
+                "c.rb" [label="c.rb" id="graph_5"]
               }
+              "a.rb" -> "b.rb" [id="graph_6" ltail="cluster_A" lhead="cluster_B" minlen="3"]
             }
           DOT
 
@@ -362,6 +362,28 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 ],
               }, {
                 id: 'graph_3',
+                type: 'module',
+                modules: [
+                  {
+                    module_name: 'B',
+                  },
+                ],
+              }, {
+                id: 'graph_4',
+                type: 'source',
+                source_name: 'b.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              }, {
+                id: 'graph_5',
+                type: 'source',
+                source_name: 'c.rb',
+                modules: [
+                  { module_name: 'B' },
+                ],
+              }, {
+                id: 'graph_6',
                 type: 'dependency',
                 dependencies: [
                   {
@@ -381,28 +403,6 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                       },
                     ],
                   },
-                ],
-              }, {
-                id: 'graph_4',
-                type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
-              }, {
-                id: 'graph_5',
-                type: 'source',
-                source_name: 'b.rb',
-                modules: [
-                  { module_name: 'B' },
-                ],
-              }, {
-                id: 'graph_6',
-                type: 'source',
-                source_name: 'c.rb',
-                modules: [
-                  { module_name: 'B' },
                 ],
               },
             ]
