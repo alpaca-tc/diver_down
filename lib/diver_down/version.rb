@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module DiverDown
-  VERSION = '0.0.1.alpha6'
+  VERSION = '0.0.1.alpha7'
 end
