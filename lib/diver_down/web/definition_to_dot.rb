@@ -285,7 +285,6 @@ module DiverDown
 
             sources.each do |source|
               insert_source(source)
-              insert_dependencies(source)
             end
           else
             buf = swap_io do
@@ -303,7 +302,6 @@ module DiverDown
                   sources = (by_modules[module_names] || []).sort_by(&:source_name)
                   sources.each do |source|
                     insert_source(source)
-                    insert_dependencies(source)
                   end
 
                   next_proc&.call
@@ -314,6 +312,10 @@ module DiverDown
 
             io.write buf.string
           end
+        end
+
+        definition.sources.sort_by(&:source_name).each do |source|
+          insert_dependencies(source)
         end
       end
 
