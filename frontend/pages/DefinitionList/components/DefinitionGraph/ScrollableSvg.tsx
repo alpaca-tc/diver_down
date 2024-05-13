@@ -166,6 +166,7 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
             height={size.height ?? 1000}
             defaultTool={TOOL_PAN}
             preventPanOutside={false}
+            detectAutoPan={false}
             tool={tool}
             onChangeTool={setTool}
             value={value}
