@@ -6,6 +6,7 @@ module DiverDown
   class Web
     class ModuleStore
       BLANK_ARRAY = [].freeze
+      BLANK_MEMO = ''
       BLANK_RE = /\A\s*\z/
 
       private_constant(:BLANK_RE)
@@ -17,22 +18,42 @@ module DiverDown
 
       # @param source_name [String]
       # @param module_names [Array<String>]
-      def set(source_name, module_names)
-        @store[source_name] = module_names.dup.reject do
+      def set_modules(source_name, module_names)
+        source = (@store[source_name] ||= {})
+
+        source[:modules] = module_names.dup.reject do
           BLANK_RE.match?(_1)
         end.freeze
       end
 
       # @param source_name [String]
       # @return [Array<Module>]
-      def get(source_name)
-        @store[source_name] || BLANK_ARRAY
+      def get_modules(source_name)
+        return BLANK_ARRAY unless @store.key?(source_name)
+
+        @store[source_name][:modules] || BLANK_ARRAY
+      end
+
+      # @param source_name [String]
+      # @param memo [String]
+      # @return [void]
+      def set_memo(source_name, memo)
+        source = (@store[source_name] ||= {})
+        source[:memo] = memo.strip
+      end
+
+      # @param source_name [String]
+      # @return [String]
+      def get_memo(source_name)
+        return BLANK_MEMO unless @store.key?(source_name)
+
+        @store[source_name][:memo] || BLANK_MEMO
       end
 
       # @param source_name [String]
       # @return [Boolean]
-      def include?(source_name)
-        get(source_name).any?
+      def classified?(source_name)
+        get_modules(source_name).any?
       end
 
       # @return [Hash]

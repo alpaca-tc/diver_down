@@ -9,42 +9,67 @@ RSpec.describe DiverDown::Web::ModuleStore do
       end
     end
 
-    describe '#set' do
-      it 'set modules to source' do
+    describe '#set_modules' do
+      it 'set_modules modules to source' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
 
         expect {
-          instance.set('a.rb', ['A', 'B'])
+          instance.set_modules('a.rb', ['A', 'B'])
         }.to change {
-          instance.get('a.rb')
+          instance.get_modules('a.rb')
         }.from([]).to(['A', 'B'])
       end
     end
 
-    describe '#get' do
-      it 'returns blank array if source is not set' do
+    describe '#get_modules' do
+      it 'returns blank array if source is not set_modules' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
 
-        expect(instance.get('a.rb')).to eq([])
+        expect(instance.get_modules('a.rb')).to eq([])
 
-        instance.set('a.rb', ['A', 'B'])
-        expect(instance.get('a.rb')).to eq(['A', 'B'])
+        instance.set_modules('a.rb', ['A', 'B'])
+        expect(instance.get_modules('a.rb')).to eq(['A', 'B'])
       end
     end
 
-    describe '#include?' do
+    describe '#set_memo' do
+      it 'sets memo' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        expect {
+          instance.set_memo('a.rb', ' memo ')
+        }.to change {
+          instance.get_memo('a.rb')
+        }.from('').to('memo')
+      end
+    end
+
+    describe '#get_memo' do
+      it 'returns blank string if source is not set_modules' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        expect(instance.get_memo('a.rb')).to eq('')
+
+        instance.set_memo('a.rb', 'a')
+        expect(instance.get_memo('a.rb')).to eq('a')
+      end
+    end
+
+    describe '#classified?' do
       it 'returns bool' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
 
-        instance.set('a.rb', [])
-        instance.set('b.rb', ['A'])
+        instance.set_modules('a.rb', [])
+        instance.set_modules('b.rb', ['A'])
 
-        expect(instance.include?('a.rb')).to be(false)
-        expect(instance.include?('b.rb')).to be(true)
-        expect(instance.include?('c.rb')).to be(false)
+        expect(instance.classified?('a.rb')).to be(false)
+        expect(instance.classified?('b.rb')).to be(true)
+        expect(instance.classified?('c.rb')).to be(false)
       end
     end
 
@@ -52,13 +77,25 @@ RSpec.describe DiverDown::Web::ModuleStore do
       it 'writes modules to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
-        instance.set('a.rb', ['A', 'B'])
+        instance.set_modules('a.rb', ['A', 'B'])
 
         expect {
           instance.flush
         }.to change {
-          described_class.new(tempfile.path).get('a.rb')
+          described_class.new(tempfile.path).get_modules('a.rb')
         }.from([]).to(['A', 'B'])
+      end
+
+      it 'writes memo to path' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+        instance.set_memo('a.rb', 'memo')
+
+        expect {
+          instance.flush
+        }.to change {
+          described_class.new(tempfile.path).get_memo('a.rb')
+        }.from('').to('memo')
       end
 
       it 'sorts by source name' do
@@ -68,7 +105,7 @@ RSpec.describe DiverDown::Web::ModuleStore do
         sources = ['a.rb', 'b.rb', 'c.rb']
 
         sources.shuffle.each do |source|
-          instance.set(source, ['A'])
+          instance.set_modules(source, ['A'])
         end
 
         expect {
@@ -87,7 +124,8 @@ RSpec.describe DiverDown::Web::ModuleStore do
         sources = ['a.rb', 'b.rb', 'c.rb']
 
         sources.shuffle.each do |source|
-          instance.set(source, ['A'])
+          instance.set_modules(source, ['A'])
+          instance.set_memo(source, 'memo')
         end
 
         expect(instance.to_h.keys).to eq(sources)

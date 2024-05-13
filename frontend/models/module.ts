@@ -8,6 +8,7 @@ export type SpecificModule = {
   }>
   sources: Array<{
     sourceName: string
+    memo: string
   }>
   relatedDefinitions: Array<{
     id: number

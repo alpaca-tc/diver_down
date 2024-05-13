@@ -82,9 +82,10 @@ export const List = forwardRef<HTMLLIElement, Props>((props, ref) => {
           }
 
           const isSelected = selectedDefinitionIds.includes(definition.id)
-          const countLabel = definition.unclassifiedSourcesCount === 0 ?
-            `(${definition.sourcesCount})` :
-            `(${definition.unclassifiedSourcesCount}/${definition.sourcesCount})`
+          const countLabel =
+            definition.unclassifiedSourcesCount === 0
+              ? `(${definition.sourcesCount})`
+              : `(${definition.unclassifiedSourcesCount}/${definition.sourcesCount})`
 
           items.push({
             key: `definition-${definition.id}`,

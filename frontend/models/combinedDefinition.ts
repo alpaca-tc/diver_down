@@ -1,4 +1,5 @@
 import { Module } from './module'
+import { Source } from './source'
 
 type BaseDotMetadata = {
   id: string
@@ -7,6 +8,7 @@ type BaseDotMetadata = {
 export type DotSourceMetadata = {
   type: 'source'
   sourceName: string
+  memo: string
   modules: Module[]
 } & BaseDotMetadata
 
@@ -34,10 +36,5 @@ export type CombinedDefinition = {
   titles: string[]
   dot: string
   dotMetadata: DotMetadata[]
-  sources: Array<{ sourceName: string; modules: Module[] }>
-}
-
-export type DotSource = {
-  type: 'source'
-  sourceName: string
+  sources: Source[]
 }

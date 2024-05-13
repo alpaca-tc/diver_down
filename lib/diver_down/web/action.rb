@@ -33,13 +33,14 @@ module DiverDown
         end
         # rubocop:enable Style/HashEachMethods
 
-        classified_sources_count = source_names.count { @module_store.include?(_1) }
+        classified_sources_count = source_names.count { @module_store.classified?(_1) }
 
         json(
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
-              modules: @module_store.get(source_name).map do |module_name|
+              memo: @module_store.get_memo(source_name),
+              modules: @module_store.get_modules(source_name).map do |module_name|
                 { module_name: }
               end,
             }
@@ -56,7 +57,7 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            modules = @module_store.get(source.source_name)
+            modules = @module_store.get_modules(source.source_name)
             module_set.add(modules) unless modules.empty?
           end
         end
@@ -83,7 +84,7 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            source_module_names = @module_store.get(source.source_name)
+            source_module_names = @module_store.get_modules(source.source_name)
 
             next unless source_module_names[0..module_names.size - 1] == module_names
 
@@ -108,6 +109,7 @@ module DiverDown
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
+              memo: @module_store.get_memo(source_name),
             }
           end,
           related_definitions: related_definitions.map do |definition|
@@ -137,7 +139,7 @@ module DiverDown
               definition_group: definition.definition_group,
               title: definition.title,
               sources_count: definition.sources.size,
-              unclassified_sources_count: definition.sources.reject { @module_store.include?(_1.source_name) }.size,
+              unclassified_sources_count: definition.sources.reject { @module_store.classified?(_1.source_name) }.size,
             }
           end,
           pagination: pagination.to_h
@@ -195,7 +197,8 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
-                modules: @module_store.get(_1.source_name).map do |module_name|
+                memo: @module_store.get_memo(_1.source_name),
+                modules: @module_store.get_modules(_1.source_name).map do |module_name|
                   { module_name: }
                 end,
               }
@@ -246,11 +249,12 @@ module DiverDown
                          []
                        else
                          source = DiverDown::Definition::Source.combine(*found_sources)
-                         @module_store.get(source.source_name)
+                         @module_store.get_modules(source.source_name)
                        end
 
         json(
           source_name:,
+          memo: @module_store.get_memo(source_name),
           modules: module_names.map do
             { module_name: _1 }
           end,
@@ -287,7 +291,28 @@ module DiverDown
         end
 
         if found_source
-          @module_store.set(source_name, modules)
+          @module_store.set_modules(source_name, modules)
+          @module_store.flush
+
+          json({})
+        else
+          not_found
+        end
+      end
+
+      # POST /api/sources/:source_name/memo.json
+      #
+      # @param source_name [String]
+      # @param memo [String]
+      def set_memo(source_name, memo)
+        found_source = @store.any? do |_, definition|
+          definition.sources.any? do |source|
+            source.source_name == source_name
+          end
+        end
+
+        if found_source
+          @module_store.set_memo(source_name, memo)
           @module_store.flush
 
           json({})

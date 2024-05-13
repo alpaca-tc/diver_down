@@ -76,7 +76,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition_1, definition_2)
-      module_store.set('a.rb', ['A'])
+      module_store.set_modules('a.rb', ['A'])
 
       get '/api/definitions.json'
 
@@ -315,7 +315,8 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      module_store.set('a.rb', ['A'])
+      module_store.set_modules('a.rb', ['A'])
+      module_store.set_memo('a.rb', 'memo')
 
       get '/api/sources.json'
 
@@ -324,14 +325,17 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'memo' => 'memo',
             'modules' => [{ 'module_name' => 'A' }],
           },
           {
             'source_name' => 'b.rb',
+            'memo' => '',
             'modules' => [],
           },
           {
             'source_name' => 'c.rb',
+            'memo' => '',
             'modules' => [],
           },
         ],
@@ -366,8 +370,8 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition)
-      module_store.set('a.rb', ['A', 'B'])
-      module_store.set('b.rb', ['B', 'C'])
+      module_store.set_modules('a.rb', ['A', 'B'])
+      module_store.set_modules('b.rb', ['B', 'C'])
 
       get '/api/modules.json'
 
@@ -418,8 +422,9 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition_1, definition_2)
-      module_store.set('a.rb', ['A'])
-      module_store.set('b.rb', ['A', 'B'])
+      module_store.set_modules('a.rb', ['A'])
+      module_store.set_modules('b.rb', ['A', 'B'])
+      module_store.set_memo('a.rb', 'memo')
 
       get '/api/modules/A.json'
 
@@ -433,9 +438,11 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'memo' => 'memo',
           },
           {
             'source_name' => 'b.rb',
+            'memo' => '',
           },
         ],
         'related_definitions' => [
@@ -464,6 +471,7 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'b.rb',
+            'memo' => '',
           },
         ],
         'related_definitions' => [
@@ -486,7 +494,8 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition)
-      module_store.set('a.rb', ['グローバル'])
+      module_store.set_modules('a.rb', ['グローバル'])
+      module_store.set_memo('a.rb', 'memo')
 
       get "/api/modules/#{CGI.escape('グローバル')}.json"
 
@@ -500,6 +509,7 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'memo' => 'memo',
           },
         ],
         'related_definitions' => [
@@ -555,11 +565,29 @@ RSpec.describe DiverDown::Web do
       )
       bit_ids = store.set(definition_1, definition_2)
 
+      module_store.set_memo('a.rb', 'memo')
+
       get "/api/definitions/#{bit_ids.inject(0, &:|)}.json"
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')
       expect(last_response.body).to include('digraph')
+
+      json = JSON.parse(last_response.body)
+      expect(json['sources']).to eq(
+        [
+          {
+            'source_name' => 'a.rb',
+            'memo' => 'memo',
+            'modules' => [],
+          },
+          {
+            'source_name' => 'b.rb',
+            'memo' => '',
+            'modules' => [],
+          },
+        ]
+      )
     end
 
     it 'returns combined definition with compound=true' do
@@ -609,9 +637,25 @@ RSpec.describe DiverDown::Web do
       store.set(definition_1)
       store.set(definition_2)
 
+      module_store.set_memo('a.rb', 'memo')
+
       get '/api/sources/a.rb.json'
 
       expect(last_response.status).to eq(200)
+
+      json = JSON.parse(last_response.body)
+      expect(json).to eq(
+        'source_name' => 'a.rb',
+        'memo' => 'memo',
+        'modules' => [],
+        'related_definitions' => [
+          {
+            'id' => 1,
+            'title' => 'title',
+          },
+        ],
+        'reverse_dependencies' => []
+      )
     end
   end
 
@@ -637,7 +681,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get('a.rb')).to eq(['A', 'B'])
+      expect(module_store.get_modules('a.rb')).to eq(['A', 'B'])
     end
 
     it 'ignores blank modules' do
@@ -655,7 +699,33 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get('a.rb')).to eq(['B'])
+      expect(module_store.get_modules('a.rb')).to eq(['B'])
+    end
+  end
+
+  describe 'POST /api/sources/:source/memo.json' do
+    it 'returns 404 if source is not found' do
+      post '/api/sources/unknown/memo.json'
+
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'set memo if source is found' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/memo.json', { memo: ' memo ' }
+
+      expect(last_response.status).to eq(200)
+
+      expect(module_store.get_memo('a.rb')).to eq('memo')
     end
   end
 end

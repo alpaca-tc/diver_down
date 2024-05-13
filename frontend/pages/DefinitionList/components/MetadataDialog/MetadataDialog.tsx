@@ -2,13 +2,26 @@ import { ComponentProps, FC, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Button, Cluster, DefinitionList, FaPencilIcon, Heading, ModelessDialog, Stack, Table, Td, Th } from '@/components/ui'
+import {
+  Button,
+  Cluster,
+  DefinitionList,
+  FaPencilIcon,
+  Heading,
+  ModelessDialog,
+  Stack,
+  Table,
+  Text,
+  Td,
+  Th,
+} from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
 import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { DialogProps } from '../dialog'
+import { SourceMemoInput } from '../SourceMemoInput'
 
 type Props = {
   dotMetadata: DotMetadata | null
@@ -25,10 +38,44 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
   mutateCombinedDefinition,
 }) => {
   const [editingModules, setEditingModules] = useState<boolean>(false)
+  const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const items: ComponentProps<typeof DefinitionList>['items'] = [
     {
       term: 'Source Name',
       description: <Link to={path.sources.show(metadata.sourceName)}>{metadata.sourceName}</Link>,
+    },
+    {
+      term: 'Memo',
+      description: (
+        <Cluster>
+          {editingMemo ? (
+            <SourceMemoInput
+              sourceName={metadata.sourceName}
+              initialMemo={metadata.memo}
+              onUpdate={() => {
+                setEditingMemo(false)
+                mutateCombinedDefinition()
+              }}
+              onClose={() => {
+                setEditingMemo(false)
+              }}
+            />
+          ) : (
+            <>
+              <Text>{metadata.memo}</Text>
+              <Button
+                square={true}
+                onClick={() => {
+                  setEditingMemo(true)
+                }}
+                size="s"
+              >
+                <FaPencilIcon alt="編集" />
+              </Button>
+            </>
+          )}
+        </Cluster>
+      ),
     },
     {
       term: 'Modules',
@@ -69,7 +116,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
     },
   ]
 
-  return <DefinitionList items={items} />
+  return <DefinitionList maxColumns={1} items={items} />
 }
 
 const DependencyDotMetadataContent: FC<{ metadata: DotDependencyMetadata }> = ({ metadata }) => (
@@ -132,7 +179,7 @@ export const MetadataDialog: FC<Props> = ({ dotMetadata, isOpen, onClose, top, l
   return (
     <ModelessDialog
       isOpen={!!(isOpen && dotMetadata)}
-      header={<ModelessHeading>Description</ModelessHeading>}
+      header={<ModelessHeading>Memo</ModelessHeading>}
       onClickClose={onClose}
       onPressEscape={onClose}
       top={top}

@@ -34,6 +34,15 @@ export const Show: React.FC = () => {
             <Stack gap={1.5}>
               <Section>
                 <Stack gap={0.5}>
+                  <Heading type="sectionTitle">Memo</Heading>
+                  <div style={{ overflow: 'clip' }}>
+                    <Text>{specificSource.memo}</Text>
+                  </div>
+                </Stack>
+              </Section>
+
+              <Section>
+                <Stack gap={0.5}>
                   <Heading type="sectionTitle">Modules</Heading>
                   <div style={{ overflow: 'clip' }}>
                     <Table fixedHead>

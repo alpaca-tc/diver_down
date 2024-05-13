@@ -2,13 +2,27 @@ import { FC, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
-import { Aside, Button, Cluster, EmptyTableBody, FaPencilIcon, Table, TableReel, Td, Text, Th } from '@/components/ui'
+import {
+  Aside,
+  Button,
+  Cluster,
+  EmptyTableBody,
+  FaCircleInfoIcon,
+  FaPencilIcon,
+  Table,
+  TableReel,
+  Td,
+  Text,
+  Th,
+  Tooltip,
+} from '@/components/ui'
 import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
 import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { sortSources } from '@/models/source'
+import { SourceMemoInput } from '../SourceMemoInput'
 
 type Props = {
   combinedDefinition: CombinedDefinition
@@ -26,7 +40,8 @@ type SortState = {
 
 export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombinedDefinition }) => {
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
-  const [editingSourceNames, setEditingSourceNames] = useState<string[]>([])
+  const [editingModulesSourceNames, setEditingModulesSourceNames] = useState<string[]>([])
+  const [editingMemoSourceNames, setEditingMemoSourceNames] = useState<string[]>([])
 
   const setNextSortType = useCallback(
     (key: SortState['key']) => {
@@ -58,6 +73,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
                 <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
                   Source name
                 </Th>
+                <Th>Memo</Th>
                 <Th fixed sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
                   Modules
                 </Th>
@@ -75,17 +91,54 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
                     <Td>
                       <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
                     </Td>
-                    {editingSourceNames.includes(source.sourceName) ? (
+                    <Td>
+                      {editingMemoSourceNames.includes(source.sourceName) ? (
+                        <SourceMemoInput
+                          sourceName={source.sourceName}
+                          initialMemo={source.memo}
+                          onUpdate={() => {
+                            setEditingMemoSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                            mutateCombinedDefinition()
+                          }}
+                          onClose={() => {
+                            setEditingMemoSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                          }}
+                        />
+                      ) : (
+                        <FixedWidthMemo align="center">
+                          {source.memo !== '' ? (
+                            <Tooltip message={source.memo} horizontal="center" vertical="bottom">
+                              <FaCircleInfoIcon />
+                            </Tooltip>
+                          ) : (
+                            <Transparent>
+                              <FaCircleInfoIcon />
+                            </Transparent>
+                          )}
+                          <div>
+                            <Button
+                              square={true}
+                              onClick={() => setEditingMemoSourceNames((prev) => [...prev, source.sourceName])}
+                              size="s"
+                            >
+                              <FaPencilIcon alt="Edit" />
+                            </Button>
+                          </div>
+                        </FixedWidthMemo>
+                      )}
+                    </Td>
+                    {!editingMemoSourceNames.includes(source.sourceName) &&
+                    editingModulesSourceNames.includes(source.sourceName) ? (
                       <Td fixed colSpan={2}>
                         <SourceModulesComboBox
                           sourceName={source.sourceName}
                           initialModules={source.modules}
                           onUpdate={() => {
-                            setEditingSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                            setEditingModulesSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
                             mutateCombinedDefinition()
                           }}
                           onClose={() => {
-                            setEditingSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
+                            setEditingModulesSourceNames((prev) => prev.filter((name) => name !== source.sourceName))
                           }}
                         />
                       </Td>
@@ -104,7 +157,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
                           <div>
                             <Button
                               square={true}
-                              onClick={() => setEditingSourceNames((prev) => [...prev, source.sourceName])}
+                              onClick={() => setEditingModulesSourceNames((prev) => [...prev, source.sourceName])}
                               size="s"
                             >
                               <FaPencilIcon alt="Edit" />
@@ -139,6 +192,14 @@ const WrapperAside = styled(Aside)`
 const TableWrapper = styled.div`
   overflow: clip;
   overflow-x: scroll;
+`
+
+const Transparent = styled.span`
+  opacity: 0;
+`
+
+const FixedWidthMemo = styled(Cluster)`
+  width: 4em;
 `
 
 const StyledTable = styled(Table)`

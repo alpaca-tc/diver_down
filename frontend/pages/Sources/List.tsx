@@ -49,7 +49,12 @@ export const List: FC = () => {
   return (
     <StyledSection>
       <Stack>
-        <Heading type="screenTitle">Sources {data ? `(classified: ${Math.round(data.classifiedSourcesCount / data.sources.length * 100)}% ${data.classifiedSourcesCount} / ${data.sources.length})` : null}</Heading>
+        <Heading type="screenTitle">
+          Sources{' '}
+          {data
+            ? `(classified: ${Math.round((data.classifiedSourcesCount / data.sources.length) * 100)}% ${data.classifiedSourcesCount} / ${data.sources.length})`
+            : null}
+        </Heading>
 
         <div style={{ overflow: 'clip' }}>
           <Table fixedHead>
