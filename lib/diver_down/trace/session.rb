@@ -91,13 +91,7 @@ module DiverDown
 
               # Search is a heavy process and should be terminated early.
               # The position of the most recently found caller or the start of trace is used as the maximum value.
-              maximum_back_stack_size = if call_stack.empty_context_stack?
-                                          call_stack.stack_size
-                                        else
-                                          call_stack.stack_size - call_stack.context_stack_size[-1]
-                                        end
-
-              caller_location = find_neast_caller_location(maximum_back_stack_size)
+              caller_location = find_neast_caller_location(call_stack.stack_size)
 
               # `caller_location` is nil if it is filtered by caller_paths
               if caller_location
