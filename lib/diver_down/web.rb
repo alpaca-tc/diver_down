@@ -53,7 +53,7 @@ module DiverDown
       in ['GET', %r{\A/api/modules\.json\z}]
         action.modules
       in ['GET', %r{\A/api/modules/(?<module_names>.+)\.json\z}]
-        module_names = Regexp.last_match[:module_names].split('/')
+        module_names = CGI.unescape(Regexp.last_match[:module_names]).split('/')
         action.module(module_names)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
