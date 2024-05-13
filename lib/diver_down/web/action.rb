@@ -39,6 +39,7 @@ module DiverDown
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
+              memo: @module_store.get_memo(source_name),
               modules: @module_store.get_modules(source_name).map do |module_name|
                 { module_name: }
               end,
@@ -108,6 +109,7 @@ module DiverDown
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
+              memo: @module_store.get_memo(source_name),
             }
           end,
           related_definitions: related_definitions.map do |definition|
@@ -195,6 +197,7 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
+                memo: @module_store.get_memo(_1.source_name),
                 modules: @module_store.get_modules(_1.source_name).map do |module_name|
                   { module_name: }
                 end,
@@ -251,6 +254,7 @@ module DiverDown
 
         json(
           source_name:,
+          memo: @module_store.get_memo(source_name),
           modules: module_names.map do
             { module_name: _1 }
           end,
@@ -288,6 +292,27 @@ module DiverDown
 
         if found_source
           @module_store.set_modules(source_name, modules)
+          @module_store.flush
+
+          json({})
+        else
+          not_found
+        end
+      end
+
+      # POST /api/sources/:source_name/memo.json
+      #
+      # @param source_name [String]
+      # @param memo [String]
+      def set_memo(source_name, memo)
+        found_source = @store.any? do |_, definition|
+          definition.sources.any? do |source|
+            source.source_name == source_name
+          end
+        end
+
+        if found_source
+          @module_store.set_memo(source_name, memo)
           @module_store.flush
 
           json({})

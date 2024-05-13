@@ -41,6 +41,7 @@ module DiverDown
               id:,
               type: 'source',
               source_name: data.source_name,
+              memo: module_store.get_memo(data.source_name),
               modules:,
             }
           end

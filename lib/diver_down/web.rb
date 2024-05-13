@@ -68,6 +68,10 @@ module DiverDown
         source = Regexp.last_match[:source]
         modules = request.params['modules'] || []
         action.set_modules(source, modules)
+      in ['POST', %r{\A/api/sources/(?<source>[^/]+)/memo.json\z}]
+        source = Regexp.last_match[:source]
+        memo = request.params['memo'] || ''
+        action.set_memo(source, memo)
       in ['GET', %r{\A/api/pid\.json\z}]
         action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
