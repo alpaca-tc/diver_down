@@ -7,7 +7,7 @@ import { EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { useSources } from '@/repositories/sourceRepository'
-import { Sources } from '@/models/source'
+import { Sources, sortSources } from '@/models/source'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -40,41 +40,10 @@ export const List: FC = () => {
 
   const sources: Sources['sources'] = useMemo(() => {
     if (!data) {
-      return null
+      return []
     }
 
-    let sorted = [...data.sources]
-
-    if (sortState.sort === 'none') {
-      return sorted
-    }
-
-    const ascString = (a: string, b: string) => {
-      if (a > b) return 1
-      if (a < b) return -1
-      return 0
-    }
-
-    switch (sortState.key) {
-      case 'sourceName': {
-        sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
-        break
-      }
-      case 'modules': {
-        sorted = sorted.sort((a, b) =>
-          ascString(
-            a.modules.map((module) => module.moduleName).join('-'),
-            b.modules.map((module) => module.moduleName).join('-'),
-          ),
-        )
-      }
-    }
-
-    if (sortState.sort === 'desc') {
-      sorted = sorted.reverse()
-    }
-
-    return sorted
+    return sortSources(data.sources, sortState.key, sortState.sort)
   }, [data?.sources, sortState])
 
   return (
