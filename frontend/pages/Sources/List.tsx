@@ -9,26 +9,36 @@ import { spacing } from '@/constants/theme'
 import { useSources } from '@/repositories/sourceRepository'
 
 export const List: FC = () => {
-  const { sources, isLoading } = useSources()
+  const { data, isLoading } = useSources()
 
   return (
     <StyledSection>
       <Stack>
-        <Heading type="screenTitle">Sources</Heading>
+        <Heading type="screenTitle">Sources {data ? `(classified: ${Math.round(data.classifiedSourcesCount / data.sources.length * 100)}% ${data.classifiedSourcesCount} / ${data.sources.length})` : null}</Heading>
 
         <div style={{ overflow: 'clip' }}>
           <Table fixedHead>
             <thead>
               <tr>
                 <Th>Source name</Th>
+                <Th>Modules</Th>
               </tr>
             </thead>
-            {sources && sources.length > 0 ? (
+            {data && data.sources.length > 0 ? (
               <tbody>
-                {sources.map((source) => (
+                {data.sources.map((source) => (
                   <tr key={source.sourceName}>
                     <Td>
                       <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                    </Td>
+                    <Td>
+                      {source.modules.map((module, index) => (
+                        <Text key={index} as="div" whiteSpace="nowrap">
+                          <Link to={path.modules.show(source.modules.slice(0, index + 1).map((mod) => mod.moduleName))}>
+                            {module.moduleName}
+                          </Link>
+                        </Text>
+                      ))}
                     </Td>
                   </tr>
                 ))}

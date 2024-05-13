@@ -3,6 +3,7 @@ import { Module } from './module'
 
 export type Source = {
   sourceName: string
+  modules: Module[]
 }
 
 type RelatedDefinition = {
@@ -20,4 +21,9 @@ export type SpecificSource = {
   modules: Module[]
   relatedDefinitions: RelatedDefinition[]
   reverseDependencies: ReverseDependency[]
+}
+
+export type Sources = {
+  sources: Source[]
+  classifiedSourcesCount: number
 }

@@ -324,12 +324,15 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'modules' => ['A'],
           },
           {
             'source_name' => 'b.rb',
+            'modules' => [],
           },
           {
             'source_name' => 'c.rb',
+            'modules' => [],
           },
         ],
         'classified_sources_count' => 1,

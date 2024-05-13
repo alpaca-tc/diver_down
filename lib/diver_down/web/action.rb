@@ -39,6 +39,9 @@ module DiverDown
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
+              modules: @module_store.get(source_name).map do |module_name|
+                { module_name: }
+              end,
             }
           end,
           classified_sources_count:

@@ -1,21 +1,33 @@
 import useSWR from 'swr'
 
 import { path } from '@/constants/path'
-import { SpecificSource } from '@/models/source'
+import { Sources, SpecificSource } from '@/models/source'
 
 import { get } from './httpRequest'
 
 type SourcesReponse = {
-  sources: Array<{ source_name: string }>
+  sources: Array<{
+    source_name: string
+    modules: Array<{
+      module_name: string
+    }>
+  }>
+  classified_sources_count: number
 }
 
 export const useSources = () => {
-  const { data, isLoading } = useSWR(path.api.sources.index(), async () => {
+  const { data, isLoading } = useSWR<Sources>(path.api.sources.index(), async () => {
     const response = await get<SourcesReponse>(path.api.sources.index())
-    return response.sources.map((source) => ({ sourceName: source.source_name }))
+    return {
+      sources: response.sources.map((source) => ({
+        sourceName: source.source_name,
+        modules: source.modules.map((module) => ({ moduleName: module.module_name })),
+      })),
+      classifiedSourcesCount: response.classified_sources_count
+    }
   })
 
-  return { sources: data, isLoading }
+  return { data, isLoading }
 }
 
 type SpecificSourceResponse = {
