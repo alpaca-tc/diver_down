@@ -3,6 +3,7 @@ import { Module } from './module'
 
 export type Source = {
   sourceName: string
+  memo: string
   modules: Module[]
 }
 
@@ -18,6 +19,7 @@ type ReverseDependency = {
 
 export type SpecificSource = {
   sourceName: string
+  memo: string
   modules: Module[]
   relatedDefinitions: RelatedDefinition[]
   reverseDependencies: ReverseDependency[]
@@ -48,10 +50,7 @@ export const sortSources = (sources: Source[], key: 'sourceName' | 'modules', so
     }
     case 'modules': {
       sorted = sorted.sort((a, b) =>
-        ascString(
-          a.modules.map((module) => module.moduleName).join('-'),
-          b.modules.map((module) => module.moduleName).join('-'),
-        ),
+        ascString(a.modules.map((module) => module.moduleName).join('-'), b.modules.map((module) => module.moduleName).join('-')),
       )
     }
   }

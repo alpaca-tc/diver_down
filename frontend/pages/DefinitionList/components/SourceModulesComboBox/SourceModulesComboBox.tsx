@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react'
 import { ComboBoxItem } from 'smarthr-ui/lib/components/ComboBox/types'
 
-import { Button, Cluster, FaXmarkIcon, SingleComboBox, Text } from '@/components/ui'
+import { Button, Cluster, FaXmarkIcon, FormControl, Input, SingleComboBox, Text } from '@/components/ui'
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 import { useSourceModules } from '@/repositories/sourceModulesRepository'
@@ -61,8 +61,8 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
     [setTemporaryItem, setSelectedItem],
   )
 
-  const handleUpdate = useCallback(() => {
-    trigger({ modules: selectedItem?.data ?? [] })
+  const handleUpdate = useCallback(async () => {
+    await trigger({ modules: selectedItem?.data ?? [] })
     mutate()
     onUpdate()
   }, [mutate, trigger, selectedItem, onUpdate])
@@ -80,22 +80,23 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
   return (
     <Cluster>
       <div>
-        <Text as="p">When entering the name of a module, please use the `/` character to separate the levels of hierarchy.</Text>
-        <SingleComboBox
-          items={items}
-          selectedItem={selectedItem}
-          dropdownHelpMessage="Select or input Module"
-          creatable
-          isLoading={isLoading}
-          onSelect={handleSelectItem}
-          onClear={handleClear}
-          onAdd={handleAddItem}
-          width="200px"
-          decorators={{
-            noResultText: () => `no result.`,
-            destroyButtonIconAlt: (text) => `destroy.(${text})`,
-          }}
-        />
+        <FormControl title="Modules" helpMessage="Submodules are separated by slash">
+          <SingleComboBox
+            items={items}
+            selectedItem={selectedItem}
+            dropdownHelpMessage="Select or input Module"
+            creatable
+            isLoading={isLoading}
+            onSelect={handleSelectItem}
+            onClear={handleClear}
+            onAdd={handleAddItem}
+            width="200px"
+            decorators={{
+              noResultText: () => `no result.`,
+              destroyButtonIconAlt: (text) => `destroy.(${text})`,
+            }}
+          />
+        </FormControl>
       </div>
       <Button square={true} variant="primary" onClick={handleUpdate} size="s">
         Update

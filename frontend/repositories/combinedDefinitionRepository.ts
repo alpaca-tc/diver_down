@@ -10,6 +10,7 @@ import { get } from './httpRequest'
 type DotSourceMetadataResponse = {
   id: string
   type: 'source'
+  memo: string
   source_name: string
   modules: Array<{
     module_name: string
@@ -45,6 +46,7 @@ type CombinedDefinitionReponse = {
   dot_metadata: DotMetadataResponse[]
   sources: Array<{
     source_name: string
+    memo: string
     modules: Array<{
       module_name: string
     }>
@@ -58,6 +60,7 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
         id: metadata.id,
         type: metadata.type,
         sourceName: metadata.source_name,
+        memo: metadata.memo,
         modules: metadata.modules.map((module) => ({
           moduleName: module.module_name,
         })),
@@ -99,6 +102,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
     dotMetadata: response.dot_metadata.map((res) => parseDotMetadata(res)),
     sources: response.sources.map((source) => ({
       sourceName: source.source_name,
+      memo: source.memo,
       modules: source.modules.map((module) => ({
         moduleName: module.module_name,
       })),

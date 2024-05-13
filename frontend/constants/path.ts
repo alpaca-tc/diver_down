@@ -26,6 +26,9 @@ export const path = {
     sources: {
       index: () => '/api/sources.json',
       show: (sourceName: string) => `/api/sources/${sourceName}.json`,
+      memo: {
+        update: (sourceName: string) => `/api/sources/${sourceName}/memo.json`,
+      },
       modules: {
         update: (sourceName: string) => `/api/sources/${sourceName}/modules.json`,
       },

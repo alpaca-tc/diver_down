@@ -51,6 +51,7 @@ export const Show: React.FC = () => {
                       <thead>
                         <tr>
                           <Th>Source Name</Th>
+                          <Th>Memo</Th>
                         </tr>
                       </thead>
                       {specificModule.sources.length === 0 ? (
@@ -63,6 +64,11 @@ export const Show: React.FC = () => {
                             <tr key={source.sourceName}>
                               <Td>
                                 <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                              </Td>
+                              <Td>
+                                <Text>
+                                  {source.memo}
+                                </Text>
                               </Td>
                             </tr>
                           ))}

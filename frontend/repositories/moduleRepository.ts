@@ -28,6 +28,7 @@ type SpecificModuleResponse = {
   }>
   sources: Array<{
     source_name: string
+    memo: string
   }>
 }
 
@@ -39,8 +40,14 @@ export const useModule = (moduleNames: string[]) => {
       modules: response.modules.map((mod) => ({
         moduleName: mod.module_name,
       })),
-      sources: response.sources.map((source) => ({ sourceName: source.source_name })),
-      relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
+      sources: response.sources.map((source) => ({
+        sourceName: source.source_name,
+        memo: source.memo,
+      })),
+      relatedDefinitions: response.related_definitions.map((definition) => ({
+        id: definition.id,
+        title: definition.title,
+      })),
     }
   })
 
