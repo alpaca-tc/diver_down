@@ -58,16 +58,25 @@ RSpec.describe DiverDown::Web do
       })
     end
 
-    it 'returns definition if store has one definition' do
-      definition = DiverDown::Definition.new(
-        title: 'title',
+    it 'returns definition if store has some definition' do
+      definition_1 = DiverDown::Definition.new(
+        title: 'title1',
         sources: [
           DiverDown::Definition::Source.new(
             source_name: 'a.rb'
           ),
         ]
       )
-      store.set(definition)
+      definition_2 = DiverDown::Definition.new(
+        title: 'title2',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'b.rb'
+          ),
+        ]
+      )
+      store.set(definition_1, definition_2)
+      module_store.set('a.rb', ['A'])
 
       get '/api/definitions.json'
 
@@ -76,15 +85,22 @@ RSpec.describe DiverDown::Web do
         'definitions' => [
           {
             'id' => 1,
-            'title' => 'title',
+            'title' => 'title1',
             'definition_group' => nil,
             'sources_count' => 1,
+            'unclassified_sources_count' => 0,
+          }, {
+            'id' => 2,
+            'title' => 'title2',
+            'definition_group' => nil,
+            'sources_count' => 1,
+            'unclassified_sources_count' => 1,
           },
         ],
         'pagination' => {
           'current_page' => 1,
           'total_pages' => 1,
-          'total_count' => 1,
+          'total_count' => 2,
           'per' => 100,
         },
       })

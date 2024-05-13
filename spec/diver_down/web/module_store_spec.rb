@@ -34,6 +34,20 @@ RSpec.describe DiverDown::Web::ModuleStore do
       end
     end
 
+    describe '#include?' do
+      it 'returns bool' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        instance.set('a.rb', [])
+        instance.set('b.rb', ['A'])
+
+        expect(instance.include?('a.rb')).to be(false)
+        expect(instance.include?('b.rb')).to be(true)
+        expect(instance.include?('c.rb')).to be(false)
+      end
+    end
+
     describe '#flush' do
       it 'writes modules to path' do
         tempfile = Tempfile.new(['test', '.yaml'])

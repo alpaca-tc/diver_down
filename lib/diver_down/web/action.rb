@@ -131,6 +131,7 @@ module DiverDown
               definition_group: definition.definition_group,
               title: definition.title,
               sources_count: definition.sources.size,
+              unclassified_sources_count: definition.sources.reject { @module_store.include?(_1.source_name) }.size,
             }
           end,
           pagination: pagination.to_h
