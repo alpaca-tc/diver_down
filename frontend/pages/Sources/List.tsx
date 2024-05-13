@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
@@ -7,9 +7,75 @@ import { EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { useSources } from '@/repositories/sourceRepository'
+import { Sources } from '@/models/source'
+
+const sortTypes = ['asc', 'desc', 'none'] as const
+
+type SortTypes = (typeof sortTypes)[number]
+
+type SortState = {
+  key: 'sourceName' | 'modules'
+  sort: SortTypes
+}
 
 export const List: FC = () => {
   const { data, isLoading } = useSources()
+  const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
+
+  const setNextSortType = useCallback(
+    (key: SortState['key']) => {
+      setSortState((prev) => {
+        if (prev.key === key) {
+          return {
+            key,
+            sort: sortTypes[(sortTypes.indexOf(prev.sort) + 1) % sortTypes.length],
+          }
+        } else {
+          return { key, sort: 'asc' }
+        }
+      })
+    },
+    [setSortState],
+  )
+
+  const sources: Sources['sources'] = useMemo(() => {
+    if (!data) {
+      return null
+    }
+
+    let sorted = [...data.sources]
+
+    if (sortState.sort === 'none') {
+      return sorted
+    }
+
+    const ascString = (a: string, b: string) => {
+      if (a > b) return 1
+      if (a < b) return -1
+      return 0
+    }
+
+    switch (sortState.key) {
+      case 'sourceName': {
+        sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
+        break
+      }
+      case 'modules': {
+        sorted = sorted.sort((a, b) =>
+          ascString(
+            a.modules.map((module) => module.moduleName).join('-'),
+            b.modules.map((module) => module.moduleName).join('-'),
+          ),
+        )
+      }
+    }
+
+    if (sortState.sort === 'desc') {
+      sorted = sorted.reverse()
+    }
+
+    return sorted
+  }, [data?.sources, sortState])
 
   return (
     <StyledSection>
@@ -20,13 +86,17 @@ export const List: FC = () => {
           <Table fixedHead>
             <thead>
               <tr>
-                <Th>Source name</Th>
-                <Th>Modules</Th>
+                <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
+                  Source name
+                </Th>
+                <Th fixed sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
+                  Modules
+                </Th>
               </tr>
             </thead>
-            {data && data.sources.length > 0 ? (
+            {sources && sources.length > 0 ? (
               <tbody>
-                {data.sources.map((source) => (
+                {sources.map((source) => (
                   <tr key={source.sourceName}>
                     <Td>
                       <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
