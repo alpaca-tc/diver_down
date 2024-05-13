@@ -324,7 +324,7 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
-            'modules' => ['A'],
+            'modules' => [{ 'module_name' => 'A' }],
           },
           {
             'source_name' => 'b.rb',
