@@ -34,6 +34,31 @@ RSpec.describe DiverDown::Web::ModuleStore do
       end
     end
 
+    describe '#set_memo' do
+      it 'sets memo' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        expect {
+          instance.set_memo('a.rb', ' memo ')
+        }.to change {
+          instance.get_memo('a.rb')
+        }.from('').to('memo')
+      end
+    end
+
+    describe '#get_memo' do
+      it 'returns blank string if source is not set_modules' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        expect(instance.get_memo('a.rb')).to eq('')
+
+        instance.set_memo('a.rb', 'a')
+        expect(instance.get_memo('a.rb')).to eq('a')
+      end
+    end
+
     describe '#classified?' do
       it 'returns bool' do
         tempfile = Tempfile.new(['test', '.yaml'])
@@ -59,6 +84,18 @@ RSpec.describe DiverDown::Web::ModuleStore do
         }.to change {
           described_class.new(tempfile.path).get_modules('a.rb')
         }.from([]).to(['A', 'B'])
+      end
+
+      it 'writes memo to path' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+        instance.set_memo('a.rb', 'memo')
+
+        expect {
+          instance.flush
+        }.to change {
+          described_class.new(tempfile.path).get_memo('a.rb')
+        }.from('').to('memo')
       end
 
       it 'sorts by source name' do
@@ -88,6 +125,7 @@ RSpec.describe DiverDown::Web::ModuleStore do
 
         sources.shuffle.each do |source|
           instance.set_modules(source, ['A'])
+          instance.set_memo(source, 'memo')
         end
 
         expect(instance.to_h.keys).to eq(sources)
