@@ -29,6 +29,12 @@ module DiverDown
         @store[source_name] || BLANK_ARRAY
       end
 
+      # @param source_name [String]
+      # @return [Boolean]
+      def include?(source_name)
+        get(source_name).any?
+      end
+
       # @return [Hash]
       def to_h
         sorted_store = {}
