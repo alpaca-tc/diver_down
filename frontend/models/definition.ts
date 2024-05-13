@@ -3,4 +3,5 @@ export type Definition = {
   definitionGroup: string | null
   title: string
   sourcesCount: number
+  unclassifiedSourcesCount: number
 }
