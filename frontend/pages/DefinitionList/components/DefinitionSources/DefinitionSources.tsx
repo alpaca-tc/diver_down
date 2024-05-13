@@ -8,6 +8,7 @@ import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
 import { SourceModulesComboBox } from '../SourceModulesComboBox'
+import { sortSources } from '@/models/source'
 
 type Props = {
   combinedDefinition: CombinedDefinition
@@ -44,38 +45,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
   )
 
   const sources: CombinedDefinition['sources'] = useMemo(() => {
-    let sorted = [...combinedDefinition.sources]
-
-    if (sortState.sort === 'none') {
-      return sorted
-    }
-
-    const ascString = (a: string, b: string) => {
-      if (a > b) return 1
-      if (a < b) return -1
-      return 0
-    }
-
-    switch (sortState.key) {
-      case 'sourceName': {
-        sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
-        break
-      }
-      case 'modules': {
-        sorted = sorted.sort((a, b) =>
-          ascString(
-            a.modules.map((module) => module.moduleName).join('-'),
-            b.modules.map((module) => module.moduleName).join('-'),
-          ),
-        )
-      }
-    }
-
-    if (sortState.sort === 'desc') {
-      sorted = sorted.reverse()
-    }
-
-    return sorted
+    return sortSources(combinedDefinition.sources, sortState.key, sortState.sort)
   }, [combinedDefinition.sources, sortState])
 
   return (

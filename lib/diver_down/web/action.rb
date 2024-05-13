@@ -33,12 +33,18 @@ module DiverDown
         end
         # rubocop:enable Style/HashEachMethods
 
+        classified_sources_count = source_names.count { @module_store.include?(_1) }
+
         json(
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
+              modules: @module_store.get(source_name).map do |module_name|
+                { module_name: }
+              end,
             }
-          end
+          end,
+          classified_sources_count:
         )
       end
 
