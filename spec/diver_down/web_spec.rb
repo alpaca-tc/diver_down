@@ -455,6 +455,42 @@ RSpec.describe DiverDown::Web do
         ],
       })
     end
+
+    it 'returns module if module_name is escaped' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+
+      ids = store.set(definition)
+      module_store.set('a.rb', ['グローバル'])
+
+      get "/api/modules/#{CGI.escape('グローバル')}.json"
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq({
+        'modules' => [
+          {
+            'module_name' => 'グローバル',
+          },
+        ],
+        'sources' => [
+          {
+            'source_name' => 'a.rb',
+          },
+        ],
+        'related_definitions' => [
+          {
+            'id' => ids[0],
+            'title' => 'title',
+          },
+        ],
+      })
+    end
   end
 
   describe 'GET /api/definitions/:id.json' do
