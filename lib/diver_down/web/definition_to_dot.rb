@@ -31,7 +31,7 @@ module DiverDown
           private
 
           def source_to_h
-            modules = module_store.get(data.source_name).map do
+            modules = module_store.get_modules(data.source_name).map do
               {
                 module_name: _1,
               }
@@ -185,11 +185,11 @@ module DiverDown
         dependency_map = Hash.new { |h, k| h[k] = Hash.new { |hi, ki| hi[ki] = [] } }
 
         definition.sources.sort_by(&:source_name).each do |source|
-          source_modules = module_store.get(source.source_name)
+          source_modules = module_store.get_modules(source.source_name)
           next if source_modules.empty?
 
           source.dependencies.each do |dependency|
-            dependency_modules = module_store.get(dependency.source_name)
+            dependency_modules = module_store.get_modules(dependency.source_name)
             next if dependency_modules.empty?
 
             dependency_map[source_modules][dependency_modules].push(dependency)
@@ -268,7 +268,7 @@ module DiverDown
 
       def render_sources
         by_modules = definition.sources.group_by do |source|
-          module_store.get(source.source_name)
+          module_store.get_modules(source.source_name)
         end
 
         # Remove duplicated prefix modules
@@ -326,8 +326,8 @@ module DiverDown
       def insert_dependencies(source)
         source.dependencies.each do
           attributes = {}
-          ltail = module_label(*module_store.get(source.source_name))
-          lhead = module_label(*module_store.get(_1.source_name))
+          ltail = module_label(*module_store.get_modules(source.source_name))
+          lhead = module_label(*module_store.get_modules(_1.source_name))
 
           if @compound && (ltail || lhead)
             # Rendering of dependencies between modules is done only once

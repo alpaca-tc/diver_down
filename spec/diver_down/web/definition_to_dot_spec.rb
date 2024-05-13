@@ -136,7 +136,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set('a.rb', ['A', 'B'])
+          module_store.set_modules('a.rb', ['A', 'B'])
 
           instance = described_class.new(definition, module_store)
 
@@ -207,9 +207,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set('a.rb', ['A'])
-          module_store.set('b.rb', ['B'])
-          module_store.set('c.rb', ['B'])
+          module_store.set_modules('a.rb', ['A'])
+          module_store.set_modules('b.rb', ['B'])
+          module_store.set_modules('c.rb', ['B'])
 
           instance = described_class.new(definition, module_store, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -320,9 +320,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set('a.rb', ['A'])
-          module_store.set('b.rb', ['B'])
-          module_store.set('c.rb', ['B'])
+          module_store.set_modules('a.rb', ['A'])
+          module_store.set_modules('b.rb', ['B'])
+          module_store.set_modules('c.rb', ['B'])
 
           instance = described_class.new(definition, module_store, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -454,11 +454,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set('a.rb', ['A'])
-          module_store.set('b.rb', ['B'])
-          module_store.set('c.rb', ['B'])
-          module_store.set('d.rb', ['B', 'C'])
-          module_store.set('unknown.rb', ['Unknown'])
+          module_store.set_modules('a.rb', ['A'])
+          module_store.set_modules('b.rb', ['B'])
+          module_store.set_modules('c.rb', ['B'])
+          module_store.set_modules('d.rb', ['B', 'C'])
+          module_store.set_modules('unknown.rb', ['Unknown'])
 
           instance = described_class.new(definition, module_store, only_module: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -559,9 +559,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set('b.rb', ['A'])
-          module_store.set('c.rb', ['A', 'C'])
-          module_store.set('d.rb', ['B'])
+          module_store.set_modules('b.rb', ['A'])
+          module_store.set_modules('c.rb', ['A', 'C'])
+          module_store.set_modules('d.rb', ['B'])
 
           instance = described_class.new(definition, module_store, concentrate: true)
           expect(instance.to_s).to eq(<<~DOT)

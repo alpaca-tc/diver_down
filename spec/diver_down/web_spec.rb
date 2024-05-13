@@ -76,7 +76,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition_1, definition_2)
-      module_store.set('a.rb', ['A'])
+      module_store.set_modules('a.rb', ['A'])
 
       get '/api/definitions.json'
 
@@ -315,7 +315,7 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      module_store.set('a.rb', ['A'])
+      module_store.set_modules('a.rb', ['A'])
 
       get '/api/sources.json'
 
@@ -366,8 +366,8 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition)
-      module_store.set('a.rb', ['A', 'B'])
-      module_store.set('b.rb', ['B', 'C'])
+      module_store.set_modules('a.rb', ['A', 'B'])
+      module_store.set_modules('b.rb', ['B', 'C'])
 
       get '/api/modules.json'
 
@@ -418,8 +418,8 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition_1, definition_2)
-      module_store.set('a.rb', ['A'])
-      module_store.set('b.rb', ['A', 'B'])
+      module_store.set_modules('a.rb', ['A'])
+      module_store.set_modules('b.rb', ['A', 'B'])
 
       get '/api/modules/A.json'
 
@@ -486,7 +486,7 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition)
-      module_store.set('a.rb', ['グローバル'])
+      module_store.set_modules('a.rb', ['グローバル'])
 
       get "/api/modules/#{CGI.escape('グローバル')}.json"
 
@@ -637,7 +637,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get('a.rb')).to eq(['A', 'B'])
+      expect(module_store.get_modules('a.rb')).to eq(['A', 'B'])
     end
 
     it 'ignores blank modules' do
@@ -655,7 +655,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get('a.rb')).to eq(['B'])
+      expect(module_store.get_modules('a.rb')).to eq(['B'])
     end
   end
 end

@@ -17,7 +17,7 @@ module DiverDown
 
       # @param source_name [String]
       # @param module_names [Array<String>]
-      def set(source_name, module_names)
+      def set_modules(source_name, module_names)
         @store[source_name] = module_names.dup.reject do
           BLANK_RE.match?(_1)
         end.freeze
@@ -25,14 +25,14 @@ module DiverDown
 
       # @param source_name [String]
       # @return [Array<Module>]
-      def get(source_name)
+      def get_modules(source_name)
         @store[source_name] || BLANK_ARRAY
       end
 
       # @param source_name [String]
       # @return [Boolean]
-      def include?(source_name)
-        get(source_name).any?
+      def classified?(source_name)
+        get_modules(source_name).any?
       end
 
       # @return [Hash]
