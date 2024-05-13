@@ -294,6 +294,7 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
         'sources' => [],
+        'classified_sources_count' => 0,
       })
     end
 
@@ -304,9 +305,17 @@ RSpec.describe DiverDown::Web do
           DiverDown::Definition::Source.new(
             source_name: 'a.rb'
           ),
+          DiverDown::Definition::Source.new(
+            source_name: 'b.rb'
+          ),
+          DiverDown::Definition::Source.new(
+            source_name: 'c.rb'
+          ),
         ]
       )
       store.set(definition)
+
+      module_store.set('a.rb', ['A'])
 
       get '/api/sources.json'
 
@@ -316,7 +325,14 @@ RSpec.describe DiverDown::Web do
           {
             'source_name' => 'a.rb',
           },
+          {
+            'source_name' => 'b.rb',
+          },
+          {
+            'source_name' => 'c.rb',
+          },
         ],
+        'classified_sources_count' => 1,
       })
     end
   end
