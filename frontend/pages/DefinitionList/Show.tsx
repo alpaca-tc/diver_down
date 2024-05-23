@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
-import { Aside, Section, Sidebar, Stack } from '@/components/ui'
+import { Aside, Button, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
