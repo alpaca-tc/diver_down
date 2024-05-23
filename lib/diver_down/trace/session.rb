@@ -46,6 +46,10 @@ module DiverDown
           next if TracePoint == tp.defined_class
 
           case tp.event
+          when :b_call
+            call_stack.push
+          when :b_return
+            call_stack.pop
           when :call, :c_call
             # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
             if call_stack.ignored?
