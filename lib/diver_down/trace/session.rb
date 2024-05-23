@@ -155,6 +155,8 @@ module DiverDown
       end
 
       def constantizable_source_name(source_name)
+        return if source_name.nil?
+
         DiverDown::Helper.constantize(source_name)
         source_name
       rescue NameError
