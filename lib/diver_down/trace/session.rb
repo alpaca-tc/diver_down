@@ -70,7 +70,8 @@ module DiverDown
               next
             end
 
-            source_name = DiverDown::Helper.normalize_module_name(mod) if @module_set.include?(mod)
+            source_name = normalize_module_name(mod, tp)
+
             pushed = false
 
             unless source_name.nil?
@@ -138,6 +139,25 @@ module DiverDown
           frame_pos += 1
         end
 
+        nil
+      end
+
+      # Return nil if resolved module do not exist.
+      # Like an AnonymousController in rspec-rails.
+      def normalize_module_name(mod, tp)
+        normalized = nil
+        normalized ||= constantizable_source_name(DiverDown::Helper.normalize_module_name(mod)) if @module_set.include?(mod)
+
+        # NOTE: Only one anonymous class is traced back to support `AnonymousController` in rspec-rails, but it can be traced back further
+        normalized ||= constantizable_source_name(DiverDown::Helper.normalize_module_name(mod.superclass)) if DiverDown::Helper.class?(mod) && mod != DiverDown::Helper.resolve_module(tp.defined_class) && @module_set.include?(mod.superclass)
+
+        normalized
+      end
+
+      def constantizable_source_name(source_name)
+        DiverDown::Helper.constantize(source_name)
+        source_name
+      rescue NameError
         nil
       end
     end
