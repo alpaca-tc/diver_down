@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { Link } from '@/components/Link'
 import {
   Aside,
-  Button,
   Cluster,
   EmptyTableBody,
   FaCircleInfoIcon,
@@ -67,7 +66,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
     <WrapperAside>
       <TableWrapper>
         <TableReel>
-          <StyledTable fixedHead>
+          <Table fixedHead>
             <thead>
               <tr>
                 <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
@@ -170,7 +169,7 @@ export const DefinitionSources: FC<Props> = ({ combinedDefinition, mutateCombine
                 ))}
               </tbody>
             )}
-          </StyledTable>
+          </Table>
         </TableReel>
       </TableWrapper>
     </WrapperAside>
@@ -182,7 +181,8 @@ const WrapperAside = styled(Aside)`
   padding: 0;
   height: inherit;
   overflow-y: scroll;
-  max-width: 400px;
+  max-width: 600px;
+  border-left: 1px ${color.BORDER} solid;
 
   &&& {
     margin-top: 0;
@@ -200,8 +200,4 @@ const Transparent = styled.span`
 
 const FixedWidthMemo = styled(Cluster)`
   width: 4em;
-`
-
-const StyledTable = styled(Table)`
-  border-left: 1px ${color.BORDER} solid;
 `

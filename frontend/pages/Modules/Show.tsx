@@ -66,9 +66,7 @@ export const Show: React.FC = () => {
                                 <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
                               </Td>
                               <Td>
-                                <Text>
-                                  {source.memo}
-                                </Text>
+                                <Text>{source.memo}</Text>
                               </Td>
                             </tr>
                           ))}
