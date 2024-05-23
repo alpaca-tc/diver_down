@@ -1,11 +1,10 @@
-import React, { FC, useCallback, useContext, useMemo, useState } from 'react'
+import React, { FC, useCallback, useMemo, useState } from 'react'
 import { ComboBoxItem } from 'smarthr-ui/lib/components/ComboBox/types'
 
 import { Button, Cluster, FaXmarkIcon, FormControl, Input, SingleComboBox, Text } from '@/components/ui'
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 import { useSourceModules } from '@/repositories/sourceModulesRepository'
-import { RecentModulesContext } from '@/context/RecentModulesContext'
 
 type Item = ComboBoxItem<Module[]>
 
@@ -27,7 +26,6 @@ const convertModulesToItem = (modules: Module[]): Item => ({
 const DELIMITER_RE = /\s*\/\s*/
 
 export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, onClose, onUpdate }) => {
-  const { setRecentModules } = useContext(RecentModulesContext)
   const { data, isLoading, mutate } = useModules()
   const { trigger } = useSourceModules(sourceName)
   const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModulesToItem(modules)), [data])
@@ -64,9 +62,7 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
   )
 
   const handleUpdate = useCallback(async () => {
-    const modules = selectedItem?.data ?? []
-    await trigger({ modules })
-    setRecentModules(modules)
+    await trigger({ modules: selectedItem?.data ?? [] })
     mutate()
     onUpdate()
   }, [mutate, trigger, selectedItem, onUpdate])
