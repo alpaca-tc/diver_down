@@ -3,9 +3,18 @@
 module DiverDown
   module Trace
     class Tracer
+      DEFAULT_TRACE_EVENTS = %i[
+        call
+        return
+        c_call
+        c_return
+        b_call
+        b_return
+      ].freeze
+
       # @return [Array<Symbol>]
       def self.trace_events
-        @trace_events || %i[call c_call return c_return]
+        @trace_events || DEFAULT_TRACE_EVENTS
       end
 
       # @param events [Array<Symbol>]

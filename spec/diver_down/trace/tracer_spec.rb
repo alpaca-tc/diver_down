@@ -443,6 +443,93 @@ RSpec.describe DiverDown::Trace::Tracer do
         ))
       end
 
+      it 'traces tracer_with_block.rb' do
+        wrapper = Class.new do
+          def self.wrap
+            yield
+          end
+        end
+        stub_const('Wrapper', wrapper)
+
+        definition = wrapper.wrap do
+          trace_fixture(
+            'tracer_with_block.rb',
+            caller_paths: [
+              fixture_path('tracer_with_block.rb'),
+            ],
+            module_set: {
+              modules: [
+                'Wrapper',
+                'AntipollutionModule::A',
+                'AntipollutionModule::B',
+                'AntipollutionModule::C',
+                'AntipollutionModule::D',
+              ],
+            }
+          )
+        end
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'AntipollutionModule::A',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::B',
+                  method_ids: [
+                    {
+                      name: 'call_c',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_with_block\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              source_name: 'AntipollutionModule::B',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::C',
+                  method_ids: [
+                    {
+                      name: 'call_d',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_with_block\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              source_name: 'AntipollutionModule::C',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::D',
+                  method_ids: [
+                    {
+                      name: 'call_name',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_with_block\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              source_name: 'AntipollutionModule::D',
+            },
+          ]
+        ))
+      end
+
       it 'traces tracer_subclass.rb' do
         definition = trace_fixture(
           'tracer_subclass.rb',
