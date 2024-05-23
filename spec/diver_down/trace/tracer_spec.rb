@@ -782,6 +782,43 @@ RSpec.describe DiverDown::Trace::Tracer do
         ))
       end
 
+      it 'traces tracer_nil_name_class.rb' do
+        definition = trace_fixture(
+          'tracer_nil_name_class.rb',
+          caller_paths: [fixture_path('tracer_nil_name_class.rb')],
+          module_set: {
+            paths: [fixture_path('tracer_nil_name_class.rb')],
+          }
+        )
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'AntipollutionModule::A',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::B',
+                  method_ids: [
+                    {
+                      name: 'call_b',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_nil_name_class\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              source_name: 'AntipollutionModule::B',
+              dependencies: [],
+            },
+          ]
+        ))
+      end
+
       it 'traces wrapped in the module to be target before starting the trace' do
         dir = Dir.mktmpdir
         File.write(File.join(dir, 'a.rb'), <<~RUBY)
