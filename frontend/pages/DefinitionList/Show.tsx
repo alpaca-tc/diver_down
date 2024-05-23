@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
-import { Aside, Button, Section, Sidebar, Stack } from '@/components/ui'
+import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
@@ -15,6 +15,8 @@ import { DefinitionSources } from './components/DefinitionSources'
 import { MetadataDialog } from './components/MetadataDialog'
 
 import type { DialogProps } from './components/dialog'
+import { RecentModulesContext } from '@/context/RecentModulesContext'
+import { Module } from '@/models/module'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
@@ -29,6 +31,7 @@ export const Show: React.FC = () => {
     isLoading,
     mutate: mutateCombinedDefinition,
   } = useCombinedDefinition(selectedDefinitionIds, graphOptions.compound, graphOptions.concentrate, graphOptions.onlyModule)
+  const [recentModules, setRecentModules] = useState<Module[]>([])
 
   const onCloseDialog = useCallback(() => {
     setVisibleDialog(null)
@@ -36,45 +39,47 @@ export const Show: React.FC = () => {
 
   return (
     <Wrapper>
-      <StyledSidebar contentsMinWidth="0px" gap={0}>
-        <StyledAside>
-          <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
-        </StyledAside>
-        <StyledSection>
-          <MetadataDialog
-            isOpen={visibleDialog?.type === 'metadataDialog'}
-            dotMetadata={visibleDialog?.type === 'metadataDialog' ? visibleDialog.metadata : null}
-            top={visibleDialog?.type === 'metadataDialog' ? visibleDialog.top : 0}
-            left={visibleDialog?.type === 'metadataDialog' ? visibleDialog.left : 0}
-            onClose={onCloseDialog}
-            setVisibleDialog={setVisibleDialog}
-            mutateCombinedDefinition={mutateCombinedDefinition}
-          />
-          {isLoading ? (
-            <CenterStack>
-              <Loading text="Loading..." alt="Loading" />
-            </CenterStack>
-          ) : !combinedDefinition ? (
-            <CenterStack>
-              <p>No data</p>
-            </CenterStack>
-          ) : (
-            <StyledStack>
-              <DefinitionGraph
-                combinedDefinition={combinedDefinition}
-                graphOptions={graphOptions}
-                setGraphOptions={setGraphOptions}
-                visibleDialog={visibleDialog}
-                setVisibleDialog={setVisibleDialog}
-              />
-              <StyledDefinitionSources
-                combinedDefinition={combinedDefinition}
-                mutateCombinedDefinition={mutateCombinedDefinition}
-              />
-            </StyledStack>
-          )}
-        </StyledSection>
-      </StyledSidebar>
+      <RecentModulesContext.Provider value={{ recentModules, setRecentModules }}>
+        <StyledSidebar contentsMinWidth="0px" gap={0}>
+          <StyledAside>
+            <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
+          </StyledAside>
+          <StyledSection>
+            <MetadataDialog
+              isOpen={visibleDialog?.type === 'metadataDialog'}
+              dotMetadata={visibleDialog?.type === 'metadataDialog' ? visibleDialog.metadata : null}
+              top={visibleDialog?.type === 'metadataDialog' ? visibleDialog.top : 0}
+              left={visibleDialog?.type === 'metadataDialog' ? visibleDialog.left : 0}
+              onClose={onCloseDialog}
+              setVisibleDialog={setVisibleDialog}
+              mutateCombinedDefinition={mutateCombinedDefinition}
+            />
+            {isLoading ? (
+              <CenterStack>
+                <Loading text="Loading..." alt="Loading" />
+              </CenterStack>
+            ) : !combinedDefinition ? (
+              <CenterStack>
+                <p>No data</p>
+              </CenterStack>
+            ) : (
+              <StyledStack>
+                <DefinitionGraph
+                  combinedDefinition={combinedDefinition}
+                  graphOptions={graphOptions}
+                  setGraphOptions={setGraphOptions}
+                  visibleDialog={visibleDialog}
+                  setVisibleDialog={setVisibleDialog}
+                />
+                <StyledDefinitionSources
+                  combinedDefinition={combinedDefinition}
+                  mutateCombinedDefinition={mutateCombinedDefinition}
+                />
+              </StyledStack>
+            )}
+          </StyledSection>
+        </StyledSidebar>
+      </RecentModulesContext.Provider>
     </Wrapper>
   )
 }

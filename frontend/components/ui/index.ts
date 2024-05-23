@@ -11,6 +11,7 @@ export {
   FONT_FAMILY,
   FaCircleInfoIcon,
   FaCirclePlusIcon,
+  FaCopyIcon,
   FaGearIcon,
   FaPencilIcon,
   FaTrashIcon,
