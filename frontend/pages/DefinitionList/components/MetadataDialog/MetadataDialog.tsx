@@ -1,4 +1,4 @@
-import { ComponentProps, FC, useMemo, useState } from 'react'
+import { ComponentProps, FC, useContext, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
@@ -19,9 +19,10 @@ import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
-import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { DialogProps } from '../dialog'
-import { SourceMemoInput } from '../SourceMemoInput'
+import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
+import { RecentModulesContext } from '@/context/RecentModulesContext'
+import { SourceMemoInput } from '@/components/SourceMemoInput'
 
 type Props = {
   dotMetadata: DotMetadata | null
@@ -37,6 +38,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
   metadata,
   mutateCombinedDefinition,
 }) => {
+  const { setRecentModules } = useContext(RecentModulesContext)
   const [editingModules, setEditingModules] = useState<boolean>(false)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const items: ComponentProps<typeof DefinitionList>['items'] = [
@@ -85,7 +87,8 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
             <SourceModulesComboBox
               sourceName={metadata.sourceName}
               initialModules={metadata.modules}
-              onUpdate={() => {
+              onUpdate={(modules) => {
+                setRecentModules(modules)
                 setEditingModules(false)
                 mutateCombinedDefinition()
               }}
