@@ -22,12 +22,10 @@ import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
 import { Source, sortSources } from '@/models/source'
-import { SourceMemoInput } from '../SourceMemoInput'
 import { RecentModulesContext } from '@/context/RecentModulesContext'
-import { useSourceModules } from '@/repositories/sourceModulesRepository'
-import { Module } from '@/models/module'
 import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
+import { SourceMemoInput } from '@/components/SourceMemoInput'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -44,7 +42,7 @@ type DefinitionSourceTrProps = {
 }
 
 const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, mutateCombinedDefinition }) => {
-  const { recentModules } = useContext(RecentModulesContext)
+  const { recentModules, setRecentModules } = useContext(RecentModulesContext)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const [editingModules, setEditingModules] = useState<boolean>(false)
 
@@ -90,7 +88,8 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, mutateCombine
           <SourceModulesComboBox
             sourceName={source.sourceName}
             initialModules={source.modules}
-            onUpdate={() => {
+            onUpdate={(modules) => {
+              setRecentModules(modules)
               setEditingModules(false)
               mutateCombinedDefinition()
             }}

@@ -5,7 +5,6 @@ import { Button, Cluster, FaXmarkIcon, FormControl, Input, SingleComboBox, Text 
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 import { useSourceModules } from '@/repositories/sourceModulesRepository'
-import { RecentModulesContext } from '@/context/RecentModulesContext'
 
 type Item = ComboBoxItem<Module[]>
 
@@ -13,7 +12,7 @@ type Props = {
   sourceName: string
   initialModules: Module[]
   onClose: () => void
-  onUpdate: () => void
+  onUpdate: (modules: Module[]) => void
 }
 
 const equalModules = (a: Module[], b: Module[]) => a.every((module, index) => module.moduleName === (b[index]?.moduleName ?? ''))
@@ -27,7 +26,6 @@ const convertModulesToItem = (modules: Module[]): Item => ({
 const DELIMITER_RE = /\s*\/\s*/
 
 export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, onClose, onUpdate }) => {
-  const { setRecentModules } = useContext(RecentModulesContext)
   const { data, isLoading, mutate } = useModules()
   const { trigger } = useSourceModules(sourceName)
   const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModulesToItem(modules)), [data])
@@ -66,9 +64,8 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
   const handleUpdate = useCallback(async () => {
     const modules = selectedItem?.data ?? []
     await trigger({ modules })
-    setRecentModules(modules)
     mutate()
-    onUpdate()
+    onUpdate(modules)
   }, [mutate, trigger, selectedItem, onUpdate])
 
   const items = useMemo(() => {

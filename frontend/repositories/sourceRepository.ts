@@ -17,7 +17,7 @@ type SourcesReponse = {
 }
 
 export const useSources = () => {
-  const { data, isLoading } = useSWR<Sources>(path.api.sources.index(), async () => {
+  const { data, mutate, isLoading } = useSWR<Sources>(path.api.sources.index(), async () => {
     const response = await get<SourcesReponse>(path.api.sources.index())
     return {
       sources: response.sources.map((source) => ({
@@ -29,7 +29,7 @@ export const useSources = () => {
     }
   })
 
-  return { data, isLoading }
+  return { data, mutate, isLoading }
 }
 
 type SpecificSourceResponse = {
