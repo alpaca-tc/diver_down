@@ -19,9 +19,9 @@ import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
-import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { DialogProps } from '../dialog'
 import { SourceMemoInput } from '../SourceMemoInput'
+import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 
 type Props = {
   dotMetadata: DotMetadata | null

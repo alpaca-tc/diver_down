@@ -21,12 +21,13 @@ import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
-import { SourceModulesComboBox } from '../SourceModulesComboBox'
 import { Source, sortSources } from '@/models/source'
 import { SourceMemoInput } from '../SourceMemoInput'
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { useSourceModules } from '@/repositories/sourceModulesRepository'
 import { Module } from '@/models/module'
+import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
+import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -46,12 +47,6 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, mutateCombine
   const { recentModules } = useContext(RecentModulesContext)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const [editingModules, setEditingModules] = useState<boolean>(false)
-  const { trigger } = useSourceModules(source.sourceName)
-
-  const updateSourceModules = useCallback(async () => {
-    await trigger({ modules: recentModules })
-    mutateCombinedDefinition()
-  }, [recentModules])
 
   return (
     <tr>
@@ -122,17 +117,13 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, mutateCombine
               </Button>
             </div>
 
-            {source.modules.length === 0 && recentModules.length > 0 && (
+            {source.modules.length === 0 && (
               <div>
-                <Button square={true} variant="primary" onClick={updateSourceModules} size="s">
-                  <Tooltip
-                    message={`Save "${recentModules.map((mod) => mod.moduleName).join('/')}"`}
-                    horizontal="center"
-                    vertical="bottom"
-                  >
-                    <FaCopyIcon />
-                  </Tooltip>
-                </Button>
+                <UpdateSourceModulesButton
+                  sourceName={source.sourceName}
+                  newModules={recentModules}
+                  onSaved={mutateCombinedDefinition}
+                />
               </div>
             )}
           </Cluster>
