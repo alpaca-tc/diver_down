@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useMemo, useState } from 'react'
+import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ComboBoxItem } from 'smarthr-ui/lib/components/ComboBox/types'
 
 import { Button, Cluster, FaXmarkIcon, FormControl, Input, SingleComboBox, Text } from '@/components/ui'
@@ -28,12 +28,17 @@ const DELIMITER_RE = /\s*\/\s*/
 export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, onClose, onUpdate }) => {
   const { data, isLoading, mutate } = useModules()
   const { trigger } = useSourceModules(sourceName)
-  const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModulesToItem(modules)), [data])
 
   const [temporaryItem, setTemporaryItem] = useState<Item | null>(null)
-  const [selectedItem, setSelectedItem] = useState<Item | null>(
-    defaultItems.find((item) => equalModules(item.data!, initialModules)) ?? null,
-  )
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+
+  const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModulesToItem(modules)), [data])
+
+  useEffect(() => {
+    if (selectedItem || !isLoading) return
+
+    setSelectedItem(defaultItems.find((item) => equalModules(item.data!, initialModules)) ?? null)
+  }, [isLoading, defaultItems, selectedItem, initialModules])
 
   const handleSelectItem = useCallback(
     (item: Item) => {
