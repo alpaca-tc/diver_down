@@ -25,7 +25,7 @@ Or install it yourself as:
 
 ## Usage
 
-`divert_down` is mainly divided into the `DiverDown::Trace` for dynamic analysing ruby code, and the `DiverDown::Web` for viewing the result on the browser.
+`diver_down` is mainly divided into the `DiverDown::Trace` for dynamic analysing ruby code, and the `DiverDown::Web` for viewing the result on the browser.
 
 ### `DiverDown::Trace`
 
