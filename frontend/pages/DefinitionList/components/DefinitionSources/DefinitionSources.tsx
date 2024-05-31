@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext, useMemo, useState } from 'react'
+import { FC, useCallback, useContext, useEffect, useMemo, useState, createRef } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
@@ -8,7 +8,6 @@ import {
   Cluster,
   EmptyTableBody,
   FaCircleInfoIcon,
-  FaCopyIcon,
   FaPencilIcon,
   Table,
   TableReel,
@@ -26,6 +25,8 @@ import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
+import React from 'react'
+import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -38,16 +39,48 @@ type SortState = {
 
 type DefinitionSourceTrProps = {
   source: Source
+  combinedDefinition: CombinedDefinition
   mutateCombinedDefinition: () => void
 }
 
-const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, mutateCombinedDefinition }) => {
+// Return tr
+const isTr = (event: MouseEvent, trRef: HTMLTableRowElement): boolean => {
+  const tr = (event.target as HTMLElement).closest<Element>('tr')
+
+  return tr === trRef
+}
+
+const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefinition, mutateCombinedDefinition }) => {
+  const ref = createRef<HTMLTableRowElement>()
   const { recentModules, setRecentModules } = useContext(RecentModulesContext)
+  const { setHoverDotMetadata } = useContext(HoverDotMetadataContext)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const [editingModules, setEditingModules] = useState<boolean>(false)
 
+  // On hover .node, .edge, .cluster
+  useEffect(() => {
+    if (!combinedDefinition || !ref.current) return
+
+    const currentRef = ref.current
+
+    const onMouseMove = (event: MouseEvent) => {
+      if (!isTr(event, currentRef)) return
+
+      const dotMetadata = combinedDefinition.dotMetadata.find((d) => d.type === 'source' && d.sourceName === source.sourceName)
+
+      console.log(`set ${dotMetadata?.id}`)
+      setHoverDotMetadata(dotMetadata ?? null)
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+    }
+  }, [combinedDefinition?.dotMetadata, setHoverDotMetadata])
+
   return (
-    <tr>
+    <tr ref={ref}>
       <Td>
         <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
       </Td>
@@ -187,6 +220,7 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
                   <DefinitionSourceTr
                     key={source.sourceName}
                     source={source}
+                    combinedDefinition={combinedDefinition}
                     mutateCombinedDefinition={mutateCombinedDefinition}
                   />
                 ))}

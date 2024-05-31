@@ -17,6 +17,8 @@ import { MetadataDialog } from './components/MetadataDialog'
 import type { DialogProps } from './components/dialog'
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { Module } from '@/models/module'
+import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
+import { DotMetadata } from '@/models/combinedDefinition'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
@@ -26,6 +28,7 @@ export const Show: React.FC = () => {
     concentrate: false,
     onlyModule: false,
   })
+  const [hoverDotMetadata, setHoverDotMetadata] = useState<DotMetadata | null>(null)
   const {
     data: combinedDefinition,
     isLoading,
@@ -40,45 +43,47 @@ export const Show: React.FC = () => {
   return (
     <Wrapper>
       <RecentModulesContext.Provider value={{ recentModules, setRecentModules }}>
-        <StyledSidebar contentsMinWidth="0px" gap={0}>
-          <StyledAside>
-            <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
-          </StyledAside>
-          <StyledSection>
-            <MetadataDialog
-              isOpen={visibleDialog?.type === 'metadataDialog'}
-              dotMetadata={visibleDialog?.type === 'metadataDialog' ? visibleDialog.metadata : null}
-              top={visibleDialog?.type === 'metadataDialog' ? visibleDialog.top : 0}
-              left={visibleDialog?.type === 'metadataDialog' ? visibleDialog.left : 0}
-              onClose={onCloseDialog}
-              setVisibleDialog={setVisibleDialog}
-              mutateCombinedDefinition={mutateCombinedDefinition}
-            />
-            {isLoading ? (
-              <CenterStack>
-                <Loading text="Loading..." alt="Loading" />
-              </CenterStack>
-            ) : !combinedDefinition ? (
-              <CenterStack>
-                <p>No data</p>
-              </CenterStack>
-            ) : (
-              <StyledStack>
-                <DefinitionGraph
-                  combinedDefinition={combinedDefinition}
-                  graphOptions={graphOptions}
-                  setGraphOptions={setGraphOptions}
-                  visibleDialog={visibleDialog}
-                  setVisibleDialog={setVisibleDialog}
-                />
-                <StyledDefinitionSources
-                  combinedDefinition={combinedDefinition}
-                  mutateCombinedDefinition={mutateCombinedDefinition}
-                />
-              </StyledStack>
-            )}
-          </StyledSection>
-        </StyledSidebar>
+        <HoverDotMetadataContext.Provider value={{ hoverDotMetadata, setHoverDotMetadata }}>
+          <StyledSidebar contentsMinWidth="0px" gap={0}>
+            <StyledAside>
+              <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
+            </StyledAside>
+            <StyledSection>
+              <MetadataDialog
+                isOpen={visibleDialog?.type === 'metadataDialog'}
+                dotMetadata={visibleDialog?.type === 'metadataDialog' ? visibleDialog.metadata : null}
+                top={visibleDialog?.type === 'metadataDialog' ? visibleDialog.top : 0}
+                left={visibleDialog?.type === 'metadataDialog' ? visibleDialog.left : 0}
+                onClose={onCloseDialog}
+                setVisibleDialog={setVisibleDialog}
+                mutateCombinedDefinition={mutateCombinedDefinition}
+              />
+              {isLoading ? (
+                <CenterStack>
+                  <Loading text="Loading..." alt="Loading" />
+                </CenterStack>
+              ) : !combinedDefinition ? (
+                <CenterStack>
+                  <p>No data</p>
+                </CenterStack>
+              ) : (
+                <StyledStack>
+                  <DefinitionGraph
+                    combinedDefinition={combinedDefinition}
+                    graphOptions={graphOptions}
+                    setGraphOptions={setGraphOptions}
+                    visibleDialog={visibleDialog}
+                    setVisibleDialog={setVisibleDialog}
+                  />
+                  <StyledDefinitionSources
+                    combinedDefinition={combinedDefinition}
+                    mutateCombinedDefinition={mutateCombinedDefinition}
+                  />
+                </StyledStack>
+              )}
+            </StyledSection>
+          </StyledSidebar>
+        </HoverDotMetadataContext.Provider>
       </RecentModulesContext.Provider>
     </Wrapper>
   )

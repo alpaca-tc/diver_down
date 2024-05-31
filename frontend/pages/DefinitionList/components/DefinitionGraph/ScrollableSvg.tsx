@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { ReactSVGPanZoom, TOOL_NONE, TOOL_PAN } from 'react-svg-pan-zoom'
 import { ReactSvgPanZoomLoader } from 'react-svg-pan-zoom-loader'
 import styled from 'styled-components'
@@ -11,6 +11,8 @@ import { extractSvgSize, getClosestAndSmallestElement, toSVGPoint } from '@/util
 import { DialogProps } from '../dialog'
 
 import type { Tool, Value } from 'react-svg-pan-zoom'
+import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
+import { color } from '@/constants/theme'
 
 type Props = {
   combinedDefinition: CombinedDefinition
@@ -41,7 +43,7 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
 
   const [value, setValue] = useState<Value>({} as Value) // NOTE: react-svg-pan-zoom supported blank object as a initial value. but types is not supported.
   const [tool, setTool] = useState<Tool>(TOOL_PAN)
-  const [hoverMetadata, setHoverMetadata] = useState<DotMetadata | null>(null)
+  const { hoverDotMetadata, setHoverDotMetadata } = useContext(HoverDotMetadataContext)
   const [svg, setSvg] = useState<string>('')
 
   const svgSize = extractSvgSize(svg)
@@ -77,9 +79,9 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
     }
 
     const onClickGeometry = (event: MouseEvent) => {
-      if (hoverMetadata) {
+      if (hoverDotMetadata) {
         event.preventDefault()
-        setVisibleDialog({ type: 'metadataDialog', metadata: hoverMetadata, left: event.clientX, top: event.clientY })
+        setVisibleDialog({ type: 'metadataDialog', metadata: hoverDotMetadata, left: event.clientX, top: event.clientY })
       }
     }
 
@@ -88,12 +90,12 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
     return () => {
       document.removeEventListener('click', onClickGeometry)
     }
-  }, [tool, hoverMetadata, setVisibleDialog])
+  }, [tool, hoverDotMetadata, setVisibleDialog])
 
   // On hover .node, .edge, .cluster
   useEffect(() => {
     if (tool !== TOOL_NONE) {
-      setHoverMetadata(null)
+      setHoverDotMetadata(null)
       return
     }
 
@@ -102,9 +104,9 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
 
       if (element) {
         const metadata = combinedDefinition.dotMetadata.find(({ id }) => element.id === id)
-        setHoverMetadata(metadata ?? null)
+        setHoverDotMetadata(metadata ?? null)
       } else {
-        setHoverMetadata(null)
+        setHoverDotMetadata(null)
       }
     }
 
@@ -136,7 +138,7 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
       }
     }
 
-    setHoverMetadata((prev) => findNewMetadata(prev))
+    setHoverDotMetadata((prev) => findNewMetadata(prev))
     setVisibleDialog((prev) => {
       if (prev?.type === 'metadataDialog') {
         const newMetadata = findNewMetadata(prev.metadata)
@@ -150,12 +152,16 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
         return prev
       }
     })
-  }, [combinedDefinition.dotMetadata, setVisibleDialog, setHoverMetadata])
+  }, [combinedDefinition.dotMetadata, setVisibleDialog, setHoverDotMetadata])
+
+  useEffect(() => {
+    console.log(hoverDotMetadata?.id)
+  }, [hoverDotMetadata])
 
   if (!svg) return null
 
   return (
-    <Wrapper ref={observeRef} $idOnHover={hoverMetadata?.id}>
+    <Wrapper ref={observeRef} $idOnHover={hoverDotMetadata?.id}>
       <ReactSvgPanZoomLoader
         svgXML={svg}
         render={(content) => (
@@ -198,7 +204,10 @@ const Wrapper = styled.div<{ $idOnHover: string | undefined }>`
     props.$idOnHover &&
     `
     #${props.$idOnHover} {
-      stroke-width: 3;
+      ellipse {
+        stroke-width: 4;
+        stroke: ${color.DANGER};
+      }
     }
 
     cursor: pointer;
