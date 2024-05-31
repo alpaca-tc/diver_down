@@ -3,7 +3,21 @@ import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
 import { Loading } from '@/components/Loading'
-import { Button, Cluster, EmptyTableBody, FaPencilIcon, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
+import {
+  Button,
+  Cluster,
+  EmptyTableBody,
+  FaPencilIcon,
+  FormControl,
+  Heading,
+  Input,
+  Section,
+  Stack,
+  Table,
+  Td,
+  Text,
+  Th,
+} from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { useSources } from '@/repositories/sourceRepository'
@@ -12,6 +26,7 @@ import { Module } from '@/models/module'
 import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
+import { useDebounce } from '@/hooks/useDebounce'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -109,6 +124,23 @@ export const List: FC = () => {
   const { data, mutate, isLoading } = useSources()
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
   const [recentModules, setRecentModules] = useState<Module[]>([])
+  const [inputSourceName, setInputSourceName] = useState<string>('')
+  const [filteredSourceName, setFilteredSourceName] = useState<string>('')
+
+  const handleInputSourceName = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInputSourceName(event.target.value)
+    },
+    [setInputSourceName],
+  )
+
+  useDebounce(
+    () => {
+      setFilteredSourceName(inputSourceName)
+    },
+    200,
+    [inputSourceName],
+  )
 
   const setNextSortType = useCallback(
     (key: SortState['key']) => {
@@ -127,12 +159,28 @@ export const List: FC = () => {
   )
 
   const sources: Sources['sources'] = useMemo(() => {
+    console.log(`changed filteredSourceName ${filteredSourceName}`)
+
     if (!data) {
       return []
     }
 
-    return sortSources(data.sources, sortState.key, sortState.sort)
-  }, [data?.sources, sortState])
+    let sources = data.sources
+
+    if (!/^\s*$/.test(inputSourceName)) {
+      const words = filteredSourceName
+        .split(/\s+/)
+        .map((s) => s.trim().toLowerCase())
+        .filter((s) => s !== '')
+
+      sources = sources.filter((source) => {
+        const sourceName = source.sourceName.toLowerCase()
+        return words.every((word) => sourceName.includes(word))
+      })
+    }
+
+    return sortSources(sources, sortState.key, sortState.sort)
+  }, [data?.sources, sortState, filteredSourceName])
 
   return (
     <StyledSection>
@@ -143,6 +191,10 @@ export const List: FC = () => {
             ? `(classified: ${Math.round((data.classifiedSourcesCount / data.sources.length) * 100)}% ${data.classifiedSourcesCount} / ${data.sources.length})`
             : null}
         </Heading>
+
+        <FormControl title="Filtering Sources" helpMessage="Refine the source with a source name">
+          <Input name="title" type="text" onChange={handleInputSourceName} value={inputSourceName} />
+        </FormControl>
 
         <div style={{ overflow: 'clip' }}>
           <Table fixedHead>
