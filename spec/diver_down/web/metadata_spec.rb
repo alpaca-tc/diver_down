@@ -104,6 +104,15 @@ RSpec.describe DiverDown::Web::Metadata do
 
         expect(instance.to_h[:sources].keys).to eq(source_names)
       end
+
+      it "doesn't include blank source" do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        instance.source('a.rb')
+
+        expect(instance.to_h[:sources].keys).to eq([])
+      end
     end
   end
 end

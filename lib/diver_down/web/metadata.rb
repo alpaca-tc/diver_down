@@ -23,7 +23,11 @@ module DiverDown
       # @return [Hash]
       def to_h
         source_names = @source_map.keys.sort
-        sources = source_names.to_h { [_1, source(_1).to_h] }
+
+        sources = source_names.filter_map {
+          h = source(_1).to_h
+          [_1, h] unless h.empty?
+        }.to_h
 
         {
           sources:,
@@ -49,8 +53,8 @@ module DiverDown
 
         # NOTE: This is for backward compatibility. It will be removed in the future.
         (loaded[:sources] || loaded || []).each do |source_name, source_hash|
-          @source_map[source_name].memo = source_hash[:memo] if source_hash[:memo]
-          @source_map[source_name].modules = source_hash[:modules] if source_hash[:modules]
+          source(source_name).memo = source_hash[:memo] if source_hash[:memo]
+          source(source_name).modules = source_hash[:modules] if source_hash[:modules]
         end
 
         loaded[:alias]&.each do |alias_name, source_names|
