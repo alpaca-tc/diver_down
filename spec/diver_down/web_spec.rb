@@ -756,12 +756,12 @@ RSpec.describe DiverDown::Web do
     end
   end
 
-  describe 'POST /api/source_aliase/:alias_name.json' do
+  describe 'POST /api/source_aliase.json' do
     it 'deletes alias if source_names are empty' do
       metadata.source_alias.update_alias('A', ['B'])
 
       expect {
-        post '/api/source_aliases/A.json', { source_names: [] }
+        post '/api/source_aliases.json', { alias_name: 'A', source_names: [] }
       }.to change {
         metadata.source_alias.aliased_source_names('A')
       }.from(['B']).to(nil)
@@ -771,12 +771,23 @@ RSpec.describe DiverDown::Web do
 
     it 'adds alias if source_names are present' do
       expect {
-        post '/api/source_aliases/A.json', { source_names: ['B'] }
+        post '/api/source_aliases.json', { alias_name: 'A', source_names: ['B'] }
       }.to change {
         metadata.source_alias.aliased_source_names('A')
       }.from(nil).to(['B'])
 
       expect(last_response.status).to eq(200)
+    end
+
+    it 'updates alias if old_alias_name is present' do
+      metadata.source_alias.update_alias('A', ['B'])
+
+      post '/api/source_aliases.json', { alias_name: 'B', old_alias_name: 'A', source_names: ['C'] }
+
+      expect(last_response.status).to eq(200)
+      expect(metadata.source_alias.to_h).to eq(
+        'B' => ['C']
+      )
     end
   end
 end

@@ -17,11 +17,11 @@ module DiverDown
         )
 
         definition.sources.each do |source|
-          resolved_source_name = @metadata_alias.resolve_alias(source.source_name)
+          resolved_source_name = @metadata_alias.resolve_alias(source.source_name) || source.source_name
           new_source = new_definition.find_or_build_source(resolved_source_name)
 
           source.dependencies.each do |dependency|
-            resolved_dependency_source_name = @metadata_alias.resolve_alias(dependency.source_name)
+            resolved_dependency_source_name = @metadata_alias.resolve_alias(dependency.source_name) || dependency.source_name
             new_dependency = new_source.find_or_build_dependency(resolved_dependency_source_name)
 
             next unless new_dependency

@@ -12,6 +12,20 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
         instance.update_alias('A', [])
         expect(instance.to_h).to eq({})
       end
+
+      it 'combines source_names' do
+        instance = described_class.new
+
+        instance.update_alias('A', ['', ' '])
+        expect(instance.to_h).to be_empty
+      end
+
+      it 'raises exception if source_names are conflicted' do
+        instance = described_class.new
+
+        instance.update_alias('A', ['A', 'B'])
+        expect { instance.update_alias('B', ['A']) }.to raise_error(described_class::ConflictError)
+      end
     end
 
     describe '#resolve_alias' do
@@ -21,7 +35,7 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
         instance.update_alias('A', ['A', 'B'])
         expect(instance.resolve_alias('A')).to eq('A')
         expect(instance.resolve_alias('B')).to eq('A')
-        expect(instance.resolve_alias('C')).to eq('C')
+        expect(instance.resolve_alias('C')).to be_nil
       end
     end
 
@@ -40,9 +54,9 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
         instance = described_class.new
 
         instance.update_alias('B', ['C'])
-        instance.update_alias('A', ['A', 'B', 'C'].shuffle)
+        instance.update_alias('A', ['A', 'B'].shuffle)
 
-        expect(instance.to_h).to eq('A' => ['A', 'B', 'C'], 'B' => ['C'])
+        expect(instance.to_h).to eq('A' => ['A', 'B'], 'B' => ['C'])
         expect(instance.to_h.keys).to eq(['A', 'B'])
       end
     end
