@@ -121,10 +121,10 @@ View the analysis results in a browser.
 This gem is specifically designed to analyze large applications with a modular monolithic architecture. It allows users to categorize each analyzed file into specified modules directly through the web interface.
 
 - `--definition-dir` Specifies the directory where the analysis results are stored.
-- `--module-store-path` Designates a path to save the results that include details on which module each file belongs to. If this option is not specified, the results will be temporarily stored in a default temporary file.
+- `--metadata` Designates a path to save the results that include details on which module each file belongs to. If this option is not specified, the results will be temporarily stored in a default temporary file.
 
 ```sh
-bundle exec diver_down_web --definition-dir tmp/diver_down --module-store-path tmp/module_store.yml
+bundle exec diver_down_web --definition-dir tmp/diver_down --metadata tmp/metadata.yml
 open http://localhost:8080
 ```
 
@@ -151,7 +151,7 @@ $ pnpm run dev
 
 # Start server for backend
 $ bundle install
-$ DIVER_DOWN_DIR=/path/to/definitions_dir DIVER_DOWN_MODULE_STORE=/path/to/module_store.yml bundle exec puma
+$ DIVER_DOWN_DIR=/path/to/definitions_dir DIVER_DOWN_METADATA=/path/to/metadata.yml bundle exec puma
 ```
 
 ## Contributing

@@ -11,7 +11,7 @@ module DiverDown
     require 'diver_down/web/definition_to_dot'
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
-    require 'diver_down/web/module_store'
+    require 'diver_down/web/metadata'
     require 'diver_down/web/indented_string_io'
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
@@ -20,11 +20,11 @@ module DiverDown
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
 
     # @param definition_dir [String]
-    # @param module_store [DiverDown::ModuleStore]
+    # @param metadata [DiverDown::Web::Metadata]
     # @param store [DiverDown::Web::DefinitionStore]
-    def initialize(definition_dir:, module_store:, store: DiverDown::Web::DefinitionStore.new)
+    def initialize(definition_dir:, metadata:, store: DiverDown::Web::DefinitionStore.new)
       @store = store
-      @module_store = module_store
+      @metadata = metadata
       @files_server = Rack::Files.new(File.join(WEB_DIR))
 
       definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"].sort
@@ -37,7 +37,7 @@ module DiverDown
     # @return [Array[Integer, Hash, Array]]
     def call(env)
       request = Rack::Request.new(env)
-      action = DiverDown::Web::Action.new(store: @store, module_store: @module_store, request:)
+      action = DiverDown::Web::Action.new(store: @store, metadata: @metadata, request:)
 
       case [request.request_method, request.path]
       in ['GET', %r{\A/api/definitions\.json\z}]

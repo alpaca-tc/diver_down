@@ -14,7 +14,7 @@ option_parser = OptionParser.new do |opts|
     Usage: diver_down_web [options]
 
     Example:
-      diver_down_web --definition-dir /path/to/definitions --module-store /path/to/module_store.yml
+      diver_down_web --definition-dir /path/to/definitions --metadata /path/to/metadata.yml
 
     Options:
   BANNER
@@ -23,8 +23,8 @@ option_parser = OptionParser.new do |opts|
     options[:definition_dir] = path
   end
 
-  opts.on('--module-store PATH', 'Path to the module store') do |path|
-    options[:module_store] = path
+  opts.on('--metadata PATH', 'Path to the metadata.yml') do |path|
+    options[:metadata] = path
   end
 end
 option_parser.parse!(ARGV)
@@ -39,7 +39,7 @@ end
 app = Rack::JSONBodyParser.new(
   DiverDown::Web.new(
     definition_dir: options.fetch(:definition_dir),
-    module_store: DiverDown::Web::ModuleStore.new(options[:module_store] || Tempfile.new(['module_store', '.yaml']))
+    metadata: DiverDown::Web::Metadata.new(options[:metadata] || Tempfile.new(['metadata', '.yaml']).path)
   )
 )
 

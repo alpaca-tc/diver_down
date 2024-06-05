@@ -4,7 +4,7 @@ RSpec.describe DiverDown::Web do
   include Rack::Test::Methods
 
   def app
-    @app ||= described_class.new(definition_dir:, module_store:, store:)
+    @app ||= described_class.new(definition_dir:, metadata:, store:)
   end
 
   let(:definition_dir) do
@@ -15,9 +15,9 @@ RSpec.describe DiverDown::Web do
     DiverDown::Web::DefinitionStore.new
   end
 
-  let(:module_store) do
-    module_store_path = Tempfile.new(['test', '.yaml']).path
-    DiverDown::Web::ModuleStore.new(module_store_path)
+  let(:metadata) do
+    metadata_path = Tempfile.new(['test', '.yaml']).path
+    DiverDown::Web::Metadata.new(metadata_path)
   end
 
   describe 'GET /' do
@@ -76,7 +76,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition_1, definition_2)
-      module_store.set_modules('a.rb', ['A'])
+      metadata.source('a.rb').modules = ['A']
 
       get '/api/definitions.json'
 
@@ -315,8 +315,8 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      module_store.set_modules('a.rb', ['A'])
-      module_store.set_memo('a.rb', 'memo')
+      metadata.source('a.rb').modules = ['A']
+      metadata.source('a.rb').memo = 'memo'
 
       get '/api/sources.json'
 
@@ -370,8 +370,8 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition)
-      module_store.set_modules('a.rb', ['A', 'B'])
-      module_store.set_modules('b.rb', ['B', 'C'])
+      metadata.source('a.rb').modules = ['A', 'B']
+      metadata.source('b.rb').modules = ['B', 'C']
 
       get '/api/modules.json'
 
@@ -422,9 +422,9 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition_1, definition_2)
-      module_store.set_modules('a.rb', ['A'])
-      module_store.set_modules('b.rb', ['A', 'B'])
-      module_store.set_memo('a.rb', 'memo')
+      metadata.source('a.rb').modules = ['A']
+      metadata.source('b.rb').modules = ['A', 'B']
+      metadata.source('a.rb').memo = 'memo'
 
       get '/api/modules/A.json'
 
@@ -494,8 +494,8 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition)
-      module_store.set_modules('a.rb', ['グローバル'])
-      module_store.set_memo('a.rb', 'memo')
+      metadata.source('a.rb').modules = ['グローバル']
+      metadata.source('a.rb').memo = 'memo'
 
       get "/api/modules/#{CGI.escape('グローバル')}.json"
 
@@ -565,7 +565,7 @@ RSpec.describe DiverDown::Web do
       )
       bit_ids = store.set(definition_1, definition_2)
 
-      module_store.set_memo('a.rb', 'memo')
+      metadata.source('a.rb').memo = 'memo'
 
       get "/api/definitions/#{bit_ids.inject(0, &:|)}.json"
 
@@ -637,7 +637,7 @@ RSpec.describe DiverDown::Web do
       store.set(definition_1)
       store.set(definition_2)
 
-      module_store.set_memo('a.rb', 'memo')
+      metadata.source('a.rb').memo = 'memo'
 
       get '/api/sources/a.rb.json'
 
@@ -681,7 +681,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get_modules('a.rb')).to eq(['A', 'B'])
+      expect(metadata.source('a.rb').modules).to eq(['A', 'B'])
     end
 
     it 'ignores blank modules' do
@@ -699,7 +699,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get_modules('a.rb')).to eq(['B'])
+      expect(metadata.source('a.rb').modules).to eq(['B'])
     end
   end
 
@@ -725,7 +725,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
 
-      expect(module_store.get_memo('a.rb')).to eq('memo')
+      expect(metadata.source('a.rb').memo).to eq('memo')
     end
   end
 end
