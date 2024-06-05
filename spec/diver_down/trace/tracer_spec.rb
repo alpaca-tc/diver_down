@@ -1,21 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe DiverDown::Trace::Tracer do
-  # fill default values
-  def fill_default(hash)
-    hash[:title] ||= ''
-    hash[:definition_group] ||= nil
-    hash[:sources] ||= []
-    hash[:sources].each do |source|
-      source[:dependencies] ||= []
-
-      source[:dependencies].each do |dependency|
-        dependency[:method_ids] ||= []
-      end
-    end
-    hash
-  end
-
   describe '#initialize' do
     describe 'with relative path caller_paths' do
       it 'raises ArgumentError' do
@@ -39,6 +24,8 @@ RSpec.describe DiverDown::Trace::Tracer do
   end
 
   describe '#new_session' do
+    include DefinitionHelper
+
     it 'provides session for tracing ruby code without block' do
       klass_a = Class.new do
         def self.call_b
@@ -101,6 +88,8 @@ RSpec.describe DiverDown::Trace::Tracer do
   end
 
   describe '#trace' do
+    include DefinitionHelper
+
     describe 'when tracing script' do
       # @param path [String]
       # @return [DiverDown::Definition]
