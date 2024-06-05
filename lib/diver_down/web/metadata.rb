@@ -4,6 +4,9 @@ module DiverDown
   class Web
     class Metadata
       require 'diver_down/web/metadata/source_metadata'
+      require 'diver_down/web/metadata/source_alias'
+
+      attr_reader :alias
 
       # @param path [String]
       def initialize(path)
@@ -24,6 +27,7 @@ module DiverDown
 
         {
           sources:,
+          alias: @alias.to_h,
         }
       end
 
@@ -37,21 +41,20 @@ module DiverDown
 
       def load
         @source_map = Hash.new { |h, source_name| h[source_name] = DiverDown::Web::Metadata::SourceMetadata.new }
+        @alias = DiverDown::Web::Metadata::SourceAlias.new
 
-        begin
-          loaded = YAML.load_file(@path)
+        loaded = YAML.load_file(@path)
 
-          return if loaded.nil?
+        return if loaded.nil?
 
-          # NOTE: This is for backward compatibility. It will be removed in the future.
-          sources = loaded[:sources] || loaded
+        # NOTE: This is for backward compatibility. It will be removed in the future.
+        (loaded[:sources] || loaded || []).each do |source_name, source_hash|
+          @source_map[source_name].memo = source_hash[:memo] if source_hash[:memo]
+          @source_map[source_name].modules = source_hash[:modules] if source_hash[:modules]
+        end
 
-          sources.each do |source_name, source_hash|
-            @source_map[source_name].memo = source_hash[:memo] if source_hash[:memo]
-            @source_map[source_name].modules = source_hash[:modules] if source_hash[:modules]
-          end
-        rescue StandardError
-          # Ignore error
+        loaded[:alias]&.each do |alias_name, source_names|
+          @alias.add_alias(alias_name, source_names)
         end
       end
     end
