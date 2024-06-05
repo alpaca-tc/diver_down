@@ -6,7 +6,7 @@ module DiverDown
       require 'diver_down/web/metadata/source_metadata'
       require 'diver_down/web/metadata/source_alias'
 
-      attr_reader :alias
+      attr_reader :source_alias
 
       # @param path [String]
       def initialize(path)
@@ -31,7 +31,7 @@ module DiverDown
 
         {
           sources:,
-          alias: @alias.to_h,
+          source_alias: @source_alias.to_h,
         }
       end
 
@@ -45,7 +45,7 @@ module DiverDown
 
       def load
         @source_map = Hash.new { |h, source_name| h[source_name] = DiverDown::Web::Metadata::SourceMetadata.new }
-        @alias = DiverDown::Web::Metadata::SourceAlias.new
+        @source_alias = DiverDown::Web::Metadata::SourceAlias.new
 
         loaded = YAML.load_file(@path)
 
@@ -57,8 +57,8 @@ module DiverDown
           source(source_name).modules = source_hash[:modules] if source_hash[:modules]
         end
 
-        loaded[:alias]&.each do |alias_name, source_names|
-          @alias.add_alias(alias_name, source_names)
+        loaded[:source_alias]&.each do |alias_name, source_names|
+          @source_alias.add_alias(alias_name, source_names)
         end
       end
     end

@@ -18,7 +18,30 @@ module DiverDown
       def initialize(store:, metadata:, request:)
         @store = store
         @metadata = metadata
+        @alias_resolver = DiverDown::Web::AliasResolver.new(@metadata.source_alias)
         @request = request
+      end
+
+      # GET /api/aliases.json
+      def aliases
+        aliases = @metadata.source_alias.to_h.map do |alias_name, source_names|
+          {
+            alias_name:,
+            source_names:,
+          }
+        end
+
+        json(
+          aliases:,
+        )
+      end
+
+      # POST /api/aliases/:alias_name.json
+      def update_alias(alias_name, source_names)
+        @metadata.source_alias.add_alias(alias_name, source_names)
+        @metadata.flush
+
+        json({})
       end
 
       # GET /api/sources.json
@@ -37,12 +60,12 @@ module DiverDown
 
         json(
           sources: source_names.sort.map do |source_name|
-            source = @metadata.source(source_name)
+            source_metadata = @metadata.source(source_name)
 
             {
               source_name:,
-              memo: source.memo,
-              modules: source.modules.map do |module_name|
+              memo: source_metadata.memo,
+              modules: source_metadata.modules.map do |module_name|
                 { module_name: }
               end,
             }

@@ -2,6 +2,18 @@
 
 RSpec.describe DiverDown::Web::Metadata::SourceAlias do
   describe 'InstanceMethods' do
+    describe '#add_alias' do
+      it 'adds/deletes alias' do
+        instance = described_class.new
+
+        instance.add_alias('A', ['A', 'B'])
+        expect(instance.to_h).to eq('A' => ['A', 'B'])
+
+        instance.add_alias('A', [])
+        expect(instance.to_h).to eq({})
+      end
+    end
+
     describe '#resolve_alias' do
       it 'returns alias name or source_name' do
         instance = described_class.new

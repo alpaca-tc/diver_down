@@ -728,4 +728,55 @@ RSpec.describe DiverDown::Web do
       expect(metadata.source('a.rb').memo).to eq('memo')
     end
   end
+
+  describe 'GET /api/aliases.json' do
+    it 'returns [] if alias is not added' do
+      get '/api/aliases.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq('aliases' => [])
+    end
+
+    it 'returns aliases' do
+      metadata.source_alias.add_alias('A', ['A', 'C', 'B'])
+
+      get '/api/aliases.json'
+
+      expect(last_response.status).to eq(200)
+
+      json = JSON.parse(last_response.body)
+      expect(json).to eq(
+        'aliases' => [
+          {
+            'alias_name' => 'A',
+            'source_names' => ['A', 'B', 'C'],
+          },
+        ],
+      )
+    end
+  end
+
+  describe 'POST /api/aliase/:alias_name.json' do
+    it 'deletes alias if source_names are empty' do
+      metadata.source_alias.add_alias('A', ['B'])
+
+      expect {
+        post '/api/aliases/A.json', { source_names: [] }
+      }.to change {
+        metadata.source_alias.aliased_source_names('A')
+      }.from(['B']).to(nil)
+
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'adds alias if source_names are present' do
+      expect {
+        post '/api/aliases/A.json', { source_names: ['B'] }
+      }.to change {
+        metadata.source_alias.aliased_source_names('A')
+      }.from(nil).to(['B'])
+
+      expect(last_response.status).to eq(200)
+    end
+  end
 end

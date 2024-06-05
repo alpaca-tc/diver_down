@@ -77,6 +77,12 @@ module DiverDown
         action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
         action.initialization_status(@total_definition_files_size)
+      in ['GET', %r{\A/api/aliases\.json\z}]
+        action.aliases
+      in ['POST', %r{\A/api/aliases/(?<alias_name>[^/]+)\.json\z}]
+        alias_name = Regexp.last_match[:alias_name]
+        source_names = request.params['source_names'] || []
+        action.update_alias(alias_name, source_names)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
       in ['GET', /\.json\z/], ['POST', /\.json\z/]

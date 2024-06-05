@@ -4,9 +4,11 @@ module DiverDown
   class Web
     class Metadata
       class SourceAlias
+        BLANK_RE = /\A\s*\z/
+
         def initialize
           # Hash{ alias_name => Set<source_name, ...> }
-          @alias_to_source_names = Hash.new { |h, k| h[k] = Set.new }
+          @alias_to_source_names = {}
           @source_name_to_alias = {}
         end
 
@@ -14,10 +16,19 @@ module DiverDown
         # @param source_names [Array<String>]
         # @return [void]
         def add_alias(alias_name, source_names)
-          @alias_to_source_names[alias_name].merge(source_names)
+          source_names = source_names.reject { BLANK_RE.match?(_1) }
 
-          source_names.each do |source_name|
-            @source_name_to_alias[source_name] = alias_name
+          if source_names.empty?
+            prev_source_names = @alias_to_source_names.delete(alias_name)
+            prev_source_names.each do |prev_source_name|
+              @source_name_to_alias.delete(prev_source_name)
+            end
+          else
+            @alias_to_source_names[alias_name] = source_names.sort
+
+            source_names.each do |source_name|
+              @source_name_to_alias[source_name] = alias_name
+            end
           end
         end
 
@@ -34,7 +45,7 @@ module DiverDown
         # @param alias_name [String]
         # @return [Array<String>]
         def aliased_source_names(alias_name)
-          @alias_to_source_names[alias_name].sort if @alias_to_source_names.key?(alias_name)
+          @alias_to_source_names[alias_name] if @alias_to_source_names.key?(alias_name)
         end
 
         # @return [Hash]
