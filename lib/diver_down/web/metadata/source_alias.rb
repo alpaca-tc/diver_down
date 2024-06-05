@@ -15,7 +15,7 @@ module DiverDown
         # @param alias_name [String]
         # @param source_names [Array<String>]
         # @return [void]
-        def add_alias(alias_name, source_names)
+        def update_alias(alias_name, source_names)
           source_names = source_names.reject { BLANK_RE.match?(_1) }
 
           if source_names.empty?

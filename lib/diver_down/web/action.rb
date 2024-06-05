@@ -38,7 +38,7 @@ module DiverDown
 
       # POST /api/aliases/:alias_name.json
       def update_alias(alias_name, source_names)
-        @metadata.source_alias.add_alias(alias_name, source_names)
+        @metadata.source_alias.update_alias(alias_name, source_names)
         @metadata.flush
 
         json({})

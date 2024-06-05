@@ -58,7 +58,7 @@ module DiverDown
         end
 
         loaded[:source_alias]&.each do |alias_name, source_names|
-          @source_alias.add_alias(alias_name, source_names)
+          @source_alias.update_alias(alias_name, source_names)
         end
       end
     end

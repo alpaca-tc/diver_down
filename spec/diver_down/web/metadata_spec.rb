@@ -62,7 +62,7 @@ RSpec.describe DiverDown::Web::Metadata do
       it 'writes alias to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
-        instance.source_alias.add_alias('A', ['A', 'C', 'B'])
+        instance.source_alias.update_alias('A', ['A', 'C', 'B'])
 
         expect {
           instance.flush

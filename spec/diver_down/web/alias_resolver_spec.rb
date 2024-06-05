@@ -56,7 +56,7 @@ RSpec.describe DiverDown::Web::AliasResolver do
           ]
         )
 
-        source_alias.add_alias('Document', ['DocumentA'])
+        source_alias.update_alias('Document', ['DocumentA'])
         resolver = described_class.new(source_alias)
         resolved_definition = resolver.resolve(definition)
 

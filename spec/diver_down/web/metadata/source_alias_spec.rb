@@ -2,14 +2,14 @@
 
 RSpec.describe DiverDown::Web::Metadata::SourceAlias do
   describe 'InstanceMethods' do
-    describe '#add_alias' do
+    describe '#update_alias' do
       it 'adds/deletes alias' do
         instance = described_class.new
 
-        instance.add_alias('A', ['A', 'B'])
+        instance.update_alias('A', ['A', 'B'])
         expect(instance.to_h).to eq('A' => ['A', 'B'])
 
-        instance.add_alias('A', [])
+        instance.update_alias('A', [])
         expect(instance.to_h).to eq({})
       end
     end
@@ -18,7 +18,7 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
       it 'returns alias name or source_name' do
         instance = described_class.new
 
-        instance.add_alias('A', ['A', 'B'])
+        instance.update_alias('A', ['A', 'B'])
         expect(instance.resolve_alias('A')).to eq('A')
         expect(instance.resolve_alias('B')).to eq('A')
         expect(instance.resolve_alias('C')).to eq('C')
@@ -29,7 +29,7 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
       it 'returns aliased source_names' do
         instance = described_class.new
 
-        instance.add_alias('A', ['A', 'C', 'B'])
+        instance.update_alias('A', ['A', 'C', 'B'])
         expect(instance.aliased_source_names('A')).to eq(['A', 'B', 'C'])
         expect(instance.aliased_source_names('B')).to be_nil
       end
@@ -39,8 +39,8 @@ RSpec.describe DiverDown::Web::Metadata::SourceAlias do
       it 'returns hash' do
         instance = described_class.new
 
-        instance.add_alias('B', ['C'])
-        instance.add_alias('A', ['A', 'B', 'C'].shuffle)
+        instance.update_alias('B', ['C'])
+        instance.update_alias('A', ['A', 'B', 'C'].shuffle)
 
         expect(instance.to_h).to eq('A' => ['A', 'B', 'C'], 'B' => ['C'])
         expect(instance.to_h.keys).to eq(['A', 'B'])
