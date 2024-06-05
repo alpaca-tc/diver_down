@@ -11,9 +11,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
         DiverDown::Definition.new(title:, sources: definition_sources)
       end
 
-      let(:module_store) do
+      let(:metadata) do
         path = Tempfile.new(['test', '.yaml']).path
-        DiverDown::Web::ModuleStore.new(path)
+        DiverDown::Web::Metadata.new(path)
       end
 
       context 'when definition is blank' do
@@ -22,7 +22,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             title: 'title'
           )
 
-          expect(described_class.new(definition, module_store).to_s).to eq(<<~DOT)
+          expect(described_class.new(definition, metadata).to_s).to eq(<<~DOT)
             strict digraph "title" {
             }
           DOT
@@ -35,7 +35,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             title: '"title"'
           )
 
-          expect(described_class.new(definition, module_store).to_s).to eq(<<~DOT)
+          expect(described_class.new(definition, metadata).to_s).to eq(<<~DOT)
             strict digraph "\\"title\\"" {
             }
           DOT
@@ -53,16 +53,16 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_memo('a.rb', 'memo')
+          metadata.source('a.rb').memo = 'memo'
 
-          instance = described_class.new(definition, module_store)
+          instance = described_class.new(definition, metadata)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb" id="graph_1"]
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -96,7 +96,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          instance = described_class.new(definition, module_store)
+          instance = described_class.new(definition, metadata)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               "a.rb" [label="a.rb" id="graph_1"]
@@ -105,7 +105,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -144,9 +144,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_modules('a.rb', ['A', 'B'])
+          metadata.source('a.rb').modules = ['A', 'B']
 
-          instance = described_class.new(definition, module_store)
+          instance = described_class.new(definition, metadata)
 
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
@@ -162,7 +162,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -216,11 +216,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_modules('a.rb', ['A'])
-          module_store.set_modules('b.rb', ['B'])
-          module_store.set_modules('c.rb', ['B'])
+          metadata.source('a.rb').modules = ['A']
+          metadata.source('b.rb').modules = ['B']
+          metadata.source('c.rb').modules = ['B']
 
-          instance = described_class.new(definition, module_store, compound: true)
+          instance = described_class.new(definition, metadata, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               compound=true
@@ -239,7 +239,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -332,11 +332,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_modules('a.rb', ['A'])
-          module_store.set_modules('b.rb', ['B'])
-          module_store.set_modules('c.rb', ['B'])
+          metadata.source('a.rb').modules = ['A']
+          metadata.source('b.rb').modules = ['B']
+          metadata.source('c.rb').modules = ['B']
 
-          instance = described_class.new(definition, module_store, compound: true)
+          instance = described_class.new(definition, metadata, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               compound=true
@@ -355,7 +355,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -469,13 +469,13 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_modules('a.rb', ['A'])
-          module_store.set_modules('b.rb', ['B'])
-          module_store.set_modules('c.rb', ['B'])
-          module_store.set_modules('d.rb', ['B', 'C'])
-          module_store.set_modules('unknown.rb', ['Unknown'])
+          metadata.source('a.rb').modules = ['A']
+          metadata.source('b.rb').modules = ['B']
+          metadata.source('c.rb').modules = ['B']
+          metadata.source('d.rb').modules = ['B', 'C']
+          metadata.source('unknown.rb').modules = ['Unknown']
 
-          instance = described_class.new(definition, module_store, only_module: true)
+          instance = described_class.new(definition, metadata, only_module: true)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               compound=true
@@ -499,7 +499,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               { id: 'graph_1', type: 'module', modules: [{ module_name: 'A' }] },
               { id: 'graph_2', type: 'module', modules: [{ module_name: 'B' }] },
@@ -536,7 +536,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          instance = described_class.new(definition, module_store, concentrate: true)
+          instance = described_class.new(definition, metadata, concentrate: true)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               concentrate=true
@@ -544,7 +544,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               {
                 id: 'graph_1',
@@ -575,11 +575,11 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          module_store.set_modules('b.rb', ['A'])
-          module_store.set_modules('c.rb', ['A', 'C'])
-          module_store.set_modules('d.rb', ['B'])
+          metadata.source('b.rb').modules = ['A']
+          metadata.source('c.rb').modules = ['A', 'C']
+          metadata.source('d.rb').modules = ['B']
 
-          instance = described_class.new(definition, module_store, concentrate: true)
+          instance = described_class.new(definition, metadata, concentrate: true)
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
               concentrate=true
@@ -602,7 +602,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             }
           DOT
 
-          expect(instance.metadata).to eq(
+          expect(instance.dot_metadata).to eq(
             [
               { id: 'graph_1', type: 'source', source_name: 'a.rb', memo: '', modules: [] },
               { id: 'graph_2', type: 'module', modules: [{ module_name: 'A' }] },

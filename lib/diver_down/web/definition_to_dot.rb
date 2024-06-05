@@ -12,8 +12,8 @@ module DiverDown
       # Between modules is prominently distanced
       MODULE_MINLEN = 3
 
-      class MetadataStore
-        Metadata = Data.define(:id, :type, :data, :module_store) do
+      class DotMetadataStore
+        DotMetadata = Data.define(:id, :type, :data, :metadata) do
           # @return [Hash]
           def to_h
             case type
@@ -31,7 +31,7 @@ module DiverDown
           private
 
           def source_to_h
-            modules = module_store.get_modules(data.source_name).map do
+            modules = metadata.source(data.source_name).modules.map do
               {
                 module_name: _1,
               }
@@ -41,7 +41,7 @@ module DiverDown
               id:,
               type: 'source',
               source_name: data.source_name,
-              memo: module_store.get_memo(data.source_name),
+              memo: metadata.source(data.source_name).memo,
               modules:,
             }
           end
@@ -77,11 +77,11 @@ module DiverDown
           end
         end
 
-        def initialize(module_store)
+        def initialize(metadata)
           @prefix = 'graph_'
-          @module_store = module_store
+          @metadata = metadata
 
-          # Hash{ id => Metadata }
+          # Hash{ id => DotMetadata }
           @to_h = {}
         end
 
@@ -89,13 +89,13 @@ module DiverDown
         # @param record [DiverDown::Definition::Source]
         # @return [String]
         def issue_source_id(source)
-          build_metadata_and_return_id(:source, source)
+          build_dot_metadata_and_return_id(:source, source)
         end
 
         # @param dependency [DiverDown::Definition::Dependency]
         # @return [String]
         def issue_dependency_id(dependency)
-          build_metadata_and_return_id(:dependency, [dependency])
+          build_dot_metadata_and_return_id(:dependency, [dependency])
         end
 
         # @param module_names [Array<String>]
@@ -106,17 +106,17 @@ module DiverDown
           if issued_metadata
             issued_metadata.id
           else
-            build_metadata_and_return_id(:module, module_names)
+            build_dot_metadata_and_return_id(:module, module_names)
           end
         end
 
         # @param id [String]
         # @param dependency [DiverDown::Definition::Dependency]
         def append_dependency(id, dependency)
-          metadata = @to_h.fetch(id)
-          dependencies = metadata.data
+          dot_metadata = @to_h.fetch(id)
+          dependencies = dot_metadata.data
           combined_dependencies = DiverDown::Definition::Dependency.combine(*dependencies, dependency)
-          metadata.data.replace(combined_dependencies)
+          dot_metadata.data.replace(combined_dependencies)
         end
 
         # @return [Array<Hash>]
@@ -126,10 +126,10 @@ module DiverDown
 
         private
 
-        def build_metadata_and_return_id(type, data)
+        def build_dot_metadata_and_return_id(type, data)
           id = "#{@prefix}#{length + 1}"
-          metadata = Metadata.new(id:, type:, data:, module_store: @module_store)
-          @to_h[id] = metadata
+          dot_metadata = DotMetadata.new(id:, type:, data:, metadata: @metadata)
+          @to_h[id] = dot_metadata
 
           id
         end
@@ -140,24 +140,24 @@ module DiverDown
       end
 
       # @param definition [DiverDown::Definition]
-      # @param module_store [DiverDown::ModuleStore]
+      # @param metadata [DiverDown::Web::Metadata]
       # @param compound [Boolean]
       # @param concentrate [Boolean] https://graphviz.org/docs/attrs/concentrate/
-      def initialize(definition, module_store, compound: false, concentrate: false, only_module: false)
+      def initialize(definition, metadata, compound: false, concentrate: false, only_module: false)
         @definition = definition
-        @module_store = module_store
+        @metadata = metadata
         @io = DiverDown::Web::IndentedStringIo.new
         @indent = 0
         @compound = compound || only_module # When only-module is enabled, dependencies between modules are displayed as compound.
         @compound_map = Hash.new { |h, k| h[k] = {} } # Hash{ ltail => Hash{ lhead => issued id } }
         @concentrate = concentrate
         @only_module = only_module
-        @metadata_store = MetadataStore.new(module_store)
+        @dot_metadata_store = DotMetadataStore.new(metadata)
       end
 
       # @return [Array<Hash>]
-      def metadata
-        @metadata_store.to_a
+      def dot_metadata
+        @dot_metadata_store.to_a
       end
 
       # @return [String]
@@ -179,18 +179,18 @@ module DiverDown
 
       private
 
-      attr_reader :definition, :module_store, :io
+      attr_reader :definition, :metadata, :io
 
       def render_only_modules
         # Hash{ from_module => { to_module => Array<DiverDown::Definition::Dependency> } }
         dependency_map = Hash.new { |h, k| h[k] = Hash.new { |hi, ki| hi[ki] = [] } }
 
         definition.sources.sort_by(&:source_name).each do |source|
-          source_modules = module_store.get_modules(source.source_name)
+          source_modules = metadata.source(source.source_name).modules
           next if source_modules.empty?
 
           source.dependencies.each do |dependency|
-            dependency_modules = module_store.get_modules(dependency.source_name)
+            dependency_modules = metadata.source(dependency.source_name).modules
             next if dependency_modules.empty?
 
             dependency_map[source_modules][dependency_modules].push(dependency)
@@ -215,9 +215,9 @@ module DiverDown
 
               io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
               io.indented do
-                io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+                io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
                 io.puts %(label="#{escape_quote(module_name)}")
-                io.puts %("#{escape_quote(module_name)}" #{build_attributes(label: module_name, id: @metadata_store.issue_modules_id(module_names))})
+                io.puts %("#{escape_quote(module_name)}" #{build_attributes(label: module_name, id: @dot_metadata_store.issue_modules_id(module_names))})
 
                 next_proc&.call
               end
@@ -245,11 +245,11 @@ module DiverDown
               # Add the dependency to the edge of the compound
               if @compound_map[ltail].include?(lhead)
                 compound_id = @compound_map[ltail][lhead]
-                @metadata_store.append_dependency(compound_id, _1)
+                @dot_metadata_store.append_dependency(compound_id, _1)
                 next
               end
 
-              compound_id = @metadata_store.issue_dependency_id(_1)
+              compound_id = @dot_metadata_store.issue_dependency_id(_1)
               @compound_map[ltail][lhead] = compound_id
 
               attributes.merge!(
@@ -269,7 +269,7 @@ module DiverDown
 
       def render_sources
         by_modules = definition.sources.group_by do |source|
-          module_store.get_modules(source.source_name)
+          metadata.source(source.source_name).modules
         end
 
         # Remove duplicated prefix modules
@@ -297,7 +297,7 @@ module DiverDown
 
                 io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
                 io.indented do
-                  io.puts %(id="#{@metadata_store.issue_modules_id(module_names)}")
+                  io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
                   io.puts %(label="#{escape_quote(module_name)}")
 
                   sources = (by_modules[module_names] || []).sort_by(&:source_name)
@@ -321,14 +321,14 @@ module DiverDown
       end
 
       def insert_source(source)
-        io.puts %("#{escape_quote(source.source_name)}" #{build_attributes(label: source.source_name, id: @metadata_store.issue_source_id(source))})
+        io.puts %("#{escape_quote(source.source_name)}" #{build_attributes(label: source.source_name, id: @dot_metadata_store.issue_source_id(source))})
       end
 
       def insert_dependencies(source)
         source.dependencies.each do
           attributes = {}
-          ltail = module_label(*module_store.get_modules(source.source_name))
-          lhead = module_label(*module_store.get_modules(_1.source_name))
+          ltail = module_label(*metadata.source(source.source_name).modules)
+          lhead = module_label(*metadata.source(_1.source_name).modules)
 
           if @compound && (ltail || lhead)
             # Rendering of dependencies between modules is done only once
@@ -338,11 +338,11 @@ module DiverDown
             # Add the dependency to the edge of the compound
             if between_modules && @compound_map[ltail].include?(lhead)
               compound_id = @compound_map[ltail][lhead]
-              @metadata_store.append_dependency(compound_id, _1)
+              @dot_metadata_store.append_dependency(compound_id, _1)
               next
             end
 
-            compound_id = @metadata_store.issue_dependency_id(_1)
+            compound_id = @dot_metadata_store.issue_dependency_id(_1)
             @compound_map[ltail][lhead] = compound_id
 
             attributes.merge!(
@@ -353,7 +353,7 @@ module DiverDown
             )
           else
             attributes.merge!(
-              id: @metadata_store.issue_dependency_id(_1)
+              id: @dot_metadata_store.issue_dependency_id(_1)
             )
           end
 
