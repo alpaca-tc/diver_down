@@ -22,9 +22,9 @@ module DiverDown
         @request = request
       end
 
-      # GET /api/aliases.json
-      def aliases
-        aliases = @metadata.source_alias.to_h.map do |alias_name, source_names|
+      # GET /api/source_aliases.json
+      def source_aliases
+        source_aliases = @metadata.source_alias.to_h.map do |alias_name, source_names|
           {
             alias_name:,
             source_names:,
@@ -32,12 +32,12 @@ module DiverDown
         end
 
         json(
-          aliases:,
+          source_aliases:,
         )
       end
 
-      # POST /api/aliases/:alias_name.json
-      def update_alias(alias_name, source_names)
+      # POST /api/source_aliases/:alias_name.json
+      def update_source_alias(alias_name, source_names)
         @metadata.source_alias.update_alias(alias_name, source_names)
         @metadata.flush
 
