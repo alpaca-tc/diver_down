@@ -32,21 +32,29 @@ module DiverDown
         end
 
         json(
-          source_aliases:,
+          source_aliases:
         )
       end
 
-      # POST /api/source_aliases/:alias_name.json
+      # POST /api/source_aliases.json
+      # @param alias_name [String]
+      # @param old_alias_name [String]
+      # @param source_names [Array<String>]
       def update_source_alias(alias_name, old_alias_name, source_names)
-        if old_alias_name
-          # Delete old alias
-          @metadata.source_alias.update_alias(old_alias_name, [])
+        @metadata.source_alias.transaction do
+          unless old_alias_name.to_s.empty?
+            # Delete old alias
+            @metadata.source_alias.update_alias(old_alias_name, [])
+          end
+
+          @metadata.source_alias.update_alias(alias_name, source_names)
         end
 
-        @metadata.source_alias.update_alias(alias_name, source_names)
         @metadata.flush
 
         json({})
+      rescue DiverDown::Web::Metadata::SourceAlias::ConflictError => e
+        json_error(e.message)
       end
 
       # GET /api/sources.json
@@ -400,8 +408,12 @@ module DiverDown
         end
       end
 
-      def json(data)
-        [200, { 'content-type' => 'application/json' }, [data.to_json]]
+      def json(data, status = 200)
+        [status, { 'content-type' => 'application/json' }, [data.to_json]]
+      end
+
+      def json_error(message, status = 422)
+        json({ message: }, status)
       end
     end
   end

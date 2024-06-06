@@ -738,7 +738,7 @@ RSpec.describe DiverDown::Web do
     end
 
     it 'returns source_aliases' do
-      metadata.source_alias.update_alias('A', ['A', 'C', 'B'])
+      metadata.source_alias.update_alias('A', ['C', 'B'])
 
       get '/api/source_aliases.json'
 
@@ -749,9 +749,9 @@ RSpec.describe DiverDown::Web do
         'source_aliases' => [
           {
             'alias_name' => 'A',
-            'source_names' => ['A', 'B', 'C'],
+            'source_names' => ['B', 'C'],
           },
-        ],
+        ]
       )
     end
   end
@@ -788,6 +788,19 @@ RSpec.describe DiverDown::Web do
       expect(metadata.source_alias.to_h).to eq(
         'B' => ['C']
       )
+    end
+
+    it 'renders 422 when conflicted' do
+      metadata.source_alias.update_alias('A', ['B'])
+      prev = metadata.source_alias.to_h
+
+      post '/api/source_aliases.json', { alias_name: 'B', source_names: ['C'] }
+
+      expect(last_response.status).to eq(422)
+      expect(JSON.parse(last_response.body)).to match(
+        'message' => include('already')
+      )
+      expect(metadata.source_alias.to_h).to eq(prev)
     end
   end
 end

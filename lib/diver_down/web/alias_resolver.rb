@@ -13,7 +13,7 @@ module DiverDown
       def resolve(definition)
         new_definition = DiverDown::Definition.new(
           definition_group: definition.definition_group,
-          title: definition.title,
+          title: definition.title
         )
 
         definition.sources.each do |source|
@@ -29,7 +29,7 @@ module DiverDown
             dependency.method_ids.each do |method_id|
               new_method_id = new_dependency.find_or_build_method_id(
                 context: method_id.context,
-                name: method_id.name,
+                name: method_id.name
               )
 
               method_id.paths.each do |path|

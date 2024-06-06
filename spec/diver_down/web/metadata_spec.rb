@@ -62,13 +62,13 @@ RSpec.describe DiverDown::Web::Metadata do
       it 'writes alias to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
-        instance.source_alias.update_alias('A', ['A', 'C', 'B'])
+        instance.source_alias.update_alias('A', ['C', 'B'])
 
         expect {
           instance.flush
         }.to change {
           described_class.new(tempfile.path).source_alias.aliased_source_names('A')
-        }.from(nil).to(['A', 'B', 'C'])
+        }.from(nil).to(['B', 'C'])
       end
 
       it 'sorts by source name' do
