@@ -77,6 +77,7 @@ module DiverDown
 
             {
               source_name:,
+              resolved_alias: @metadata.source_alias.resolve_alias(source_name),
               memo: source_metadata.memo,
               modules: source_metadata.modules.map do |module_name|
                 { module_name: }
@@ -225,7 +226,10 @@ module DiverDown
                              end
 
         if definition
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @metadata, compound:, concentrate:, only_module:)
+          # Resolve source aliases
+          resolved_definition = @alias_resolver.resolve(definition)
+
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(resolved_definition, @metadata, compound:, concentrate:, only_module:)
 
           json(
             titles:,
@@ -235,6 +239,7 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
+                resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
                 memo: @metadata.source(_1.source_name).memo,
                 modules: @metadata.source(_1.source_name).modules.map do |module_name|
                   { module_name: }
@@ -292,6 +297,7 @@ module DiverDown
 
         json(
           source_name:,
+          resolved_alias: @metadata.source_alias.resolve_alias(source_name),
           memo: @metadata.source(source_name).memo,
           modules: module_names.map do
             { module_name: _1 }

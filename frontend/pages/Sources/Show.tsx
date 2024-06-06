@@ -43,6 +43,17 @@ export const Show: React.FC = () => {
 
               <Section>
                 <Stack gap={0.5}>
+                  <Heading type="sectionTitle">Source Alias</Heading>
+                  <div style={{ overflow: 'clip' }}>
+                    {specificSource.resolvedAlias ? (
+                      <Link to={path.sources.show(specificSource.resolvedAlias)}>{specificSource.resolvedAlias}</Link>
+                    ) : null}
+                  </div>
+                </Stack>
+              </Section>
+
+              <Section>
+                <Stack gap={0.5}>
                   <Heading type="sectionTitle">Modules</Heading>
                   <div style={{ overflow: 'clip' }}>
                     <Table fixedHead>

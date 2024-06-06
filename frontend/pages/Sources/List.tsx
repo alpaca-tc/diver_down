@@ -53,6 +53,7 @@ const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules 
       <Td>
         <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
       </Td>
+      <Td>{source.resolvedAlias ? <Link to={path.sources.show(source.resolvedAlias)}>{source.resolvedAlias}</Link> : null}</Td>
       <Td>
         {editingMemo ? (
           <SourceMemoInput
@@ -226,6 +227,7 @@ export const List: FC = () => {
                 <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
                   Source name
                 </Th>
+                <Th>Source Alias</Th>
                 <Th>Memo</Th>
                 <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
                   Modules

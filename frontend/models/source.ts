@@ -3,6 +3,7 @@ import { Module } from './module'
 
 export type Source = {
   sourceName: string
+  resolvedAlias: string | null
   memo: string
   modules: Module[]
 }
@@ -19,6 +20,7 @@ type ReverseDependency = {
 
 export type SpecificSource = {
   sourceName: string
+  resolvedAlias: string | null
   memo: string
   modules: Module[]
   relatedDefinitions: RelatedDefinition[]

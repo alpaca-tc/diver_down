@@ -205,7 +205,9 @@ const SourceAliasRow: FC<SourceAliasRowProps> = ({ sourceAlias, setOpenedDialog 
   return (
     <tr>
       <Td>
-        <Link to={path.sources.show(sourceAlias.aliasName)}>{sourceAlias.aliasName}</Link>
+        <Stack>
+          <Link to={path.sources.show(sourceAlias.aliasName)}>{sourceAlias.aliasName}</Link>
+        </Stack>
       </Td>
       <Td>
         <Stack>
