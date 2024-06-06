@@ -16,6 +16,7 @@ module DiverDown
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
     require 'diver_down/web/source_alias_resolver'
+    require 'diver_down/web/module_sources_filter'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
@@ -61,7 +62,9 @@ module DiverDown
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.combine_definitions(bit_id, compound, concentrate, only_module)
+        allowed_modules = request.params['allowed_modules'] # Array<Array<String>>?
+        pp request.params
+        action.combine_definitions(bit_id, compound, concentrate, only_module, allowed_modules)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
