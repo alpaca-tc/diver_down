@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from 'react'
+import { FC, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
@@ -26,7 +26,7 @@ import { Module } from '@/models/module'
 import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
-import { useDebounce } from '@/hooks/useDebounce'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -120,12 +120,54 @@ const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules 
   )
 }
 
+type SourcesTableBodyProps = {
+  allSources: Sources['sources']
+  inputSourceName: string
+  sortState: SortState
+  onUpdated: () => void
+}
+
+const SourcesTableBody: React.FC<SourcesTableBodyProps> = ({ allSources, inputSourceName, sortState, onUpdated }) => {
+  const [recentModules, setRecentModules] = useState<Module[]>([])
+  const sources: Sources['sources'] = useMemo(() => {
+    let sources = allSources
+
+    if (!/^\s*$/.test(inputSourceName)) {
+      const words = inputSourceName
+        .split(/\s+/)
+        .map((s) => s.trim().toLowerCase())
+        .filter((s) => s !== '')
+
+      sources = sources.filter((source) => {
+        const sourceName = source.sourceName.toLowerCase()
+        return words.every((word) => sourceName.includes(word))
+      })
+    }
+
+    return sortSources(sources, sortState.key, sortState.sort)
+  }, [allSources, sortState, inputSourceName])
+
+  return (
+    <tbody>
+      {sources.map((source) => (
+        <Row
+          key={source.sourceName}
+          source={source}
+          recentModules={recentModules}
+          onUpdated={onUpdated}
+          setRecentModules={setRecentModules}
+        />
+      ))}
+    </tbody>
+  )
+}
+
 export const List: FC = () => {
   const { data, mutate, isLoading } = useSources()
+  const navigate = useNavigate()
   const [sortState, setSortState] = useState<SortState>({ key: 'sourceName', sort: 'asc' })
-  const [recentModules, setRecentModules] = useState<Module[]>([])
   const [inputSourceName, setInputSourceName] = useState<string>('')
-  const [filteredSourceName, setFilteredSourceName] = useState<string>('')
+  const deferredInputSourceName = useDeferredValue(inputSourceName)
 
   const handleInputSourceName = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,13 +176,18 @@ export const List: FC = () => {
     [setInputSourceName],
   )
 
-  useDebounce(
-    () => {
-      setFilteredSourceName(inputSourceName)
-    },
-    200,
-    [inputSourceName],
-  )
+  useEffect(() => {
+    const params: { sourceName?: string } = {}
+
+    if (deferredInputSourceName.length > 0) {
+      params.sourceName = deferredInputSourceName
+    }
+
+    navigate({
+      pathname: path.sources.index(),
+      search: createSearchParams(params).toString()
+    })
+  }, [navigate, deferredInputSourceName])
 
   const setNextSortType = useCallback(
     (key: SortState['key']) => {
@@ -157,30 +204,6 @@ export const List: FC = () => {
     },
     [setSortState],
   )
-
-  const sources: Sources['sources'] = useMemo(() => {
-    console.log(`changed filteredSourceName ${filteredSourceName}`)
-
-    if (!data) {
-      return []
-    }
-
-    let sources = data.sources
-
-    if (!/^\s*$/.test(inputSourceName)) {
-      const words = filteredSourceName
-        .split(/\s+/)
-        .map((s) => s.trim().toLowerCase())
-        .filter((s) => s !== '')
-
-      sources = sources.filter((source) => {
-        const sourceName = source.sourceName.toLowerCase()
-        return words.every((word) => sourceName.includes(word))
-      })
-    }
-
-    return sortSources(sources, sortState.key, sortState.sort)
-  }, [data?.sources, sortState, filteredSourceName])
 
   return (
     <StyledSection>
@@ -209,18 +232,13 @@ export const List: FC = () => {
                 </Th>
               </tr>
             </thead>
-            {sources && sources.length > 0 ? (
-              <tbody>
-                {sources.map((source) => (
-                  <Row
-                    key={source.sourceName}
-                    source={source}
-                    recentModules={recentModules}
-                    onUpdated={mutate}
-                    setRecentModules={setRecentModules}
-                  />
-                ))}
-              </tbody>
+            {data?.sources && data.sources.length > 0 ? (
+              <SourcesTableBody
+                allSources={data.sources}
+                inputSourceName={deferredInputSourceName}
+                sortState={sortState}
+                onUpdated={mutate}
+              />
             ) : (
               <EmptyTableBody>{isLoading ? <Loading /> : <Text>Not Found</Text>}</EmptyTableBody>
             )}
