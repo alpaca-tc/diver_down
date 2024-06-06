@@ -206,8 +206,8 @@ module DiverDown
       # @param compound [Boolean]
       # @param concentrate [Boolean]
       # @param only_module [Boolean]
-      # @param allowed_modules [Array<String>]
-      def combine_definitions(bit_id, compound, concentrate, only_module, allowed_modules)
+      # @param match_modules [Array<String>]
+      def combine_definitions(bit_id, compound, concentrate, only_module, match_modules)
         ids = DiverDown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
@@ -230,8 +230,8 @@ module DiverDown
           # Resolve source aliases
           resolved_definition = @source_alias_resolver.resolve(definition)
 
-          # Filter all sources and dependencies by modules if allowed_modules is given
-          resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(resolved_definition, match_modules: allowed_modules) unless allowed_modules.empty?
+          # Filter all sources and dependencies by modules if match_modules is given
+          resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(resolved_definition, match_modules:) unless match_modules.empty?
 
           definition_to_dot = DiverDown::Web::DefinitionToDot.new(resolved_definition, @metadata, compound:, concentrate:, only_module:)
 
