@@ -2,7 +2,7 @@
 
 module DiverDown
   class Web
-    class AliasResolver
+    class SourceAliasResolver
       # @param metadata_alias [DiverDown::Web::Metadata::SourceAlias]
       def initialize(metadata_alias)
         @metadata_alias = metadata_alias

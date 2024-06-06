@@ -8,7 +8,6 @@ module DiverDown
     WEB_DIR = File.expand_path('../../web', __dir__)
 
     require 'diver_down/web/action'
-    require 'diver_down/web/alias_resolver'
     require 'diver_down/web/definition_to_dot'
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
@@ -16,6 +15,7 @@ module DiverDown
     require 'diver_down/web/indented_string_io'
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
+    require 'diver_down/web/source_alias_resolver'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'

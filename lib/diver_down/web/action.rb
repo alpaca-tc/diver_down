@@ -18,7 +18,7 @@ module DiverDown
       def initialize(store:, metadata:, request:)
         @store = store
         @metadata = metadata
-        @alias_resolver = DiverDown::Web::AliasResolver.new(@metadata.source_alias)
+        @source_alias_resolver = DiverDown::Web::SourceAliasResolver.new(@metadata.source_alias)
         @request = request
       end
 
@@ -227,7 +227,7 @@ module DiverDown
 
         if definition
           # Resolve source aliases
-          resolved_definition = @alias_resolver.resolve(definition)
+          resolved_definition = @source_alias_resolver.resolve(definition)
 
           definition_to_dot = DiverDown::Web::DefinitionToDot.new(resolved_definition, @metadata, compound:, concentrate:, only_module:)
 

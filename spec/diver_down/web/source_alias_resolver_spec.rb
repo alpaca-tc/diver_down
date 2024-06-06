@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DiverDown::Web::AliasResolver do
+RSpec.describe DiverDown::Web::SourceAliasResolver do
   describe 'InstanceMethods' do
     describe '#resolve' do
       include DefinitionHelper
