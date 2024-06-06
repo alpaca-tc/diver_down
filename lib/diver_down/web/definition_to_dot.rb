@@ -198,7 +198,7 @@ module DiverDown
         end
 
         # Remove duplicated prefix modules
-        # from [["A"], ["A", "B"]] to [["A", "B"]]
+        # from [["A"], ["A", "B"], ["A", "C"], ["D"]] to { "A" => { "B" => {}, "C" => {} }, "D" => {} }
         uniq_modules = [*dependency_map.keys, *dependency_map.values.map(&:keys).flatten(1)].uniq
         uniq_modules.reject! do |modules|
           modules.empty? ||
@@ -268,60 +268,50 @@ module DiverDown
       end
 
       def render_sources
+        # Hash{ modules => sources }
+        # Hash{ Array<String> => Array<DiverDown::Definition::Source> }
         by_modules = definition.sources.group_by do |source|
           metadata.source(source.source_name).modules
         end
 
-        # Remove duplicated prefix modules
-        # from [["A"], ["A", "B"]] to [["A", "B"]]
-        uniq_modules = by_modules.keys.uniq
-        uniq_modules = uniq_modules.reject do |modules|
-          uniq_modules.any? { _1[0..modules.size - 1] == modules && _1.length > modules.size }
-        end
+        # Render subgraph for each module and its sources second
+        nested_modules = array_to_hash(by_modules.keys.uniq.sort)
+        render_nested_modules_sources(by_modules, nested_modules)
 
-        uniq_modules.each do |full_modules|
-          # Render module and source
-          if full_modules.empty?
-            sources = by_modules[full_modules].sort_by(&:source_name)
-
-            sources.each do |source|
-              insert_source(source)
-            end
-          else
-            buf = swap_io do
-              indexes = (0..(full_modules.length - 1)).to_a
-
-              chain_yield(indexes) do |index, next_proc|
-                module_names = full_modules[0..index]
-                module_name = module_names[-1]
-
-                io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
-                io.indented do
-                  io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
-                  io.puts %(label="#{escape_quote(module_name)}")
-
-                  sources = (by_modules[module_names] || []).sort_by(&:source_name)
-                  sources.each do |source|
-                    insert_source(source)
-                  end
-
-                  next_proc&.call
-                end
-                io.puts '}'
-              end
-            end
-
-            io.write buf.string
-          end
-        end
-
+        # Render dependencies last
         definition.sources.sort_by(&:source_name).each do |source|
           insert_dependencies(source)
         end
       end
 
-      def insert_source(source)
-        io.puts %("#{escape_quote(source.source_name)}" #{build_attributes(label: source.source_name, id: @dot_metadata_store.issue_source_id(source))})
+      def render_nested_modules_sources(by_modules, nested_modules, prefix = [])
+        nested_modules.each do |module_name, next_nested_modules|
+          module_names = prefix + [module_name].compact
+          sources = (by_modules[module_names] || []).sort_by(&:source_name)
+
+          if module_name.nil?
+            sources.each do |source|
+              io.puts build_source_node(source)
+            end
+          else
+            io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
+            io.indented do
+              io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
+              io.puts %(label="#{escape_quote(module_name)}")
+
+              sources.each do |source|
+                io.puts build_source_node(source)
+              end
+
+              render_nested_modules_sources(by_modules, next_nested_modules, module_names)
+            end
+            io.puts '}'
+          end
+        end
+      end
+
+      def build_source_node(source)
+        %("#{escape_quote(source.source_name)}" #{build_attributes(label: source.source_name, id: @dot_metadata_store.issue_source_id(source))})
       end
 
       def insert_dependencies(source)
@@ -419,6 +409,28 @@ module DiverDown
 
       def escape_quote(string)
         string.to_s.gsub(/"/, '\"')
+      end
+
+      # from [["A"], ["A", "B"], ["A", "C"], ["D"]] to { "A" => { "B" => {}, "C" => {} }, "D" => {} }
+      def array_to_hash(array)
+        hash = {}
+        array.each do |sub_array|
+          current_hash = hash
+
+          if sub_array.empty?
+            current_hash[nil] = {}
+          else
+            sub_array.each_with_index do |element, index|
+              if index == sub_array.length - 1
+                current_hash[element] = {}
+              else
+                current_hash[element] ||= {}
+                current_hash = current_hash[element]
+              end
+            end
+          end
+        end
+        hash
       end
     end
   end

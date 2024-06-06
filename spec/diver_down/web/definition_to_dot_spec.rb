@@ -196,6 +196,96 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           )
         end
 
+        it 'returns digraph given multiple modules' do
+          definition = build_definition(
+            sources: [
+              {
+                source_name: 'a.rb',
+                dependencies: [
+                  {
+                    source_name: 'b.rb',
+                    method_ids: [
+                      {
+                        name: 'call_b',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  }, {
+                    source_name: 'c.rb',
+                    method_ids: [
+                      {
+                        name: 'call_c',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  }, {
+                    source_name: 'd.rb',
+                    method_ids: [
+                      {
+                        name: 'call_d',
+                        context: 'class',
+                        paths: [],
+                      },
+                    ],
+                  },
+                ],
+              }, {
+                source_name: 'b.rb',
+              }, {
+                source_name: 'c.rb',
+              }, {
+                source_name: 'd.rb',
+              }, {
+                source_name: 'e.rb',
+              }, {
+                source_name: 'f.rb',
+              },
+            ]
+          )
+
+          metadata.source('a.rb').modules = ['A']
+          metadata.source('b.rb').modules = ['B']
+          metadata.source('c.rb').modules = ['B']
+          metadata.source('d.rb').modules = ['B', 'C']
+          metadata.source('e.rb').modules = ['B', 'D']
+          metadata.source('f.rb').modules = []
+          metadata.source('unknown.rb').modules = ['Unknown']
+
+          instance = described_class.new(definition, metadata)
+
+          expect(instance.to_s).to eq(<<~DOT)
+            strict digraph "title" {
+              "f.rb" [label="f.rb" id="graph_1"]
+              subgraph "cluster_A" {
+                id="graph_2"
+                label="A"
+                "a.rb" [label="a.rb" id="graph_3"]
+              }
+              subgraph "cluster_B" {
+                id="graph_4"
+                label="B"
+                "b.rb" [label="b.rb" id="graph_5"]
+                "c.rb" [label="c.rb" id="graph_6"]
+                subgraph "cluster_B::C" {
+                  id="graph_7"
+                  label="C"
+                  "d.rb" [label="d.rb" id="graph_8"]
+                }
+                subgraph "cluster_B::D" {
+                  id="graph_9"
+                  label="D"
+                  "e.rb" [label="e.rb" id="graph_10"]
+                }
+              }
+              "a.rb" -> "b.rb" [id="graph_11"]
+              "a.rb" -> "c.rb" [id="graph_12"]
+              "a.rb" -> "d.rb" [id="graph_13"]
+            }
+           DOT
+        end
+
         it 'returns compound digraph if compound = true' do
           definition = build_definition(
             sources: [
