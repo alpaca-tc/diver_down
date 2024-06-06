@@ -318,6 +318,8 @@ RSpec.describe DiverDown::Web do
       metadata.source('a.rb').modules = ['A']
       metadata.source('a.rb').memo = 'memo'
 
+      metadata.source_alias.update_alias('b.rb', ['a.rb'])
+
       get '/api/sources.json'
 
       expect(last_response.status).to eq(200)
@@ -325,16 +327,19 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'resolved_alias' => 'b.rb',
             'memo' => 'memo',
             'modules' => [{ 'module_name' => 'A' }],
           },
           {
             'source_name' => 'b.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
           {
             'source_name' => 'c.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
@@ -578,11 +583,13 @@ RSpec.describe DiverDown::Web do
         [
           {
             'source_name' => 'a.rb',
+            'resolved_alias' => nil,
             'memo' => 'memo',
             'modules' => [],
           },
           {
             'source_name' => 'b.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
@@ -638,6 +645,7 @@ RSpec.describe DiverDown::Web do
       store.set(definition_2)
 
       metadata.source('a.rb').memo = 'memo'
+      metadata.source_alias.update_alias('b.rb', ['a.rb'])
 
       get '/api/sources/a.rb.json'
 
@@ -646,6 +654,7 @@ RSpec.describe DiverDown::Web do
       json = JSON.parse(last_response.body)
       expect(json).to eq(
         'source_name' => 'a.rb',
+        'resolved_alias' => 'b.rb',
         'memo' => 'memo',
         'modules' => [],
         'related_definitions' => [
@@ -726,6 +735,81 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
 
       expect(metadata.source('a.rb').memo).to eq('memo')
+    end
+  end
+
+  describe 'GET /api/source_aliases.json' do
+    it 'returns [] if alias is not added' do
+      get '/api/source_aliases.json'
+
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to eq('source_aliases' => [])
+    end
+
+    it 'returns source_aliases' do
+      metadata.source_alias.update_alias('A', ['C', 'B'])
+
+      get '/api/source_aliases.json'
+
+      expect(last_response.status).to eq(200)
+
+      json = JSON.parse(last_response.body)
+      expect(json).to eq(
+        'source_aliases' => [
+          {
+            'alias_name' => 'A',
+            'source_names' => ['B', 'C'],
+          },
+        ]
+      )
+    end
+  end
+
+  describe 'POST /api/source_aliase.json' do
+    it 'deletes alias if source_names are empty' do
+      metadata.source_alias.update_alias('A', ['B'])
+
+      expect {
+        post '/api/source_aliases.json', { alias_name: 'A', source_names: [] }
+      }.to change {
+        metadata.source_alias.aliased_source_names('A')
+      }.from(['B']).to(nil)
+
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'adds alias if source_names are present' do
+      expect {
+        post '/api/source_aliases.json', { alias_name: 'A', source_names: ['B'] }
+      }.to change {
+        metadata.source_alias.aliased_source_names('A')
+      }.from(nil).to(['B'])
+
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'updates alias if old_alias_name is present' do
+      metadata.source_alias.update_alias('A', ['B'])
+
+      post '/api/source_aliases.json', { alias_name: 'B', old_alias_name: 'A', source_names: ['C'] }
+
+      expect(last_response.status).to eq(200)
+      expect(metadata.source_alias.to_h).to eq(
+        'B' => ['C']
+      )
+    end
+
+    it 'renders 422 when conflicted' do
+      metadata.source_alias.update_alias('A', ['B'])
+      prev = metadata.source_alias.to_h
+
+      post '/api/source_aliases.json', { alias_name: 'B', source_names: ['C'] }
+
+      expect(last_response.status).to eq(422)
+      expect(JSON.parse(last_response.body)).to match(
+        'message' => include('already')
+      )
+      expect(metadata.source_alias.to_h).to eq(prev)
     end
   end
 end

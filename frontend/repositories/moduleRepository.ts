@@ -5,13 +5,13 @@ import { Module, SpecificModule } from '@/models/module'
 
 import { get } from './httpRequest'
 
-type SourcesReponse = {
+type ModulesReponse = {
   modules: Array<Array<{ module_name: string }>>
 }
 
 export const useModules = () => {
   const { data, isLoading, mutate } = useSWR<Module[][]>(path.api.modules.index(), async () => {
-    const response = await get<SourcesReponse>(path.api.modules.index())
+    const response = await get<ModulesReponse>(path.api.modules.index())
     return response.modules.map((moduleList) => moduleList.map((module) => ({ moduleName: module.module_name })))
   })
 

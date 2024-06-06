@@ -25,6 +25,15 @@ RSpec.describe DiverDown::Web::Metadata do
       end
     end
 
+    describe '#alias' do
+      it 'returns DiverDown::Web::Metadata::SourceAlias' do
+        path = build_temp_path
+        instance = described_class.new(path)
+
+        expect(instance.source_alias).to be_a(DiverDown::Web::Metadata::SourceAlias)
+      end
+    end
+
     describe '#flush' do
       it 'writes modules to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
@@ -48,6 +57,18 @@ RSpec.describe DiverDown::Web::Metadata do
         }.to change {
           described_class.new(tempfile.path).source('a.rb').memo
         }.from('').to('memo')
+      end
+
+      it 'writes alias to path' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+        instance.source_alias.update_alias('A', ['C', 'B'])
+
+        expect {
+          instance.flush
+        }.to change {
+          described_class.new(tempfile.path).source_alias.aliased_source_names('A')
+        }.from(nil).to(['B', 'C'])
       end
 
       it 'sorts by source name' do
@@ -82,6 +103,15 @@ RSpec.describe DiverDown::Web::Metadata do
         end
 
         expect(instance.to_h[:sources].keys).to eq(source_names)
+      end
+
+      it "doesn't include blank source" do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+
+        instance.source('a.rb')
+
+        expect(instance.to_h[:sources].keys).to eq([])
       end
     end
   end

@@ -31,7 +31,7 @@ export const List: FC = () => {
   return (
     <StyledSection>
       <Stack>
-        <Heading type="screenTitle">Sources</Heading>
+        <Heading type="screenTitle">Modules</Heading>
 
         <div style={{ overflow: 'clip' }}>
           <Table fixedHead>

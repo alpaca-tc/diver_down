@@ -18,7 +18,43 @@ module DiverDown
       def initialize(store:, metadata:, request:)
         @store = store
         @metadata = metadata
+        @alias_resolver = DiverDown::Web::AliasResolver.new(@metadata.source_alias)
         @request = request
+      end
+
+      # GET /api/source_aliases.json
+      def source_aliases
+        source_aliases = @metadata.source_alias.to_h.map do |alias_name, source_names|
+          {
+            alias_name:,
+            source_names:,
+          }
+        end
+
+        json(
+          source_aliases:
+        )
+      end
+
+      # POST /api/source_aliases.json
+      # @param alias_name [String]
+      # @param old_alias_name [String]
+      # @param source_names [Array<String>]
+      def update_source_alias(alias_name, old_alias_name, source_names)
+        @metadata.source_alias.transaction do
+          unless old_alias_name.to_s.empty?
+            # Delete old alias
+            @metadata.source_alias.update_alias(old_alias_name, [])
+          end
+
+          @metadata.source_alias.update_alias(alias_name, source_names)
+        end
+
+        @metadata.flush
+
+        json({})
+      rescue DiverDown::Web::Metadata::SourceAlias::ConflictError => e
+        json_error(e.message)
       end
 
       # GET /api/sources.json
@@ -37,12 +73,13 @@ module DiverDown
 
         json(
           sources: source_names.sort.map do |source_name|
-            source = @metadata.source(source_name)
+            source_metadata = @metadata.source(source_name)
 
             {
               source_name:,
-              memo: source.memo,
-              modules: source.modules.map do |module_name|
+              resolved_alias: @metadata.source_alias.resolve_alias(source_name),
+              memo: source_metadata.memo,
+              modules: source_metadata.modules.map do |module_name|
                 { module_name: }
               end,
             }
@@ -189,7 +226,10 @@ module DiverDown
                              end
 
         if definition
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @metadata, compound:, concentrate:, only_module:)
+          # Resolve source aliases
+          resolved_definition = @alias_resolver.resolve(definition)
+
+          definition_to_dot = DiverDown::Web::DefinitionToDot.new(resolved_definition, @metadata, compound:, concentrate:, only_module:)
 
           json(
             titles:,
@@ -199,6 +239,7 @@ module DiverDown
             sources: definition.sources.map do
               {
                 source_name: _1.source_name,
+                resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
                 memo: @metadata.source(_1.source_name).memo,
                 modules: @metadata.source(_1.source_name).modules.map do |module_name|
                   { module_name: }
@@ -256,6 +297,7 @@ module DiverDown
 
         json(
           source_name:,
+          resolved_alias: @metadata.source_alias.resolve_alias(source_name),
           memo: @metadata.source(source_name).memo,
           modules: module_names.map do
             { module_name: _1 }
@@ -372,8 +414,12 @@ module DiverDown
         end
       end
 
-      def json(data)
-        [200, { 'content-type' => 'application/json' }, [data.to_json]]
+      def json(data, status = 200)
+        [status, { 'content-type' => 'application/json' }, [data.to_json]]
+      end
+
+      def json_error(message, status = 422)
+        json({ message: }, status)
       end
     end
   end

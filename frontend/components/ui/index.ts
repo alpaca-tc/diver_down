@@ -22,6 +22,7 @@ export {
   LineClamp,
   Loader,
   ModelessDialog,
+  MultiComboBox,
   NotificationBar,
   PageHeading,
   Section,
@@ -48,6 +49,8 @@ export {
   defaultSpacing,
   useTheme,
 } from 'smarthr-ui'
+
+export type { ComboBoxItem } from 'smarthr-ui/lib/components/ComboBox/types'
 
 export type { Theme } from 'smarthr-ui/lib/hooks/useTheme'
 export { isTouchDevice } from 'smarthr-ui/lib/libs/ua'

@@ -8,6 +8,7 @@ import { get } from './httpRequest'
 type SourcesReponse = {
   sources: Array<{
     source_name: string
+    resolved_alias: string | null
     memo: string
     modules: Array<{
       module_name: string
@@ -22,6 +23,7 @@ export const useSources = () => {
     return {
       sources: response.sources.map((source) => ({
         sourceName: source.source_name,
+        resolvedAlias: source.resolved_alias,
         memo: source.memo,
         modules: source.modules.map((module) => ({ moduleName: module.module_name })),
       })),
@@ -34,6 +36,7 @@ export const useSources = () => {
 
 type SpecificSourceResponse = {
   source_name: string
+  resolved_alias: string | null
   memo: string
   modules: Array<{
     module_name: string
@@ -58,6 +61,7 @@ export const useSource = (sourceName: string) => {
 
     return {
       sourceName: response.source_name,
+      resolvedAlias: response.resolved_alias,
       memo: response.memo,
       modules: response.modules.map((module) => ({ moduleName: module.module_name })),
       relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),

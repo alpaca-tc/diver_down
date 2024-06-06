@@ -82,7 +82,14 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
   return (
     <tr ref={ref}>
       <Td>
-        <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+        <Cluster>
+          <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+          {source.resolvedAlias ? (
+            <Tooltip message={`Alias: ${source.resolvedAlias}`} horizontal="center" vertical="bottom">
+              <FaCircleInfoIcon />
+            </Tooltip>
+          ) : null}
+        </Cluster>
       </Td>
       <Td>
         {editingMemo ? (

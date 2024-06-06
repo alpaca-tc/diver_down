@@ -46,6 +46,7 @@ type CombinedDefinitionReponse = {
   dot_metadata: DotMetadataResponse[]
   sources: Array<{
     source_name: string
+    resolved_alias: string | null
     memo: string
     modules: Array<{
       module_name: string
@@ -102,6 +103,7 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
     dotMetadata: response.dot_metadata.map((res) => parseDotMetadata(res)),
     sources: response.sources.map((source) => ({
       sourceName: source.source_name,
+      resolvedAlias: source.resolved_alias,
       memo: source.memo,
       modules: source.modules.map((module) => ({
         moduleName: module.module_name,

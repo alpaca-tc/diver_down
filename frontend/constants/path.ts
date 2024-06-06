@@ -9,6 +9,9 @@ export const path = {
     index: () => '/sources',
     show: (sourceName: string) => `/sources/${sourceName}`,
   },
+  sourceAliases: {
+    index: () => '/source_aliases',
+  },
   modules: {
     index: () => '/modules',
     show: (moduleNames: string[]) => `/modules/${moduleNames.join('/')}`,
@@ -32,6 +35,10 @@ export const path = {
       modules: {
         update: (sourceName: string) => `/api/sources/${sourceName}/modules.json`,
       },
+    },
+    sourceAliases: {
+      index: () => '/api/source_aliases.json',
+      update: () => `/api/source_aliases.json`,
     },
     modules: {
       index: () => '/api/modules.json',

@@ -8,6 +8,7 @@ module DiverDown
     WEB_DIR = File.expand_path('../../web', __dir__)
 
     require 'diver_down/web/action'
+    require 'diver_down/web/alias_resolver'
     require 'diver_down/web/definition_to_dot'
     require 'diver_down/web/definition_enumerator'
     require 'diver_down/web/bit_id'
@@ -76,6 +77,14 @@ module DiverDown
         action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
         action.initialization_status(@total_definition_files_size)
+      in ['GET', %r{\A/api/source_aliases\.json\z}]
+        action.source_aliases
+      in ['POST', %r{\A/api/source_aliases\.json\z}]
+        alias_name = request.params['alias_name']
+        old_alias_name = request.params['old_alias_name'] # NOTE: nillable
+        source_names = request.params['source_names'] || []
+
+        action.update_source_alias(alias_name, old_alias_name, source_names)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
       in ['GET', /\.json\z/], ['POST', /\.json\z/]
