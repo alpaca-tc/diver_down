@@ -318,6 +318,8 @@ RSpec.describe DiverDown::Web do
       metadata.source('a.rb').modules = ['A']
       metadata.source('a.rb').memo = 'memo'
 
+      metadata.source_alias.update_alias('b.rb', ['a.rb'])
+
       get '/api/sources.json'
 
       expect(last_response.status).to eq(200)
@@ -325,16 +327,19 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'resolved_alias' => 'b.rb',
             'memo' => 'memo',
             'modules' => [{ 'module_name' => 'A' }],
           },
           {
             'source_name' => 'b.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
           {
             'source_name' => 'c.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
@@ -578,11 +583,13 @@ RSpec.describe DiverDown::Web do
         [
           {
             'source_name' => 'a.rb',
+            'resolved_alias' => nil,
             'memo' => 'memo',
             'modules' => [],
           },
           {
             'source_name' => 'b.rb',
+            'resolved_alias' => nil,
             'memo' => '',
             'modules' => [],
           },
@@ -638,6 +645,7 @@ RSpec.describe DiverDown::Web do
       store.set(definition_2)
 
       metadata.source('a.rb').memo = 'memo'
+      metadata.source_alias.update_alias('b.rb', ['a.rb'])
 
       get '/api/sources/a.rb.json'
 
@@ -646,6 +654,7 @@ RSpec.describe DiverDown::Web do
       json = JSON.parse(last_response.body)
       expect(json).to eq(
         'source_name' => 'a.rb',
+        'resolved_alias' => 'b.rb',
         'memo' => 'memo',
         'modules' => [],
         'related_definitions' => [
