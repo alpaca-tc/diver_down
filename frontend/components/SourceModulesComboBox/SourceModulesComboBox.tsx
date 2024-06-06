@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ComboBoxItem } from 'smarthr-ui/lib/components/ComboBox/types'
 
-import { Button, Cluster, FaXmarkIcon, FormControl, Input, SingleComboBox, Text } from '@/components/ui'
+import { Button, Cluster, ComboBoxItem, FaXmarkIcon, FormControl, SingleComboBox } from '@/components/ui'
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 import { useSourceModules } from '@/repositories/sourceModulesRepository'

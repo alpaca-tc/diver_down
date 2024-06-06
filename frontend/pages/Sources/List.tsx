@@ -185,7 +185,7 @@ export const List: FC = () => {
 
     navigate({
       pathname: path.sources.index(),
-      search: createSearchParams(params).toString()
+      search: createSearchParams(params).toString(),
     })
   }, [navigate, deferredInputSourceName])
 

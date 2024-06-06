@@ -23,21 +23,31 @@ export const Header: React.FC = () => {
     {
       children: 'Definition List',
       current: pathname === path.home(),
+      href: path.home(),
       onClick: () => navigate(path.home()),
     },
     {
       children: 'Source List',
       current: pathname === path.sources.index() || /^\/sources\//.test(pathname),
+      href: path.sources.index(),
       onClick: () => navigate(path.sources.index()),
     },
     {
       children: 'Module List',
       current: pathname === path.modules.index() || /^\/modules\//.test(pathname),
+      href: path.modules.index(),
       onClick: () => navigate(path.modules.index()),
+    },
+    {
+      children: 'Source Aliases',
+      current: pathname === path.sourceAliases.index(),
+      href: path.sourceAliases.index(),
+      onClick: () => navigate(path.sourceAliases.index()),
     },
     {
       children: 'License',
       current: pathname === path.licenses.index(),
+      href: path.licenses.index(),
       onClick: () => navigate(path.licenses.index()),
     },
   ]
