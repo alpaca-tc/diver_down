@@ -9,6 +9,7 @@ describe('stringify', () => {
     expect(stringify({ a: null })).toEqual('')
     expect(stringify({ a: undefined })).toEqual('')
     expect(stringify({ a: 1, b: 2 })).toEqual('a=1&b=2')
+    expect(stringify({ a: true })).toEqual('a=1')
   })
 
   it('converts object values to params', () => {

@@ -26,11 +26,23 @@ const internalStringify = (key: string, value: any): Array<[string, string]> => 
   return entries
 }
 
+const stringifyValue = (value: any): any => {
+  if (typeof value === 'boolean') {
+    return value ? '1' : null
+  } else {
+    return value
+  }
+}
+
 export const stringify = (params: Record<string, any>): string => {
   const entries: Array<[string, string]> = []
 
   Object.entries(params).forEach(([key, value]) => {
-    entries.push(...internalStringify(key, value))
+    const v = stringifyValue(value)
+
+    if (v !== null && v !== undefined) {
+      entries.push(...internalStringify(key, v))
+    }
   })
 
   return entries.map(([key, value]) => `${key}=${value}`).join('&')
