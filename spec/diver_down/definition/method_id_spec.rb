@@ -94,5 +94,15 @@ RSpec.describe DiverDown::Definition::MethodId do
         )
       end
     end
+
+    describe '#freeze' do
+      it 'freezes instance' do
+        method_id = described_class.new(name: 'to_s', context: 'class')
+        method_id.freeze
+
+        expect(method_id).to be_frozen
+        expect { method_id.add_path('a.rb:9') }.to raise_error(FrozenError)
+      end
+    end
   end
 end

@@ -28,6 +28,7 @@ RSpec.describe DiverDown::Web::DefinitionStore do
         definition_3 = DiverDown::Definition.new(title: 'c')
         ids = store.set(definition_1, definition_2, definition_3)
         expect(ids).to eq([1, 2, 3])
+        expect([definition_1, definition_2, definition_3]).to all(be_frozen)
       end
 
       it 'returns id if definition already set' do

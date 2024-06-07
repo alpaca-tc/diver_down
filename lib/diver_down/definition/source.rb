@@ -52,6 +52,12 @@ module DiverDown
         @dependency_map[dependency_source_name]
       end
 
+      # @param dependency_source_name [String]
+      # @return [void]
+      def delete_dependency(dependency_source_name)
+        @dependency_map.delete(dependency_source_name)
+      end
+
       # @return [Array<DiverDown::Definition::Dependency>]
       def dependencies
         @dependency_map.values.sort
@@ -84,6 +90,13 @@ module DiverDown
       # @return [Integer]
       def hash
         [self.class, source_name, dependencies].hash
+      end
+
+      # @return [void]
+      def freeze
+        super
+        @dependency_map.transform_values(&:freeze)
+        @dependency_map.freeze
       end
     end
   end

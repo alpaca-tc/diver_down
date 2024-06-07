@@ -78,6 +78,12 @@ module DiverDown
       def inspect
         %(#<#{self.class} #{human_method_name} paths=#{paths.inspect}>")
       end
+
+      # @return [void]
+      def freeze
+        super
+        @paths.freeze
+      end
     end
   end
 end

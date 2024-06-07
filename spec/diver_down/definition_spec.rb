@@ -199,5 +199,44 @@ RSpec.describe DiverDown::Definition do
         expect(definition.hash).to_not eq(different_store_id.hash)
       end
     end
+
+    describe '#freeze' do
+      it 'freezes instance' do
+        definition = described_class.new(
+          title: 'title',
+          sources: [
+            DiverDown::Definition::Source.new(
+              source_name: 'a.rb',
+              dependencies: [
+                DiverDown::Definition::Dependency.new(
+                  source_name: 'b.rb',
+                  method_ids: [
+                    DiverDown::Definition::MethodId.new(
+                      name: 'A',
+                      context: 'class',
+                      paths: ['a.rb']
+                    ),
+                  ]
+                ),
+                DiverDown::Definition::Dependency.new(
+                  source_name: 'c.rb'
+                ),
+              ]
+            ),
+          ]
+        )
+
+        definition.freeze
+
+        source = definition.source('a.rb')
+        dependency = source.dependency('b.rb')
+        method_id = dependency.find_or_build_method_id(name: 'A', context: 'class')
+
+        expect { definition.find_or_build_source('unknown') }.to raise_error(FrozenError)
+        expect { source.find_or_build_dependency('unknown') }.to raise_error(FrozenError)
+        expect { dependency.find_or_build_method_id(name: 'unknown', context: 'class') }.to raise_error(FrozenError)
+        expect { method_id.add_path('a.rb:9') }.to raise_error(FrozenError)
+      end
+    end
   end
 end

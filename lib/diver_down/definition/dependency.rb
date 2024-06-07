@@ -102,6 +102,16 @@ module DiverDown
       def inspect
         %(#<#{self.class} source_name="#{source_name}" method_ids=#{method_ids}>")
       end
+
+      # @return [void]
+      def freeze
+        super
+        @method_id_map.transform_values do
+          _1.transform_values(&:freeze)
+          _1.freeze
+        end
+        @method_id_map.freeze
+      end
     end
   end
 end

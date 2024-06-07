@@ -31,6 +31,7 @@ module DiverDown
           raise(ArgumentError, 'definition already set') if _1.store_id
 
           _1.store_id = @definitions.size + 1
+          _1.freeze
 
           @definitions.push(_1)
           @definition_group_store[_1.definition_group] << _1
