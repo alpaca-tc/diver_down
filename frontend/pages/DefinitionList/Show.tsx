@@ -5,18 +5,15 @@ import { Loading } from '@/components/Loading'
 import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 import { useBitIdHash } from '@/hooks/useBitIdHash'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
 
-import { GraphOptions } from './components/ConfigureGraphOptionsDialog'
-import { DefinitionGraph } from './components/DefinitionGraph'
 import { DefinitionList } from './components/DefinitionList'
-import { DefinitionSources } from './components/DefinitionSources'
 
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { Module } from '@/models/module'
-import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
 import { useGraphOptions } from '@/hooks/useGraphOptions'
+import { DefinitionGraph } from '@/components/DefinitionGraph'
+import { DefinitionSources } from '@/components/DefinitionSources'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()

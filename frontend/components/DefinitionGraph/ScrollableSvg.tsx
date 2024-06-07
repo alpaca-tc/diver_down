@@ -11,7 +11,7 @@ import { extractSvgSize, getClosestAndSmallestElement, toSVGPoint } from '@/util
 import type { Tool, Value } from 'react-svg-pan-zoom'
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
 import { color } from '@/constants/theme'
-import { DotMetadataDialogProps } from '../DotMetadataDialog'
+import type { DotMetadataDialogProps } from '@/pages/DefinitionList/components/DotMetadataDialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition

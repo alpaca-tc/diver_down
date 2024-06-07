@@ -5,12 +5,12 @@ import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/compone
 import { color } from '@/constants/theme'
 import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
 
-import { ConfigureGraphOptionsDialog, GraphOptions } from '../ConfigureGraphOptionsDialog'
-
 import { ScrollableSvg } from './ScrollableSvg'
 
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
-import { DotMetadataDialog, DotMetadataDialogProps } from '../DotMetadataDialog'
+import { GraphOptions } from '@/hooks/useGraphOptions'
+import { ConfigureGraphOptionsDialog } from '@/components/ConfigureGraphOptionsDialog'
+import { DotMetadataDialog, DotMetadataDialogProps } from '@/components/DotMetadataDialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition
