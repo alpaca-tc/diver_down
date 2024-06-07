@@ -283,7 +283,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               "a.rb" -> "c.rb" [id="graph_12"]
               "a.rb" -> "d.rb" [id="graph_13"]
             }
-           DOT
+          DOT
         end
 
         it 'returns compound digraph if compound = true' do

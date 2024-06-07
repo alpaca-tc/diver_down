@@ -5,8 +5,6 @@ module DiverDown
     class DefinitionStore
       include Enumerable
 
-      attr_reader :bit_id
-
       def initialize
         # Hash{ Integer(unique bit flag) => DiverDown::Definition }
         @definitions = []

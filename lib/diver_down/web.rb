@@ -57,13 +57,18 @@ module DiverDown
       in ['GET', %r{\A/api/modules/(?<module_names>.+)\.json\z}]
         module_names = CGI.unescape(Regexp.last_match[:module_names]).split('/')
         action.module(module_names)
+      in ['GET', %r{\A/api/module_definitions/(?<modules>.+)\.json\z}]
+        modules = CGI.unescape(Regexp.last_match[:modules]).split('/')
+        compound = request.params['compound'] == '1'
+        concentrate = request.params['concentrate'] == '1'
+        only_module = request.params['only_module'] == '1'
+        action.module_definition(compound, concentrate, only_module, modules)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        match_modules = request.params['match_modules'] || [] # Array<Array<String>>
-        action.combine_definitions(bit_id, compound, concentrate, only_module, match_modules)
+        action.combine_definitions(bit_id, compound, concentrate, only_module)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
@@ -111,6 +116,9 @@ module DiverDown
           # No needed to synchronize because this is executed on a single thread.
           @store.set(definition)
         end
+
+        # Cache combined_definition
+        @store.combined_definition
       end
     end
   end
