@@ -184,7 +184,7 @@ export const DotMetadataDialog: FC<Props> = ({ dotMetadata, onClose, top, left, 
 
   return (
     <ModelessDialog
-      isOpen={!!(dotMetadata)}
+      isOpen={!!dotMetadata}
       header={<ModelessHeading>Memo</ModelessHeading>}
       onClickClose={onClose}
       onPressEscape={onClose}

@@ -19,12 +19,7 @@ type Props = {
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
-export const DefinitionGraph: FC<Props> = ({
-  combinedDefinition,
-  mutateCombinedDefinition,
-  graphOptions,
-  setGraphOptions,
-}) => {
+export const DefinitionGraph: FC<Props> = ({ combinedDefinition, mutateCombinedDefinition, graphOptions, setGraphOptions }) => {
   const [hoverDotMetadata, setHoverDotMetadata] = useState<DotMetadata | null>(null)
   const [openedDotMetadataDialog, setOpenedDotMetadataDialog] = useState<DotMetadataDialogProps | null>(null)
   const [openedConfigureGraphOptionsDialog, setOpenedConfigureGraphOptionsDialog] = useState<boolean>(false)

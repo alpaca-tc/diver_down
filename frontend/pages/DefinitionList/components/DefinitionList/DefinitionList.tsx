@@ -104,7 +104,7 @@ const StickyCluster = styled(Cluster)`
   background: white;
 `
 
-const StyledSection = styled(Section) <{ $foldingSection: boolean }>`
+const StyledSection = styled(Section)<{ $foldingSection: boolean }>`
   height: inherit;
   overflow: scroll;
   width: ${({ $foldingSection }) => ($foldingSection ? `100%` : '200px')};
