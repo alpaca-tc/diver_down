@@ -41,82 +41,93 @@ export const Show: React.FC = () => {
         </Heading>
 
         <Section>
-          {specificModule && !isLoading ? (
-            <Stack gap={1.5}>
-              <Section>
-                <Stack gap={0.5}>
-                  <Heading type="sectionTitle">Sources</Heading>
-                  <div style={{ overflow: 'clip' }}>
-                    <Table fixedHead>
-                      <thead>
-                        <tr>
-                          <Th>Source Name</Th>
-                          <Th>Memo</Th>
-                        </tr>
-                      </thead>
-                      {specificModule.sources.length === 0 ? (
-                        <EmptyTableBody>
-                          <Text>no sources</Text>
-                        </EmptyTableBody>
-                      ) : (
-                        <tbody>
-                          {specificModule.sources.map((source) => (
-                            <tr key={source.sourceName}>
-                              <Td>
-                                <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-                              </Td>
-                              <Td>
-                                <Text>{source.memo}</Text>
-                              </Td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      )}
-                    </Table>
-                  </div>
-                </Stack>
-              </Section>
+          <Stack gap={1.5}>
+            <Section>
+              <Stack gap={0.5}>
+                <Heading type="sectionTitle">Links</Heading>
+                <Link to={path.moduleDefinitions.show(pathModules)}>
+                  Graph
+                </Link>
+              </Stack>
+            </Section>
 
-              <Section>
-                <Stack gap={0.5}>
-                  <Cluster>
-                    <Heading type="sectionTitle">Related Definitions</Heading>
-                    <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>
-                      Select All
-                    </Link>
-                  </Cluster>
-                  <div style={{ overflow: 'clip' }}>
-                    <Table fixedHead>
-                      <thead>
-                        <tr>
-                          <Th>Title</Th>
-                        </tr>
-                      </thead>
-                      {specificModule.relatedDefinitions.length === 0 ? (
-                        <EmptyTableBody>
-                          <Text>no related definitions</Text>
-                        </EmptyTableBody>
-                      ) : (
-                        <tbody>
-                          {specificModule.relatedDefinitions.map((relatedDefinition) => (
-                            <tr key={relatedDefinition.id}>
-                              <Td>
-                                <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId([relatedDefinition.id])) })}`}>
-                                  {relatedDefinition.title}
-                                </Link>
-                              </Td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      )}
-                    </Table>
-                  </div>
-                </Stack>
-              </Section>
-            </Stack>
-          ) : (
-            <Loading />
-          )}
+            {specificModule && !isLoading ? (
+              <>
+                <Section>
+                  <Stack gap={0.5}>
+                    <Heading type="sectionTitle">Sources</Heading>
+                    <div style={{ overflow: 'clip' }}>
+                      <Table fixedHead>
+                        <thead>
+                          <tr>
+                            <Th>Source Name</Th>
+                            <Th>Memo</Th>
+                          </tr>
+                        </thead>
+                        {specificModule.sources.length === 0 ? (
+                          <EmptyTableBody>
+                            <Text>no sources</Text>
+                          </EmptyTableBody>
+                        ) : (
+                          <tbody>
+                            {specificModule.sources.map((source) => (
+                              <tr key={source.sourceName}>
+                                <Td>
+                                  <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                                </Td>
+                                <Td>
+                                  <Text>{source.memo}</Text>
+                                </Td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        )}
+                      </Table>
+                    </div>
+                  </Stack>
+                </Section>
+
+                <Section>
+                  <Stack gap={0.5}>
+                    <Cluster>
+                      <Heading type="sectionTitle">Related Definitions</Heading>
+                      <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>
+                        Select All
+                      </Link>
+                    </Cluster>
+                    <div style={{ overflow: 'clip' }}>
+                      <Table fixedHead>
+                        <thead>
+                          <tr>
+                            <Th>Title</Th>
+                          </tr>
+                        </thead>
+                        {specificModule.relatedDefinitions.length === 0 ? (
+                          <EmptyTableBody>
+                            <Text>no related definitions</Text>
+                          </EmptyTableBody>
+                        ) : (
+                          <tbody>
+                            {specificModule.relatedDefinitions.map((relatedDefinition) => (
+                              <tr key={relatedDefinition.id}>
+                                <Td>
+                                  <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId([relatedDefinition.id])) })}`}>
+                                    {relatedDefinition.title}
+                                  </Link>
+                                </Td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        )}
+                      </Table>
+                    </div>
+                  </Stack>
+                </Section>
+              </>
+            ) : (
+              <Loading />
+            )}
+          </Stack>
         </Section>
       </Stack>
     </StyledSection>

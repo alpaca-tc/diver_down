@@ -1,0 +1,118 @@
+import React, { useCallback, useMemo, useState } from 'react'
+import styled from 'styled-components'
+
+import { Loading } from '@/components/Loading'
+import { Aside, Section, Sidebar, Stack } from '@/components/ui'
+import { color } from '@/constants/theme'
+import { useBitIdHash } from '@/hooks/useBitIdHash'
+import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
+
+import { RecentModulesContext } from '@/context/RecentModulesContext'
+import { Module } from '@/models/module'
+import { useGraphOptions } from '@/hooks/useGraphOptions'
+import { DefinitionGraph } from '@/components/DefinitionGraph'
+import { DefinitionSources } from '@/components/DefinitionSources'
+import { useParams } from 'react-router-dom'
+import { useModule } from '@/repositories/moduleRepository'
+
+export const Show: React.FC = () => {
+  const pathModules = (useParams()['*'] ?? '').split('/')
+  const { data: specificModule } = useModule(pathModules)
+
+  const relatedDefinitionIds = useMemo(() => {
+    if (specificModule) {
+      return specificModule.relatedDefinitions.map(({ id }) => id)
+    } else {
+      return []
+    }
+  }, [specificModule])
+
+  const [graphOptions, setGraphOptions] = useGraphOptions()
+  const {
+    data: combinedDefinition,
+    isLoading: isLoadingCombinedDefinition,
+    mutate: mutateCombinedDefinition,
+  } = useCombinedDefinition(
+    relatedDefinitionIds,
+    graphOptions.compound,
+    graphOptions.concentrate,
+    graphOptions.onlyModule,
+    [pathModules],
+  )
+  const [recentModules, setRecentModules] = useState<Module[]>([])
+
+  return (
+    <Wrapper>
+      <RecentModulesContext.Provider value={{ recentModules, setRecentModules }}>
+        <StyledSidebar contentsMinWidth="0px" gap={0}>
+          <StyledSection>
+            {isLoadingCombinedDefinition ? (
+              <CenterStack>
+                <Loading text="Loading..." alt="Loading" />
+              </CenterStack>
+            ) : !combinedDefinition ? (
+              <CenterStack>
+                <p>No data</p>
+              </CenterStack>
+            ) : (
+              <StyledStack>
+                <DefinitionGraph
+                  combinedDefinition={combinedDefinition}
+                  mutateCombinedDefinition={mutateCombinedDefinition}
+                  graphOptions={graphOptions}
+                  setGraphOptions={setGraphOptions}
+                />
+                <StyledDefinitionSources
+                  combinedDefinition={combinedDefinition}
+                  mutateCombinedDefinition={mutateCombinedDefinition}
+                />
+              </StyledStack>
+            )}
+          </StyledSection>
+        </StyledSidebar>
+      </RecentModulesContext.Provider>
+    </Wrapper>
+  )
+}
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 1px); /* 100% - padding-top of layout */
+  width: 100vw;
+`
+
+const StyledSidebar = styled(Sidebar)`
+  display: flex;
+  height: 100%;
+`
+
+const StyledAside = styled(Aside)`
+  box-sizing: border-box;
+  border-top: 1px solid ${color.BORDER};
+  border-right: 1px solid ${color.BORDER};
+  background-color: ${color.WHITE};
+  height: inherit;
+`
+
+const StyledSection = styled(Section)`
+  box-sizing: border-box;
+  height: inherit;
+`
+
+const CenterStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  height: inherit;
+  justify-content: center;
+`
+
+const StyledStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  height: inherit;
+`
+
+const StyledDefinitionSources = styled(DefinitionSources)`
+  flex: 1;
+`
