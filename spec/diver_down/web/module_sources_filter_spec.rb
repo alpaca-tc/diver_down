@@ -47,7 +47,7 @@ RSpec.describe DiverDown::Web::ModuleSourcesFilter do
 
         metadata.source('Employee').modules = ['global']
         metadata.source('User').modules = ['global']
-        new_definition = instance.filter(definition, match_modules: [['global']])
+        new_definition = instance.filter(definition, modules: ['global'])
 
         expect(new_definition.to_h).to eq(fill_default(
           sources: [

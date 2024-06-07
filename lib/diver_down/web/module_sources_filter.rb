@@ -9,9 +9,9 @@ module DiverDown
       end
 
       # @param definition [DiverDown::Definition]
-      # @param match_modules [Array<Array<String>>]
+      # @param modules [Array<Array<String>>]
       # @return [DiverDown::Definition]
-      def filter(definition, match_modules:)
+      def filter(definition, modules:)
         new_definition = DiverDown::Definition.new(
           definition_group: definition.definition_group,
           title: definition.title
@@ -19,10 +19,7 @@ module DiverDown
 
         is_match_modules = ->(source_name) do
           source_modules = @metadata.source(source_name).modules
-
-          match_modules.any? do |modules|
-            source_modules.first(modules.size) == modules
-          end
+          source_modules.first(modules.size) == modules
         end
 
         definition.sources.each do |source|
