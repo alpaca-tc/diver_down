@@ -11,6 +11,7 @@ module DiverDown
         # Hash{ Integer(unique bit flag) => DiverDown::Definition }
         @definitions = []
         @definition_group_store = Hash.new { |h, k| h[k] = [] }
+        @combined_definition = nil
       end
 
       # @param id [Integer]
@@ -36,8 +37,26 @@ module DiverDown
           @definitions.push(_1)
           @definition_group_store[_1.definition_group] << _1
 
+          # Reset combined_definition
+          @combined_definition = nil
+
           _1.store_id
         end
+      end
+
+      # @return [DiverDown::Definition]
+      def combined_definition
+        if @combined_definition.nil?
+          @combined_definition = DiverDown::Definition.combine(
+            definition_group: nil,
+            title: 'All Definitions',
+            definitions: @definitions
+          )
+
+          @combined_definition.freeze
+        end
+
+        @combined_definition
       end
 
       # @return [Array<String, nil>]

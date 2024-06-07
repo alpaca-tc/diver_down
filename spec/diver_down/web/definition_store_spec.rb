@@ -40,6 +40,18 @@ RSpec.describe DiverDown::Web::DefinitionStore do
       end
     end
 
+    describe '#combined_definition' do
+      it 'returns combined_definition' do
+        store = described_class.new
+        definition_1 = DiverDown::Definition.new(title: 'a')
+        definition_2 = DiverDown::Definition.new(title: 'b')
+        definition_3 = DiverDown::Definition.new(title: 'c')
+        store.set(definition_1, definition_2, definition_3)
+
+        expect(store.combined_definition).to be_a(DiverDown::Definition)
+      end
+    end
+
     describe '#definition_groups' do
       it 'returns definition_groups' do
         store = described_class.new
