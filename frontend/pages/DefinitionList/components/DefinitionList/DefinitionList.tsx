@@ -15,10 +15,8 @@ type Props = {
   setSelectedDefinitionIds: React.Dispatch<React.SetStateAction<number[]>>
 }
 
-type DialogType = 'configureSearchOptionsDiaglog'
-
 export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDefinitionIds }) => {
-  const [visibleDialog, setVisibleDialog] = useState<DialogType | null>(null)
+  const [openedConfigureSearchOptionsDialog, setOpenedConfigureSearchOptionsDialog] = useState<boolean>(false)
   const [searchDefinitionsOptions, setSearchDefinitionsOptions] = useLocalStorage<SearchDefinitionsOptions>(
     'Home-DefinitionList-SearchDefinitionOptions-v1',
     { definitionGroup: '', title: '', source: '', folding: false },
@@ -38,8 +36,8 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
   }, [isLoading, setSize, isValidating, isReachingEnd])
 
   const onClickCloseDialog = useCallback(() => {
-    setVisibleDialog(null)
-  }, [setVisibleDialog])
+    setOpenedConfigureSearchOptionsDialog(false)
+  }, [setOpenedConfigureSearchOptionsDialog])
 
   const onClickReset = useCallback(() => {
     setSelectedDefinitionIds([])
@@ -63,7 +61,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
               <Button
                 size="s"
                 square
-                onClick={() => setVisibleDialog('configureSearchOptionsDiaglog')}
+                onClick={() => setOpenedConfigureSearchOptionsDialog(true)}
                 prefix={<FaGearIcon alt="Open Options" />}
               >
                 Open Options
@@ -76,7 +74,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
         </Cluster>
       </StickyCluster>
       <ConfigureSearchOptionsDialog
-        isOpen={visibleDialog === 'configureSearchOptionsDiaglog'}
+        isOpen={openedConfigureSearchOptionsDialog}
         onClickClose={onClickCloseDialog}
         searchDefinitionsOptions={searchDefinitionsOptions}
         setSearchDefinitionsOptions={setSearchDefinitionsOptions}
@@ -106,7 +104,7 @@ const StickyCluster = styled(Cluster)`
   background: white;
 `
 
-const StyledSection = styled(Section)<{ $foldingSection: boolean }>`
+const StyledSection = styled(Section) <{ $foldingSection: boolean }>`
   height: inherit;
   overflow: scroll;
   width: ${({ $foldingSection }) => ($foldingSection ? `100%` : '200px')};

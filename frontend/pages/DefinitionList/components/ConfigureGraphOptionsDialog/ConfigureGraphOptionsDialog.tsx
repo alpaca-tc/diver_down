@@ -3,12 +3,13 @@ import styled from 'styled-components'
 
 import { ActionDialog, CheckBox, FormControl, Section, Stack } from '@/components/ui'
 import { spacing } from '@/constants/theme'
+import { GraphOptions } from '@/hooks/useGraphOptions'
 
-export type GraphOptions = {
-  compound: boolean
-  concentrate: boolean
-  onlyModule: boolean
+type ConfigureGraphOptionsDialogProps = {
+  type: 'configureGraphOptionsDialog'
 }
+
+export type DialogProps = ConfigureGraphOptionsDialogProps
 
 type Props = {
   isOpen: boolean

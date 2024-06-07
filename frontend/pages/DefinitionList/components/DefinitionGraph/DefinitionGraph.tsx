@@ -1,64 +1,80 @@
-import { FC, useCallback } from 'react'
+import { FC, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/components/ui'
 import { color } from '@/constants/theme'
-import { CombinedDefinition } from '@/models/combinedDefinition'
+import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
 
 import { ConfigureGraphOptionsDialog, GraphOptions } from '../ConfigureGraphOptionsDialog'
 
 import { ScrollableSvg } from './ScrollableSvg'
 
-import type { DialogProps } from '../dialog'
+import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
+import { DotMetadataDialog, DotMetadataDialogProps } from '../DotMetadataDialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition
-  visibleDialog: DialogProps | null
-  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogProps | null>>
+  mutateCombinedDefinition: () => void
   graphOptions: GraphOptions
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
 
 export const DefinitionGraph: FC<Props> = ({
   combinedDefinition,
+  mutateCombinedDefinition,
   graphOptions,
   setGraphOptions,
-  visibleDialog,
-  setVisibleDialog,
 }) => {
-  const onClickCloseDialog = useCallback(() => {
-    setVisibleDialog(null)
-  }, [setVisibleDialog])
+  const [hoverDotMetadata, setHoverDotMetadata] = useState<DotMetadata | null>(null)
+  const [openedDotMetadataDialog, setOpenedDotMetadataDialog] = useState<DotMetadataDialogProps | null>(null)
+  const [openedConfigureGraphOptionsDialog, setOpenedConfigureGraphOptionsDialog] = useState<boolean>(false)
+
+  const onCloseConfigureGraphOptionsDialog = useCallback(() => {
+    setOpenedConfigureGraphOptionsDialog(false)
+  }, [setOpenedConfigureGraphOptionsDialog])
+
+  const onCloseDotMetadataDialog = useCallback(() => {
+    setOpenedDotMetadataDialog(null)
+  }, [setOpenedDotMetadataDialog])
 
   return (
-    <WrapperSection>
-      <ConfigureGraphOptionsDialog
-        isOpen={visibleDialog?.type === 'configureGraphOptionsDialog'}
-        onClickClose={onClickCloseDialog}
-        graphOptions={graphOptions}
-        setGraphOptions={setGraphOptions}
-      />
-      <FixedHeightHeading type="sectionTitle">
-        <LineClamp>
-          {combinedDefinition.titles.map((title, index) => (
-            <BlockText key={index} size="XXS">
-              {title}
-            </BlockText>
-          ))}
-        </LineClamp>
-        <Button
-          size="s"
-          square
-          onClick={() => setVisibleDialog({ type: 'configureGraphOptionsDialog' })}
-          prefix={<FaGearIcon alt="Open Options" />}
-        >
-          Open Graph Options
-        </Button>
-      </FixedHeightHeading>
-      <FlexHeightSvgWrapper>
-        <ScrollableSvg combinedDefinition={combinedDefinition} setVisibleDialog={setVisibleDialog} />
-      </FlexHeightSvgWrapper>
-    </WrapperSection>
+    <HoverDotMetadataContext.Provider value={{ hoverDotMetadata, setHoverDotMetadata }}>
+      <WrapperSection>
+        <ConfigureGraphOptionsDialog
+          isOpen={openedConfigureGraphOptionsDialog}
+          onClickClose={onCloseConfigureGraphOptionsDialog}
+          graphOptions={graphOptions}
+          setGraphOptions={setGraphOptions}
+        />
+        <DotMetadataDialog
+          dotMetadata={openedDotMetadataDialog?.dotMetadata ?? null}
+          top={openedDotMetadataDialog ? openedDotMetadataDialog.top : 0}
+          left={openedDotMetadataDialog ? openedDotMetadataDialog.left : 0}
+          onClose={onCloseDotMetadataDialog}
+          mutateCombinedDefinition={mutateCombinedDefinition}
+        />
+        <FixedHeightHeading type="sectionTitle">
+          <LineClamp>
+            {combinedDefinition.titles.map((title, index) => (
+              <BlockText key={index} size="XXS">
+                {title}
+              </BlockText>
+            ))}
+          </LineClamp>
+          <Button
+            size="s"
+            square
+            onClick={() => setOpenedConfigureGraphOptionsDialog(true)}
+            prefix={<FaGearIcon alt="Open Options" />}
+          >
+            Open Graph Options
+          </Button>
+        </FixedHeightHeading>
+        <FlexHeightSvgWrapper>
+          <ScrollableSvg combinedDefinition={combinedDefinition} setOpenedDotMetadataDialog={setOpenedDotMetadataDialog} />
+        </FlexHeightSvgWrapper>
+      </WrapperSection>
+    </HoverDotMetadataContext.Provider>
   )
 }
 

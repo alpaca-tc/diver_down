@@ -8,15 +8,14 @@ import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
 import { renderDot } from '@/utils/renderDot'
 import { extractSvgSize, getClosestAndSmallestElement, toSVGPoint } from '@/utils/svgHelper'
 
-import { DialogProps } from '../dialog'
-
 import type { Tool, Value } from 'react-svg-pan-zoom'
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
 import { color } from '@/constants/theme'
+import { DotMetadataDialogProps } from '../DotMetadataDialog'
 
 type Props = {
   combinedDefinition: CombinedDefinition
-  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogProps | null>>
+  setOpenedDotMetadataDialog: React.Dispatch<React.SetStateAction<DotMetadataDialogProps | null>>
 }
 
 // Return .cluster, .node, .edge or null
@@ -37,7 +36,7 @@ const findClosestElementOnCursor = (event: MouseEvent): SVGGElement | null => {
   return neastGeometryElement ?? null
 }
 
-export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog }) => {
+export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setOpenedDotMetadataDialog }) => {
   const { observeRef, size } = useRefSize<HTMLDivElement>()
   const viewerRef = useRef<ReactSVGPanZoom | null>(null)
 
@@ -74,14 +73,14 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
   // On click .node, .edge, .cluster
   useEffect(() => {
     if (tool !== TOOL_NONE) {
-      setVisibleDialog(null)
+      setOpenedDotMetadataDialog(null)
       return
     }
 
     const onClickGeometry = (event: MouseEvent) => {
       if (hoverDotMetadata) {
         event.preventDefault()
-        setVisibleDialog({ type: 'metadataDialog', metadata: hoverDotMetadata, left: event.clientX, top: event.clientY })
+        setOpenedDotMetadataDialog({ dotMetadata: hoverDotMetadata, left: event.clientX, top: event.clientY })
       }
     }
 
@@ -90,7 +89,7 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
     return () => {
       document.removeEventListener('click', onClickGeometry)
     }
-  }, [tool, hoverDotMetadata, setVisibleDialog])
+  }, [tool, hoverDotMetadata, setOpenedDotMetadataDialog])
 
   // On hover .node, .edge, .cluster
   useEffect(() => {
@@ -139,12 +138,12 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
     }
 
     setHoverDotMetadata((prev) => findNewMetadata(prev))
-    setVisibleDialog((prev) => {
-      if (prev?.type === 'metadataDialog') {
-        const newMetadata = findNewMetadata(prev.metadata)
+    setOpenedDotMetadataDialog((prev) => {
+      if (prev) {
+        const newDotMetadata = findNewMetadata(prev.dotMetadata)
 
-        if (newMetadata) {
-          return { ...prev, metadata: newMetadata }
+        if (newDotMetadata) {
+          return { ...prev, dotMetadata: newDotMetadata }
         } else {
           return null
         }
@@ -152,11 +151,7 @@ export const ScrollableSvg: FC<Props> = ({ combinedDefinition, setVisibleDialog 
         return prev
       }
     })
-  }, [combinedDefinition.dotMetadata, setVisibleDialog, setHoverDotMetadata])
-
-  useEffect(() => {
-    console.log(hoverDotMetadata?.id)
-  }, [hoverDotMetadata])
+  }, [combinedDefinition.dotMetadata, setOpenedDotMetadataDialog, setHoverDotMetadata])
 
   if (!svg) return null
 

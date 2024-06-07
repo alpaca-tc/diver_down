@@ -19,23 +19,26 @@ import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
-import { DialogProps } from '../dialog'
 import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 
+export type DotMetadataDialogProps = {
+  dotMetadata: DotMetadata
+  top: number
+  left: number
+}
+
 type Props = {
   dotMetadata: DotMetadata | null
-  isOpen: boolean
   onClose: () => void
-  setVisibleDialog: React.Dispatch<React.SetStateAction<DialogProps | null>>
   mutateCombinedDefinition: () => void
   top: number
   left: number
 }
 
-const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props, 'mutateCombinedDefinition'>> = ({
-  metadata,
+const SourceDotMetadataContent: FC<{ dotMetadata: DotSourceMetadata } & Pick<Props, 'mutateCombinedDefinition'>> = ({
+  dotMetadata,
   mutateCombinedDefinition,
 }) => {
   const { setRecentModules } = useContext(RecentModulesContext)
@@ -44,7 +47,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
   const items: ComponentProps<typeof DefinitionList>['items'] = [
     {
       term: 'Source Name',
-      description: <Link to={path.sources.show(metadata.sourceName)}>{metadata.sourceName}</Link>,
+      description: <Link to={path.sources.show(dotMetadata.sourceName)}>{dotMetadata.sourceName}</Link>,
     },
     {
       term: 'Memo',
@@ -52,8 +55,8 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
         <Cluster>
           {editingMemo ? (
             <SourceMemoInput
-              sourceName={metadata.sourceName}
-              initialMemo={metadata.memo}
+              sourceName={dotMetadata.sourceName}
+              initialMemo={dotMetadata.memo}
               onUpdate={() => {
                 setEditingMemo(false)
                 mutateCombinedDefinition()
@@ -64,7 +67,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
             />
           ) : (
             <>
-              <Text>{metadata.memo}</Text>
+              <Text>{dotMetadata.memo}</Text>
               <Button
                 square={true}
                 onClick={() => {
@@ -85,8 +88,8 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
         <Cluster>
           {editingModules ? (
             <SourceModulesComboBox
-              sourceName={metadata.sourceName}
-              initialModules={metadata.modules}
+              sourceName={dotMetadata.sourceName}
+              initialModules={dotMetadata.modules}
               onUpdate={(modules) => {
                 setRecentModules(modules)
                 setEditingModules(false)
@@ -99,7 +102,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
           ) : (
             <>
               <div>
-                {metadata.modules.map((module) => (
+                {dotMetadata.modules.map((module) => (
                   <p key={module.moduleName}>{module.moduleName}</p>
                 ))}
               </div>
@@ -122,7 +125,7 @@ const SourceDotMetadataContent: FC<{ metadata: DotSourceMetadata } & Pick<Props,
   return <DefinitionList maxColumns={1} items={items} />
 }
 
-const DependencyDotMetadataContent: FC<{ metadata: DotDependencyMetadata }> = ({ metadata }) => (
+const DependencyDotMetadataContent: FC<{ dotMetadata: DotDependencyMetadata }> = ({ dotMetadata }) => (
   <Stack gap={0.5}>
     <div style={{ overflow: 'clip' }}>
       <Table fixedHead>
@@ -133,7 +136,7 @@ const DependencyDotMetadataContent: FC<{ metadata: DotDependencyMetadata }> = ({
           </tr>
         </thead>
         <tbody>
-          {metadata.dependencies.map((dependency) =>
+          {dotMetadata.dependencies.map((dependency) =>
             dependency.methodIds.map((methodId, index) => (
               <tr key={`${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
                 <Td>
@@ -149,13 +152,13 @@ const DependencyDotMetadataContent: FC<{ metadata: DotDependencyMetadata }> = ({
   </Stack>
 )
 
-const ModuleDotMetadataContent: FC<{ metadata: DotModuleMetadata }> = ({ metadata }) => {
+const ModuleDotMetadataContent: FC<{ dotMetadata: DotModuleMetadata }> = ({ dotMetadata }) => {
   const items: ComponentProps<typeof DefinitionList>['items'] = [
     {
       term: 'Module Name',
       description: (
-        <Link to={path.modules.show(metadata.modules.map((module) => module.moduleName))}>
-          {metadata.modules.map((module) => module.moduleName).join(' / ')}
+        <Link to={path.modules.show(dotMetadata.modules.map((module) => module.moduleName))}>
+          {dotMetadata.modules.map((module) => module.moduleName).join(' / ')}
         </Link>
       ),
     },
@@ -164,24 +167,24 @@ const ModuleDotMetadataContent: FC<{ metadata: DotModuleMetadata }> = ({ metadat
   return <DefinitionList items={items} />
 }
 
-export const MetadataDialog: FC<Props> = ({ dotMetadata, isOpen, onClose, top, left, mutateCombinedDefinition }) => {
+export const DotMetadataDialog: FC<Props> = ({ dotMetadata, onClose, top, left, mutateCombinedDefinition }) => {
   const content = useMemo(() => {
     switch (dotMetadata?.type) {
       case 'source': {
-        return <SourceDotMetadataContent metadata={dotMetadata} mutateCombinedDefinition={mutateCombinedDefinition} />
+        return <SourceDotMetadataContent dotMetadata={dotMetadata} mutateCombinedDefinition={mutateCombinedDefinition} />
       }
       case 'dependency': {
-        return <DependencyDotMetadataContent metadata={dotMetadata} />
+        return <DependencyDotMetadataContent dotMetadata={dotMetadata} />
       }
       case 'module': {
-        return <ModuleDotMetadataContent metadata={dotMetadata} />
+        return <ModuleDotMetadataContent dotMetadata={dotMetadata} />
       }
     }
   }, [dotMetadata, mutateCombinedDefinition])
 
   return (
     <ModelessDialog
-      isOpen={!!(isOpen && dotMetadata)}
+      isOpen={!!(dotMetadata)}
       header={<ModelessHeading>Memo</ModelessHeading>}
       onClickClose={onClose}
       onPressEscape={onClose}
