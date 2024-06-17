@@ -61,14 +61,14 @@ const normalizeParams = (params: Record<string, any>, name: string, v: any, dept
 
   let k: string
   let after: string
-  let start: string
+  let start: number
 
   if (!name) {
     // nil name, treat same as empty string (required by tests)
     k = after = ''
   } else if (depth === 0) {
     // Start of parsing, don't treat [] or [ at start of string specially
-    const start = name.indexOf('[', 1)
+    start = name.indexOf('[', 1)
     if (start !== -1) {
       // Start of parameter nesting, use part before brackets as key
       k = name.slice(0, start)

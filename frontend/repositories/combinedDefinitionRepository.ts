@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 
 import { path } from '@/constants/path'
-import { CombinedDefinition, CombinedDefinitionGraphOptions, DotMetadata } from '@/models/combinedDefinition'
+import { CombinedDefinition, CombinedDefinitionOptions, DotMetadata } from '@/models/combinedDefinition'
 import { bitIdToIds } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 
@@ -112,7 +112,7 @@ export const fetchCombinedDefinition = async (requestPath: string): Promise<Comb
   }
 }
 
-export const stringifyCombinedDefinitionOptions = (graphOptions: CombinedDefinitionGraphOptions): string => {
+export const stringifyCombinedDefinitionOptions = (graphOptions: CombinedDefinitionOptions): string => {
   const params = {
     compound: graphOptions.compound,
     concentrate: graphOptions.concentrate,
@@ -122,7 +122,7 @@ export const stringifyCombinedDefinitionOptions = (graphOptions: CombinedDefinit
   return stringify(params)
 }
 
-export const useCombinedDefinition = (ids: number[], graphOptions: CombinedDefinitionGraphOptions) => {
+export const useCombinedDefinition = (ids: number[], graphOptions: CombinedDefinitionOptions) => {
   const requestPath = `${path.api.definitions.show(ids)}?${stringifyCombinedDefinitionOptions(graphOptions)}`
   const shouldFetch = ids.length > 0
   const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchCombinedDefinition)
