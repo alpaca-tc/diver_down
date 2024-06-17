@@ -231,5 +231,19 @@ RSpec.describe DiverDown::Definition::Dependency do
         expect(array.sort.map(&:source_name)).to eq(%w[a.rb b.rb c.rb])
       end
     end
+
+    describe '#freeze' do
+      it 'freezes instance' do
+        dependency = described_class.new(source_name: 'a.rb')
+        method_id = dependency.find_or_build_method_id(name: 'to_s', context: 'class')
+
+        expect(dependency).to_not be_frozen
+        dependency.freeze
+        expect(dependency).to be_frozen
+
+        expect { dependency.find_or_build_method_id(name: 'unknown', context: 'class') }.to raise_error(FrozenError)
+        expect { method_id.add_path('a.rb') }.to raise_error(FrozenError)
+      end
+    end
   end
 end

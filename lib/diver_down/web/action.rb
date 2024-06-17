@@ -200,6 +200,32 @@ module DiverDown
         )
       end
 
+      # GET /api/module_definition/:module_names.json
+      #
+      # @param bit_id [Integer]
+      # @param compound [Boolean]
+      # @param concentrate [Boolean]
+      # @param only_module [Boolean]
+      # @param modules [Array<String>]
+      def module_definition(compound, concentrate, only_module, modules)
+        definition = @store.combined_definition
+
+        # Filter all sources and dependencies by modules if match_modules is given
+        resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(definition, modules:)
+
+        # Resolve source aliases
+        resolved_definition = @source_alias_resolver.resolve(resolved_definition)
+
+        render_combined_definition(
+          (1..@store.size).to_a,
+          resolved_definition,
+          modules,
+          compound:,
+          concentrate:,
+          only_module:
+        )
+      end
+
       # GET /api/definitions/:bit_id.json
       #
       # @param bit_id [Integer]
@@ -229,23 +255,13 @@ module DiverDown
           # Resolve source aliases
           resolved_definition = @source_alias_resolver.resolve(definition)
 
-          definition_to_dot = DiverDown::Web::DefinitionToDot.new(resolved_definition, @metadata, compound:, concentrate:, only_module:)
-
-          json(
-            titles:,
-            bit_id: DiverDown::Web::BitId.ids_to_bit_id(valid_ids).to_s,
-            dot: definition_to_dot.to_s,
-            dot_metadata: definition_to_dot.dot_metadata,
-            sources: definition.sources.map do
-              {
-                source_name: _1.source_name,
-                resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
-                memo: @metadata.source(_1.source_name).memo,
-                modules: @metadata.source(_1.source_name).modules.map do |module_name|
-                  { module_name: }
-                end,
-              }
-            end
+          render_combined_definition(
+            valid_ids,
+            resolved_definition,
+            titles,
+            compound:,
+            concentrate:,
+            only_module:
           )
         else
           not_found
@@ -420,6 +436,27 @@ module DiverDown
 
       def json_error(message, status = 422)
         json({ message: }, status)
+      end
+
+      def render_combined_definition(ids, definition, titles, compound:, concentrate:, only_module:)
+        definition_to_dot = DiverDown::Web::DefinitionToDot.new(definition, @metadata, compound:, concentrate:, only_module:)
+
+        json(
+          titles:,
+          bit_id: DiverDown::Web::BitId.ids_to_bit_id(ids).to_s,
+          dot: definition_to_dot.to_s,
+          dot_metadata: definition_to_dot.dot_metadata,
+          sources: definition.sources.map do
+            {
+              source_name: _1.source_name,
+              resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
+              memo: @metadata.source(_1.source_name).memo,
+              modules: @metadata.source(_1.source_name).modules.map do |module_name|
+                { module_name: }
+              end,
+            }
+          end
+        )
       end
     end
   end

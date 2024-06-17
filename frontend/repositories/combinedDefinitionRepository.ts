@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 
 import { path } from '@/constants/path'
-import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
+import { CombinedDefinition, CombinedDefinitionGraphOptions, DotMetadata } from '@/models/combinedDefinition'
 import { bitIdToIds } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 
@@ -93,7 +93,7 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
   }
 }
 
-const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinition> => {
+export const fetchCombinedDefinition = async (requestPath: string): Promise<CombinedDefinition> => {
   const response = await get<CombinedDefinitionReponse>(requestPath)
 
   return {
@@ -112,17 +112,20 @@ const fetchDefinitionShow = async (requestPath: string): Promise<CombinedDefinit
   }
 }
 
-const toBooleanFlag = (value: boolean) => (value ? '1' : null)
-
-export const useCombinedDefinition = (ids: number[], compound: boolean, concentrate: boolean, onlyModule: boolean) => {
+export const stringifyCombinedDefinitionOptions = (graphOptions: CombinedDefinitionGraphOptions): string => {
   const params = {
-    compound: toBooleanFlag(compound),
-    concentrate: toBooleanFlag(concentrate),
-    only_module: toBooleanFlag(onlyModule),
+    compound: graphOptions.compound,
+    concentrate: graphOptions.concentrate,
+    only_module: graphOptions.onlyModule,
   }
-  const requestPath = `${path.api.definitions.show(ids)}?${stringify(params)}`
+
+  return stringify(params)
+}
+
+export const useCombinedDefinition = (ids: number[], graphOptions: CombinedDefinitionGraphOptions) => {
+  const requestPath = `${path.api.definitions.show(ids)}?${stringifyCombinedDefinitionOptions(graphOptions)}`
   const shouldFetch = ids.length > 0
-  const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchDefinitionShow)
+  const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchCombinedDefinition)
 
   return { data, isLoading, mutate }
 }

@@ -16,6 +16,7 @@ module DiverDown
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
     require 'diver_down/web/source_alias_resolver'
+    require 'diver_down/web/module_sources_filter'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
@@ -56,6 +57,12 @@ module DiverDown
       in ['GET', %r{\A/api/modules/(?<module_names>.+)\.json\z}]
         module_names = CGI.unescape(Regexp.last_match[:module_names]).split('/')
         action.module(module_names)
+      in ['GET', %r{\A/api/module_definitions/(?<modules>.+)\.json\z}]
+        modules = CGI.unescape(Regexp.last_match[:modules]).split('/')
+        compound = request.params['compound'] == '1'
+        concentrate = request.params['concentrate'] == '1'
+        only_module = request.params['only_module'] == '1'
+        action.module_definition(compound, concentrate, only_module, modules)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
@@ -109,6 +116,9 @@ module DiverDown
           # No needed to synchronize because this is executed on a single thread.
           @store.set(definition)
         end
+
+        # Cache combined_definition
+        @store.combined_definition
       end
     end
   end

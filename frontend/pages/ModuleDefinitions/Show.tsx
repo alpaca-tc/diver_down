@@ -1,39 +1,35 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { Loading } from '@/components/Loading'
 import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
-import { useBitIdHash } from '@/hooks/useBitIdHash'
-import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
-
-import { DefinitionList } from './components/DefinitionList'
 
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { Module } from '@/models/module'
 import { useGraphOptions } from '@/hooks/useGraphOptions'
 import { DefinitionGraph } from '@/components/DefinitionGraph'
 import { DefinitionSources } from '@/components/DefinitionSources'
+import { useParams } from 'react-router-dom'
+import { useModuleDefinition } from '@/repositories/moduleDefinitionRepository'
 
 export const Show: React.FC = () => {
-  const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
+  const pathModules = (useParams()['*'] ?? '').split('/')
+
   const [graphOptions, setGraphOptions] = useGraphOptions()
   const {
     data: combinedDefinition,
-    isLoading,
+    isLoading: isLoadingCombinedDefinition,
     mutate: mutateCombinedDefinition,
-  } = useCombinedDefinition(selectedDefinitionIds, graphOptions)
+  } = useModuleDefinition(pathModules, graphOptions)
   const [recentModules, setRecentModules] = useState<Module[]>([])
 
   return (
     <Wrapper>
       <RecentModulesContext.Provider value={{ recentModules, setRecentModules }}>
         <StyledSidebar contentsMinWidth="0px" gap={0}>
-          <StyledAside>
-            <DefinitionList selectedDefinitionIds={selectedDefinitionIds} setSelectedDefinitionIds={setSelectedDefinitionIds} />
-          </StyledAside>
           <StyledSection>
-            {isLoading ? (
+            {isLoadingCombinedDefinition ? (
               <CenterStack>
                 <Loading text="Loading..." alt="Loading" />
               </CenterStack>

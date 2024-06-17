@@ -155,6 +155,19 @@ RSpec.describe DiverDown::Definition::Source do
       end
     end
 
+    describe '#delete_dependency' do
+      it 'deletes dependency' do
+        source = described_class.new(source_name: 'a.rb')
+        dependency = source.find_or_build_dependency('b.rb')
+
+        expect(source.dependency(dependency.source_name)).to eq(dependency)
+
+        source.delete_dependency(dependency.source_name)
+
+        expect(source.dependency(dependency.source_name)).to be_nil
+      end
+    end
+
     describe '#<=>' do
       it 'compares sources' do
         sources = [
@@ -208,6 +221,22 @@ RSpec.describe DiverDown::Definition::Source do
             },
           ]
         )
+      end
+    end
+
+    describe '#freeze' do
+      it 'freezes instance' do
+        source = described_class.new(source_name: 'a.rb')
+        dependency = source.find_or_build_dependency('b.rb')
+        method_id = dependency.find_or_build_method_id(name: 'to_s', context: 'class')
+
+        expect(source).to_not be_frozen
+        source.freeze
+        expect(source).to be_frozen
+
+        expect { source.find_or_build_dependency('c.rb') }.to raise_error(FrozenError)
+        expect { dependency.find_or_build_method_id(name: 'unknown', context: 'class') }.to raise_error(FrozenError)
+        expect { method_id.add_path('a.rb') }.to raise_error(FrozenError)
       end
     end
   end

@@ -1,6 +1,12 @@
 import { Module } from './module'
 import { Source } from './source'
 
+export type CombinedDefinitionOptions = {
+  compound: boolean
+  concentrate: boolean
+  onlyModule: boolean
+}
+
 type BaseDotMetadata = {
   id: string
 }

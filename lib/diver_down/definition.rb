@@ -103,5 +103,13 @@ module DiverDown
         [self.class, definition_group, title, sources].hash
       end
     end
+
+    # @return [void]
+    def freeze
+      super
+
+      @source_map.transform_values(&:freeze)
+      @source_map.freeze
+    end
   end
 end

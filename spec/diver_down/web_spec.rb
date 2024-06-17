@@ -617,6 +617,28 @@ RSpec.describe DiverDown::Web do
     end
   end
 
+  describe 'GET /api/module_definitions/:module_names+.json' do
+    it 'returns combined_definition' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      metadata.source('a.rb').modules = ['A']
+
+      get '/api/module_definitions/A.json'
+
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers['content-type']).to eq('application/json')
+      expect(last_response.body).to include('digraph')
+    end
+  end
+
   describe 'GET /api/sources/:source.json' do
     it 'returns 404 if source is not found' do
       get '/api/sources/unknown.json'

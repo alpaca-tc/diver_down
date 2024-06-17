@@ -16,6 +16,9 @@ export const path = {
     index: () => '/modules',
     show: (moduleNames: string[]) => `/modules/${moduleNames.join('/')}`,
   },
+  moduleDefinitions: {
+    show: (moduleNames: string[]) => `/module_definitions/${moduleNames.join('/')}`,
+  },
   licenses: {
     index: () => '/licenses',
   },
@@ -43,6 +46,9 @@ export const path = {
     modules: {
       index: () => '/api/modules.json',
       show: (moduleNames: string[]) => `/api/modules/${moduleNames.join('/')}.json`,
+    },
+    moduleDefinitions: {
+      show: (moduleNames: string[]) => `/api/module_definitions/${moduleNames.join('/')}.json`,
     },
   },
 }

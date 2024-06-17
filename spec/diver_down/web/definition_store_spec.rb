@@ -28,6 +28,7 @@ RSpec.describe DiverDown::Web::DefinitionStore do
         definition_3 = DiverDown::Definition.new(title: 'c')
         ids = store.set(definition_1, definition_2, definition_3)
         expect(ids).to eq([1, 2, 3])
+        expect([definition_1, definition_2, definition_3]).to all(be_frozen)
       end
 
       it 'returns id if definition already set' do
@@ -36,6 +37,18 @@ RSpec.describe DiverDown::Web::DefinitionStore do
         store.set(definition)
 
         expect { store.set(definition) }.to raise_error(ArgumentError, 'definition already set')
+      end
+    end
+
+    describe '#combined_definition' do
+      it 'returns combined_definition' do
+        store = described_class.new
+        definition_1 = DiverDown::Definition.new(title: 'a')
+        definition_2 = DiverDown::Definition.new(title: 'b')
+        definition_3 = DiverDown::Definition.new(title: 'c')
+        store.set(definition_1, definition_2, definition_3)
+
+        expect(store.combined_definition).to be_a(DiverDown::Definition)
       end
     end
 

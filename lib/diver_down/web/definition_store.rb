@@ -5,12 +5,11 @@ module DiverDown
     class DefinitionStore
       include Enumerable
 
-      attr_reader :bit_id
-
       def initialize
         # Hash{ Integer(unique bit flag) => DiverDown::Definition }
         @definitions = []
         @definition_group_store = Hash.new { |h, k| h[k] = [] }
+        @combined_definition = nil
       end
 
       # @param id [Integer]
@@ -31,12 +30,31 @@ module DiverDown
           raise(ArgumentError, 'definition already set') if _1.store_id
 
           _1.store_id = @definitions.size + 1
+          _1.freeze
 
           @definitions.push(_1)
           @definition_group_store[_1.definition_group] << _1
 
+          # Reset combined_definition
+          @combined_definition = nil
+
           _1.store_id
         end
+      end
+
+      # @return [DiverDown::Definition]
+      def combined_definition
+        if @combined_definition.nil?
+          @combined_definition = DiverDown::Definition.combine(
+            definition_group: nil,
+            title: 'All Definitions',
+            definitions: @definitions
+          )
+
+          @combined_definition.freeze
+        end
+
+        @combined_definition
       end
 
       # @return [Array<String, nil>]
