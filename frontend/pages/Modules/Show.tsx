@@ -45,9 +45,7 @@ export const Show: React.FC = () => {
             <Section>
               <Stack gap={0.5}>
                 <Heading type="sectionTitle">Links</Heading>
-                <Link to={path.moduleDefinitions.show(pathModules)}>
-                  Graph
-                </Link>
+                <Link to={path.moduleDefinitions.show(pathModules)}>Graph</Link>
               </Stack>
             </Section>
 

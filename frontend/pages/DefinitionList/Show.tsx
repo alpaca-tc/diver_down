@@ -22,13 +22,7 @@ export const Show: React.FC = () => {
     data: combinedDefinition,
     isLoading,
     mutate: mutateCombinedDefinition,
-  } = useCombinedDefinition(
-    selectedDefinitionIds,
-    graphOptions.compound,
-    graphOptions.concentrate,
-    graphOptions.onlyModule,
-    [],
-  )
+  } = useCombinedDefinition(selectedDefinitionIds, graphOptions)
   const [recentModules, setRecentModules] = useState<Module[]>([])
 
   return (

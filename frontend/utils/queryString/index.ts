@@ -50,9 +50,9 @@ export const stringify = (params: Record<string, any>): string => {
 
 const paramDepthLimit = 32
 
-class QueryStringParserError extends Error { }
-class ParameterTypeError extends QueryStringParserError { }
-class ParamsTooDeepError extends QueryStringParserError { }
+class QueryStringParserError extends Error {}
+class ParameterTypeError extends QueryStringParserError {}
+class ParamsTooDeepError extends QueryStringParserError {}
 
 const normalizeParams = (params: Record<string, any>, name: string, v: any, depth: number = 0): Record<string, any> => {
   if (depth >= paramDepthLimit) {

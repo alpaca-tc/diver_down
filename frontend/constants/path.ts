@@ -47,5 +47,8 @@ export const path = {
       index: () => '/api/modules.json',
       show: (moduleNames: string[]) => `/api/modules/${moduleNames.join('/')}.json`,
     },
+    moduleDefinitions: {
+      show: (moduleNames: string[]) => `/api/module_definitions/${moduleNames.join('/')}.json`,
+    },
   },
 }

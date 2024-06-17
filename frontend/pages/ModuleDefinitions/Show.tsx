@@ -4,8 +4,6 @@ import styled from 'styled-components'
 import { Loading } from '@/components/Loading'
 import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
-import { useBitIdHash } from '@/hooks/useBitIdHash'
-import { useCombinedDefinition } from '@/repositories/combinedDefinitionRepository'
 
 import { RecentModulesContext } from '@/context/RecentModulesContext'
 import { Module } from '@/models/module'
@@ -13,32 +11,17 @@ import { useGraphOptions } from '@/hooks/useGraphOptions'
 import { DefinitionGraph } from '@/components/DefinitionGraph'
 import { DefinitionSources } from '@/components/DefinitionSources'
 import { useParams } from 'react-router-dom'
-import { useModule } from '@/repositories/moduleRepository'
+import { useModuleDefinition } from '@/repositories/moduleDefinitionRepository'
 
 export const Show: React.FC = () => {
   const pathModules = (useParams()['*'] ?? '').split('/')
-  const { data: specificModule } = useModule(pathModules)
-
-  const relatedDefinitionIds = useMemo(() => {
-    if (specificModule) {
-      return specificModule.relatedDefinitions.map(({ id }) => id)
-    } else {
-      return []
-    }
-  }, [specificModule])
 
   const [graphOptions, setGraphOptions] = useGraphOptions()
   const {
     data: combinedDefinition,
     isLoading: isLoadingCombinedDefinition,
     mutate: mutateCombinedDefinition,
-  } = useCombinedDefinition(
-    relatedDefinitionIds,
-    graphOptions.compound,
-    graphOptions.concentrate,
-    graphOptions.onlyModule,
-    [pathModules],
-  )
+  } = useModuleDefinition(pathModules, graphOptions)
   const [recentModules, setRecentModules] = useState<Module[]>([])
 
   return (
