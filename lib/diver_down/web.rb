@@ -21,11 +21,15 @@ module DiverDown
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
 
+    # @return [DiverDown::Web::DefinitionStore]
+    def self.store
+      @store ||= DiverDown::Web::DefinitionStore.new
+    end
+
     # @param definition_dir [String]
     # @param metadata [DiverDown::Web::Metadata]
     # @param store [DiverDown::Web::DefinitionStore]
-    def initialize(definition_dir:, metadata:, store: DiverDown::Web::DefinitionStore.new)
-      @store = store
+    def initialize(definition_dir:, metadata:)
       @metadata = metadata
       @files_server = Rack::Files.new(File.join(WEB_DIR))
 
@@ -39,7 +43,7 @@ module DiverDown
     # @return [Array[Integer, Hash, Array]]
     def call(env)
       request = Rack::Request.new(env)
-      action = DiverDown::Web::Action.new(store: @store, metadata: @metadata, request:)
+      action = DiverDown::Web::Action.new(store: self.class.store, metadata: @metadata, request:)
 
       case [request.request_method, request.path]
       in ['GET', %r{\A/api/definitions\.json\z}]
@@ -114,11 +118,11 @@ module DiverDown
           definition = definition_loader.load_file(definition_file)
 
           # No needed to synchronize because this is executed on a single thread.
-          @store.set(definition)
+          self.class.store.set(definition)
         end
 
         # Cache combined_definition
-        @store.combined_definition
+        self.class.store.combined_definition
       end
     end
   end
