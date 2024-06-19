@@ -1,1 +1,1 @@
-export * from './Show'
+export { List as Index } from './List'
