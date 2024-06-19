@@ -17,7 +17,7 @@ export const path = {
     show: (module: string) => `/modules/${module}`,
   },
   moduleDefinitions: {
-    show: (module: string) => `/module_definitions/${module}`,
+    index: () => `/module_definitions`,
   },
   licenses: {
     index: () => '/licenses',

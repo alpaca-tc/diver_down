@@ -13,7 +13,7 @@ import { DefinitionSources } from '@/components/DefinitionSources'
 import { useParams } from 'react-router-dom'
 import { useModuleDefinition } from '@/repositories/moduleDefinitionRepository'
 
-export const Show: React.FC = () => {
+export const List: React.FC = () => {
   const pathModules = (useParams()['*'] ?? '').split('/')
 
   const [graphOptions, setGraphOptions] = useGraphOptions()

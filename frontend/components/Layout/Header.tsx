@@ -34,8 +34,14 @@ export const Header: React.FC = () => {
     },
     {
       children: 'Module List',
-      current: pathname === path.modules.index() || /^\/modules\//.test(pathname) || /^\/module_definitions\//.test(pathname),
+      current: pathname === path.modules.index() || /^\/modules\//.test(pathname),
       href: path.modules.index(),
+      onClick: () => navigate(path.modules.index()),
+    },
+    {
+      children: 'Module Definition List',
+      current: /^\/module_definitions\//.test(pathname),
+      href: path.moduleDefinitions.index(),
       onClick: () => navigate(path.modules.index()),
     },
     {
