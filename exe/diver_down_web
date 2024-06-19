@@ -3,7 +3,6 @@
 
 require 'bundler/setup'
 require 'rack/contrib'
-require 'webrick'
 require 'diver_down'
 require 'diver_down-web'
 require 'optparse'
@@ -47,9 +46,9 @@ begin
   # Rack 2.0
   require 'rack'
   require 'rack/server'
-  Rack::Server.new(app:, server: :webrick).start
+  Rack::Server.new(app:).start
 rescue LoadError
   # Rack 3.0
   require 'rackup'
-  Rackup::Server.new(app:, server: :webrick).start
+  Rackup::Server.new(app:).start
 end

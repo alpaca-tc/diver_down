@@ -4,6 +4,7 @@ require 'diver_down'
 require 'diver_down/web'
 require 'rack/reloader'
 require 'rack/contrib'
+require 'puma'
 
 definition_dir = ENV.fetch('DIVER_DOWN_DIR')
 metadata = DiverDown::Web::Metadata.new(ENV.fetch('DIVER_DOWN_METADATA'))

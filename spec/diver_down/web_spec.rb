@@ -4,7 +4,7 @@ RSpec.describe DiverDown::Web do
   include Rack::Test::Methods
 
   def app
-    @app ||= described_class.new(definition_dir:, metadata:, store:)
+    @app ||= described_class.new(definition_dir:, metadata:)
   end
 
   let(:definition_dir) do
@@ -18,6 +18,10 @@ RSpec.describe DiverDown::Web do
   let(:metadata) do
     metadata_path = Tempfile.new(['test', '.yaml']).path
     DiverDown::Web::Metadata.new(metadata_path)
+  end
+
+  before do
+    allow(DiverDown::Web).to receive(:store).and_return(store)
   end
 
   describe 'GET /' do
