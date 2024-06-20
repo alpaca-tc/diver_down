@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button, Cluster, ComboBoxItem, FaXmarkIcon, FormControl, SingleComboBox } from '@/components/ui'
 import { Module } from '@/models/module'
@@ -14,11 +14,11 @@ type Props = {
   onUpdate: (modules: Module[]) => void
 }
 
-const equalModules = (a: Module[], b: Module[]) => a.every((module, index) => module.moduleName === (b[index]?.moduleName ?? ''))
+const equalModules = (a: Module[], b: Module[]) => a.every((module, index) => module === (b[index] ?? ''))
 
 const convertModulesToItem = (modules: Module[]): Item => ({
-  label: modules.map((module) => module.moduleName).join(' / '),
-  value: modules.map((module) => module.moduleName).join('/'),
+  label: modules.join(' / '),
+  value: modules.join('/'),
   data: modules,
 })
 
@@ -56,7 +56,7 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
 
   const handleAddItem = useCallback(
     (label: string) => {
-      const temporaryModules: Module[] = label.split(DELIMITER_RE).map((moduleName) => ({ moduleName }))
+      const temporaryModules: Module[] = label.split(DELIMITER_RE)
       const newItem = convertModulesToItem(temporaryModules)
 
       setTemporaryItem(newItem)

@@ -167,30 +167,17 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'A',
-                  },
-                ],
+                modules: ['A'],
               }, {
                 id: 'graph_2',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'A',
-                  }, {
-                    module_name: 'B',
-                  },
-                ],
+                modules: ['A', 'B'],
               }, {
                 id: 'graph_3',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'A' },
-                  { module_name: 'B' },
-                ],
+                modules: ['A', 'B'],
               },
             ]
           )
@@ -334,43 +321,29 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'A',
-                  },
-                ],
+                modules: ['A'],
               }, {
                 id: 'graph_2',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'A' },
-                ],
+                modules: ['A'],
               }, {
                 id: 'graph_3',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_4',
                 type: 'source',
                 source_name: 'b.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'B' },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_5',
                 type: 'source',
                 source_name: 'c.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'B' },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_6',
                 type: 'dependency',
@@ -450,43 +423,29 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'A',
-                  },
-                ],
+                modules: ['A'],
               }, {
                 id: 'graph_2',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'A' },
-                ],
+                modules: ['A'],
               }, {
                 id: 'graph_3',
                 type: 'module',
-                modules: [
-                  {
-                    module_name: 'B',
-                  },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_4',
                 type: 'source',
                 source_name: 'b.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'B' },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_5',
                 type: 'source',
                 source_name: 'c.rb',
                 memo: '',
-                modules: [
-                  { module_name: 'B' },
-                ],
+                modules: ['B'],
               }, {
                 id: 'graph_6',
                 type: 'dependency',
@@ -591,9 +550,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
 
           expect(instance.dot_metadata).to eq(
             [
-              { id: 'graph_1', type: 'module', modules: [{ module_name: 'A' }] },
-              { id: 'graph_2', type: 'module', modules: [{ module_name: 'B' }] },
-              { id: 'graph_3', type: 'module', modules: [{ module_name: 'B' }, { module_name: 'C' }] },
+              { id: 'graph_1', type: 'module', modules: ['A'] },
+              { id: 'graph_2', type: 'module', modules: ['B'] },
+              { id: 'graph_3', type: 'module', modules: ['B', 'C'] },
               {
                 id: 'graph_4',
                 type: 'dependency',
@@ -695,12 +654,12 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
           expect(instance.dot_metadata).to eq(
             [
               { id: 'graph_1', type: 'source', source_name: 'a.rb', memo: '', modules: [] },
-              { id: 'graph_2', type: 'module', modules: [{ module_name: 'A' }] },
-              { id: 'graph_3', type: 'source', source_name: 'b.rb', memo: '', modules: [{ module_name: 'A' }] },
-              { id: 'graph_4', type: 'module', modules: [{ module_name: 'A' }, { module_name: 'C' }] },
-              { id: 'graph_5', type: 'source', source_name: 'c.rb', memo: '', modules: [{ module_name: 'A' }, { module_name: 'C' }] },
-              { id: 'graph_6', type: 'module', modules: [{ module_name: 'B' }] },
-              { id: 'graph_7', type: 'source', source_name: 'd.rb', memo: '', modules: [{ module_name: 'B' }] },
+              { id: 'graph_2', type: 'module', modules: ['A'] },
+              { id: 'graph_3', type: 'source', source_name: 'b.rb', memo: '', modules: ['A'] },
+              { id: 'graph_4', type: 'module', modules: ['A', 'C'] },
+              { id: 'graph_5', type: 'source', source_name: 'c.rb', memo: '', modules: ['A', 'C'] },
+              { id: 'graph_6', type: 'module', modules: ['B'] },
+              { id: 'graph_7', type: 'source', source_name: 'd.rb', memo: '', modules: ['B'] },
             ]
           )
         end

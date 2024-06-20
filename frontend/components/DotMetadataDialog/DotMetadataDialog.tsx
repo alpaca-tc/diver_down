@@ -103,7 +103,7 @@ const SourceDotMetadataContent: FC<{ dotMetadata: DotSourceMetadata } & Pick<Pro
             <>
               <div>
                 {dotMetadata.modules.map((module) => (
-                  <p key={module.moduleName}>{module.moduleName}</p>
+                  <p key={module}>{module}</p>
                 ))}
               </div>
               <Button
@@ -156,11 +156,7 @@ const ModuleDotMetadataContent: FC<{ dotMetadata: DotModuleMetadata }> = ({ dotM
   const items: ComponentProps<typeof DefinitionList>['items'] = [
     {
       term: 'Module Name',
-      description: (
-        <Link to={path.modules.show(dotMetadata.modules.map((module) => module.moduleName))}>
-          {dotMetadata.modules.map((module) => module.moduleName).join(' / ')}
-        </Link>
-      ),
+      description: <Link to={path.modules.show(dotMetadata.modules)}>{dotMetadata.modules.join(' / ')}</Link>,
     },
   ]
 

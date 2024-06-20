@@ -333,7 +333,7 @@ RSpec.describe DiverDown::Web do
             'source_name' => 'a.rb',
             'resolved_alias' => 'b.rb',
             'memo' => 'memo',
-            'modules' => [{ 'module_name' => 'A' }],
+            'modules' => ['A'],
           },
           {
             'source_name' => 'b.rb',
@@ -387,19 +387,8 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
         'modules' => [
-          [
-            {
-              'module_name' => 'A',
-            }, {
-              'module_name' => 'B',
-            },
-          ], [
-            {
-              'module_name' => 'B',
-            }, {
-              'module_name' => 'C',
-            },
-          ],
+          ['A', 'B'],
+          ['B', 'C'],
         ],
       })
     end
@@ -439,11 +428,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => [
-          {
-            'module_name' => 'A',
-          },
-        ],
+        'modules' => ['A'],
         'sources' => [
           {
             'source_name' => 'a.rb',
@@ -470,13 +455,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => [
-          {
-            'module_name' => 'A',
-          }, {
-            'module_name' => 'B',
-          },
-        ],
+        'modules' => ['A', 'B'],
         'sources' => [
           {
             'source_name' => 'b.rb',
@@ -510,11 +489,7 @@ RSpec.describe DiverDown::Web do
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => [
-          {
-            'module_name' => 'グローバル',
-          },
-        ],
+        'modules' => ['グローバル'],
         'sources' => [
           {
             'source_name' => 'a.rb',

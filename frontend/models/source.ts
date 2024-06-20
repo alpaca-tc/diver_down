@@ -51,9 +51,7 @@ export const sortSources = (sources: Source[], key: 'sourceName' | 'modules', so
       break
     }
     case 'modules': {
-      sorted = sorted.sort((a, b) =>
-        ascString(a.modules.map((module) => module.moduleName).join('-'), b.modules.map((module) => module.moduleName).join('-')),
-      )
+      sorted = sorted.sort((a, b) => ascString(a.modules.join('---'), b.modules.join('---')))
     }
   }
 

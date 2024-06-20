@@ -12,9 +12,7 @@ type DotSourceMetadataResponse = {
   type: 'source'
   memo: string
   source_name: string
-  modules: Array<{
-    module_name: string
-  }>
+  modules: string[]
 }
 
 type DotDependencyMetadataResponse = {
@@ -32,9 +30,7 @@ type DotDependencyMetadataResponse = {
 type DotModuleMetadataResponse = {
   id: string
   type: 'module'
-  modules: Array<{
-    module_name: string
-  }>
+  modules: string[]
 }
 
 type DotMetadataResponse = DotSourceMetadataResponse | DotDependencyMetadataResponse | DotModuleMetadataResponse
@@ -48,9 +44,7 @@ type CombinedDefinitionReponse = {
     source_name: string
     resolved_alias: string | null
     memo: string
-    modules: Array<{
-      module_name: string
-    }>
+    modules: string[]
   }>
 }
 
@@ -62,9 +56,7 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
         type: metadata.type,
         sourceName: metadata.source_name,
         memo: metadata.memo,
-        modules: metadata.modules.map((module) => ({
-          moduleName: module.module_name,
-        })),
+        modules: metadata.modules,
       }
     }
     case 'dependency': {
@@ -85,9 +77,7 @@ const parseDotMetadata = (metadata: DotMetadataResponse): DotMetadata => {
       return {
         id: metadata.id,
         type: metadata.type,
-        modules: metadata.modules.map((module) => ({
-          moduleName: module.module_name,
-        })),
+        modules: metadata.modules,
       }
     }
   }
@@ -105,9 +95,7 @@ export const fetchCombinedDefinition = async (requestPath: string): Promise<Comb
       sourceName: source.source_name,
       resolvedAlias: source.resolved_alias,
       memo: source.memo,
-      modules: source.modules.map((module) => ({
-        moduleName: module.module_name,
-      })),
+      modules: source.modules,
     })),
   }
 }
