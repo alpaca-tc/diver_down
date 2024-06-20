@@ -109,20 +109,24 @@ module DiverDown
 
     def load_definition_files_on_thread(definition_files)
       definition_loader = DiverDown::Web::DefinitionLoader.new
+      store = self.class.store
 
       Thread.new do
         loop do
           break if definition_files.empty?
 
+          # If store is changed in test, stop loading.
+          break if store != self.class.store
+
           definition_file = definition_files.shift
           definition = definition_loader.load_file(definition_file)
 
           # No needed to synchronize because this is executed on a single thread.
-          self.class.store.set(definition)
+          store.set(definition)
         end
 
         # Cache combined_definition
-        self.class.store.combined_definition
+        store.combined_definition
       end
     end
   end
