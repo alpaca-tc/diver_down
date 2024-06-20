@@ -1,7 +1,6 @@
 import { join, resolve } from 'path';
 
 import react from "@vitejs/plugin-react";
-import reactSwc from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
 /// <reference types="vitest" />
@@ -9,7 +8,7 @@ import { defineConfig } from 'vite';
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
   root: 'frontend',
-  plugins: [reactSwc(), react()],
+  plugins: [react()],
 
   test: {
     include: ['**/__tests__/*.test.{ts,tsx}']
