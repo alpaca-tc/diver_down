@@ -32,7 +32,7 @@ export const UpdateSourceModulesButton: FC<Props> = ({ sourceName, newModules, o
   } else {
     return (
       <Button square={true} variant="primary" onClick={updateSourceModules} size="s">
-        <Tooltip message={`Save "${newModules.map((mod) => mod.moduleName).join('/')}"`} horizontal="center" vertical="bottom">
+        <Tooltip message={`Save "${newModules.join('/')}"`} horizontal="center" vertical="bottom">
           <FaCopyIcon />
         </Tooltip>
       </Button>

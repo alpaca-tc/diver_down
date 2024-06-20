@@ -79,9 +79,7 @@ module DiverDown
               source_name:,
               resolved_alias: @metadata.source_alias.resolve_alias(source_name),
               memo: source_metadata.memo,
-              modules: source_metadata.modules.map do |module_name|
-                { module_name: }
-              end,
+              modules: source_metadata.modules,
             }
           end,
           classified_sources_count:
@@ -103,13 +101,7 @@ module DiverDown
         # rubocop:enable Style/HashEachMethods
 
         json(
-          modules: module_set.sort.map do
-            _1.map do |module_name|
-              {
-                module_name:,
-              }
-            end
-          end
+          modules: module_set.sort
         )
       end
 
@@ -140,11 +132,7 @@ module DiverDown
         related_definitions = related_definition_store_ids.map { @store.get(_1) }
 
         json(
-          modules: module_names.map do
-            {
-              module_name: _1,
-            }
-          end,
+          modules: module_names,
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
@@ -315,9 +303,7 @@ module DiverDown
           source_name:,
           resolved_alias: @metadata.source_alias.resolve_alias(source_name),
           memo: @metadata.source(source_name).memo,
-          modules: module_names.map do
-            { module_name: _1 }
-          end,
+          modules: module_names,
           related_definitions: related_definitions.map do |id, definition|
             {
               id:,
@@ -451,9 +437,7 @@ module DiverDown
               source_name: _1.source_name,
               resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
               memo: @metadata.source(_1.source_name).memo,
-              modules: @metadata.source(_1.source_name).modules.map do |module_name|
-                { module_name: }
-              end,
+              modules: @metadata.source(_1.source_name).modules,
             }
           end
         )

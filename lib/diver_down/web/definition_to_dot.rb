@@ -31,11 +31,7 @@ module DiverDown
           private
 
           def source_to_h
-            modules = metadata.source(data.source_name).modules.map do
-              {
-                module_name: _1,
-              }
-            end
+            modules = metadata.source(data.source_name).modules
 
             {
               id:,
@@ -68,11 +64,7 @@ module DiverDown
             {
               id:,
               type: 'module',
-              modules: data.map do
-                {
-                  module_name: _1,
-                }
-              end,
+              modules: data,
             }
           end
         end

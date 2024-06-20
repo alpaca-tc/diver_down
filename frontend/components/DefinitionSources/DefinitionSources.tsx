@@ -144,9 +144,7 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
             <div>
               {source.modules.map((module, index) => (
                 <Text key={index} as="div" whiteSpace="nowrap">
-                  <Link to={path.modules.show(source.modules.slice(0, index + 1).map((mod) => mod.moduleName))}>
-                    {module.moduleName}
-                  </Link>
+                  <Link to={path.modules.show(source.modules.slice(0, index + 1))}>{module}</Link>
                 </Text>
               ))}
             </div>

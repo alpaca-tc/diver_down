@@ -1,11 +1,7 @@
-export type Module = {
-  moduleName: string
-}
+export type Module = string
 
 export type SpecificModule = {
-  modules: Array<{
-    moduleName: string
-  }>
+  modules: Module[]
   sources: Array<{
     sourceName: string
     memo: string

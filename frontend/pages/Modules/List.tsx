@@ -13,12 +13,11 @@ const ModuleRow: FC<{ modules: Module[] }> = ({ modules }) => (
   <Cluster>
     {modules.map((module, index) => {
       const current = modules.slice(0, index + 1)
-      const moduleNames: string[] = current.map((mod) => mod.moduleName)
 
       return (
         <Text key={index}>
           {index > 0 && ' / '}
-          <Link to={path.modules.show(moduleNames)}>{module.moduleName}</Link>
+          <Link to={path.modules.show(current)}>{module}</Link>
         </Text>
       )
     })}
