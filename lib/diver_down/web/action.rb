@@ -61,13 +61,9 @@ module DiverDown
       def sources
         source_names = Set.new
 
-        # rubocop:disable Style/HashEachMethods
-        @store.each do |_, definition|
-          definition.sources.each do |source|
-            source_names.add(source.source_name)
-          end
+        @store.combined_definition.sources.each do |source|
+          source_names.add(source.source_name)
         end
-        # rubocop:enable Style/HashEachMethods
 
         classified_sources_count = source_names.count { @metadata.source(_1).modules? }
 
@@ -91,14 +87,10 @@ module DiverDown
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
         module_set = Set.new
 
-        # rubocop:disable Style/HashEachMethods
-        @store.each do |_, definition|
-          definition.sources.each do |source|
-            modules = @metadata.source(source.source_name).modules
-            module_set.add(modules) unless modules.empty?
-          end
+        @store.combined_definition.sources.each do |source|
+          modules = @metadata.source(source.source_name).modules
+          module_set.add(modules) unless modules.empty?
         end
-        # rubocop:enable Style/HashEachMethods
 
         json(
           modules: module_set.sort
