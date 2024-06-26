@@ -15,6 +15,7 @@ type RelatedDefinition = {
 
 type ReverseDependency = {
   sourceName: string
+  modules: Module[]
   methodIds: MethodId[]
 }
 
