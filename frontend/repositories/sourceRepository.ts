@@ -43,6 +43,7 @@ type SpecificSourceResponse = {
   }>
   reverse_dependencies: Array<{
     source_name: string
+    modules: string[]
     method_ids: Array<{
       name: string
       context: 'instance' | 'class'
@@ -63,6 +64,7 @@ export const useSource = (sourceName: string) => {
       relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
       reverseDependencies: response.reverse_dependencies.map((dependency) => ({
         sourceName: dependency.source_name,
+        modules: dependency.modules,
         methodIds: dependency.method_ids.map((methodId) => ({
           name: methodId.name,
           context: methodId.context,

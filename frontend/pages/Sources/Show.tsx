@@ -11,6 +11,8 @@ import { KEY } from '@/hooks/useBitIdHash'
 import { useSource } from '@/repositories/sourceRepository'
 import { encode, idsToBitId } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
+import { Module } from '@/models/module'
+import { isEqual } from '@/utils/isEqual'
 
 export const Show: React.FC = () => {
   const sourceName = useParams().sourceName ?? ''
@@ -19,6 +21,16 @@ export const Show: React.FC = () => {
   const relatedDefinitionIds = useMemo(() => {
     if (specificSource) {
       return specificSource.relatedDefinitions.map(({ id }) => id)
+    } else {
+      return []
+    }
+  }, [specificSource])
+
+  const reverseDependencyModules: Module[][] = useMemo(() => {
+    if (specificSource) {
+      return specificSource.reverseDependencies
+        .map(({ modules }) => modules)
+        .filter((mods) => !isEqual(mods, specificSource.modules))
     } else {
       return []
     }
@@ -84,6 +96,40 @@ export const Show: React.FC = () => {
 
               <Section>
                 <Stack gap={0.5}>
+                  <Heading type="sectionTitle">Reverse dependency Modules</Heading>
+                  <div style={{ overflow: 'clip' }}>
+                    <Table fixedHead>
+                      <thead>
+                        <tr>
+                          <Th>Module Name</Th>
+                        </tr>
+                      </thead>
+                      {specificSource.modules.length === 0 ? (
+                        <EmptyTableBody>
+                          <Text>no modules</Text>
+                        </EmptyTableBody>
+                      ) : (
+                        <tbody>
+                          {reverseDependencyModules.map((modules, index) => (
+                            <tr key={modules.join('-')}>
+                              <Td>
+                                {modules.map((module, index) => (
+                                  <Text key={index} as="div" whiteSpace="nowrap">
+                                    <Link to={path.modules.show(modules.slice(0, index + 1))}>{module}</Link>
+                                  </Text>
+                                ))}
+                              </Td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      )}
+                    </Table>
+                  </div>
+                </Stack>
+              </Section>
+
+              <Section>
+                <Stack gap={0.5}>
                   <Cluster>
                     <Heading type="sectionTitle">Related Definitions</Heading>
                     <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>
@@ -126,6 +172,7 @@ export const Show: React.FC = () => {
                     <Table fixedHead>
                       <thead>
                         <tr>
+                          <Th>Module Name</Th>
                           <Th>Source Name</Th>
                           <Th>Method Id</Th>
                           <Th>Path</Th>
@@ -140,6 +187,17 @@ export const Show: React.FC = () => {
                           {specificSource.reverseDependencies.map((reverseDependency) =>
                             reverseDependency.methodIds.map((methodId, index) => (
                               <tr key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}`}>
+                                <Td>
+                                  {index === 0
+                                    ? reverseDependency.modules.map((module, index) => (
+                                        <Text key={index} as="div" whiteSpace="nowrap">
+                                          <Link to={path.modules.show(reverseDependency.modules.slice(0, index + 1))}>
+                                            {module}
+                                          </Link>
+                                        </Text>
+                                      ))
+                                    : null}
+                                </Td>
                                 <Td>
                                   {index === 0 ? (
                                     <Link to={`${path.sources.show(reverseDependency.sourceName)}`}>

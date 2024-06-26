@@ -305,6 +305,7 @@ module DiverDown
           reverse_dependencies: reverse_dependencies.values.map { |reverse_dependency|
             {
               source_name: reverse_dependency.source_name,
+              modules: @metadata.source(reverse_dependency.source_name).modules,
               method_ids: reverse_dependency.method_ids.sort.map do |method_id|
                 {
                   context: method_id.context,
