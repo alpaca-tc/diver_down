@@ -5,7 +5,7 @@ import { Loading } from '@/components/Loading'
 import { Aside, Section, Sidebar, Stack } from '@/components/ui'
 import { color } from '@/constants/theme'
 
-import { RecentModulesContext } from '@/context/RecentModulesContext'
+import { RecentModuleContext } from '@/context/RecentModuleContext'
 import { Module } from '@/models/module'
 import { useGraphOptions } from '@/hooks/useGraphOptions'
 import { DefinitionGraph } from '@/components/DefinitionGraph'
@@ -22,11 +22,11 @@ export const Show: React.FC = () => {
     isLoading: isLoadingCombinedDefinition,
     mutate: mutateCombinedDefinition,
   } = useModuleDefinition(pathModules, graphOptions)
-  const [recentModules, setRecentModules] = useState<Module[]>([])
+  const [recentModule, setRecentModule] = useState<Module | null>(null)
 
   return (
     <Wrapper>
-      <RecentModulesContext.Provider value={{ recentModules, setRecentModules }}>
+      <RecentModuleContext.Provider value={{ recentModule, setRecentModule }}>
         <StyledSidebar contentsMinWidth="0px" gap={0}>
           <StyledSection>
             {isLoadingCombinedDefinition ? (
@@ -53,7 +53,7 @@ export const Show: React.FC = () => {
             )}
           </StyledSection>
         </StyledSidebar>
-      </RecentModulesContext.Provider>
+      </RecentModuleContext.Provider>
     </Wrapper>
   )
 }

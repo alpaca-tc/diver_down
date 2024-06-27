@@ -23,8 +23,8 @@ import { spacing } from '@/constants/theme'
 import { useSources } from '@/repositories/sourceRepository'
 import { Source, Sources, sortSources } from '@/models/source'
 import { Module } from '@/models/module'
-import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
-import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
+import { SourceModuleComboBox } from '@/components/SourceModuleComboBox'
+import { UpdateSourceModuleButton } from '@/components/UpdateSourceModuleButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 
@@ -33,18 +33,18 @@ const sortTypes = ['asc', 'desc', 'none'] as const
 type SortTypes = (typeof sortTypes)[number]
 
 type SortState = {
-  key: 'sourceName' | 'modules'
+  key: 'sourceName' | 'module'
   sort: SortTypes
 }
 
 type RowProps = {
   source: Source
-  recentModules: Module[]
+  recentModule: Module | null
   onUpdated: () => void
-  setRecentModules: React.Dispatch<React.SetStateAction<Module[]>>
+  setRecentModule: React.Dispatch<React.SetStateAction<Module | null>>
 }
 
-const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules }) => {
+const Row: FC<RowProps> = ({ source, recentModule, onUpdated, setRecentModule }) => {
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const [editingModules, setEditingModules] = useState<boolean>(false)
 
@@ -78,11 +78,11 @@ const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules 
       </Td>
       {!editingMemo && editingModules ? (
         <Td>
-          <SourceModulesComboBox
+          <SourceModuleComboBox
             sourceName={source.sourceName}
-            initialModules={source.modules}
-            onUpdate={(modules) => {
-              setRecentModules(modules)
+            initialModule={source.module}
+            onUpdate={(module) => {
+              setRecentModule(module)
               setEditingModules(false)
               onUpdated()
             }}
@@ -95,11 +95,11 @@ const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules 
         <Td>
           <Cluster align="bottom">
             <div>
-              {source.modules.map((module, index) => (
-                <Text key={index} as="div" whiteSpace="nowrap">
-                  <Link to={path.modules.show(source.modules.slice(0, index + 1))}>{module}</Link>
+              {source.module && (
+                <Text as="div" whiteSpace="nowrap">
+                  <Link to={path.modules.show(source.module)}>{source.module}</Link>
                 </Text>
-              ))}
+              )}
             </div>
             <div>
               <Button square={true} onClick={() => setEditingModules(true)} size="s">
@@ -107,9 +107,9 @@ const Row: FC<RowProps> = ({ source, recentModules, onUpdated, setRecentModules 
               </Button>
             </div>
 
-            {source.modules.length === 0 && (
+            {source.module === null && (
               <div>
-                <UpdateSourceModulesButton sourceName={source.sourceName} newModules={recentModules} onSaved={onUpdated} />
+                <UpdateSourceModuleButton sourceName={source.sourceName} newModule={recentModule} onSaved={onUpdated} />
               </div>
             )}
           </Cluster>
@@ -127,7 +127,7 @@ type SourcesTableBodyProps = {
 }
 
 const SourcesTableBody: React.FC<SourcesTableBodyProps> = ({ allSources, inputSourceName, sortState, onUpdated }) => {
-  const [recentModules, setRecentModules] = useState<Module[]>([])
+  const [recentModule, setRecentModule] = useState<Module | null>(null)
   const sources: Sources['sources'] = useMemo(() => {
     let sources = allSources
 
@@ -152,9 +152,9 @@ const SourcesTableBody: React.FC<SourcesTableBodyProps> = ({ allSources, inputSo
         <Row
           key={source.sourceName}
           source={source}
-          recentModules={recentModules}
+          recentModule={recentModule}
           onUpdated={onUpdated}
-          setRecentModules={setRecentModules}
+          setRecentModule={setRecentModule}
         />
       ))}
     </tbody>
@@ -227,8 +227,8 @@ export const List: FC = () => {
                 </Th>
                 <Th>Source Alias</Th>
                 <Th>Memo</Th>
-                <Th sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
-                  Modules
+                <Th sort={sortState.key === 'module' ? sortState.sort : 'none'} onSort={() => setNextSortType('module')}>
+                  Module
                 </Th>
               </tr>
             </thead>

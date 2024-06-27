@@ -22,9 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path={path.sources.show(':sourceName')} element={<SourceShow />} />
           <Route path={path.sourceAliases.index()} element={<SourceAliasIndex />} />
           <Route path={path.modules.index()} element={<ModuleIndex />} />
-          <Route path={path.modules.show(['*'])} element={<ModuleShow />} />
+          <Route path={path.modules.show('*')} element={<ModuleShow />} />
           <Route path={path.licenses.index()} element={<LicenseIndex />} />
-          <Route path={path.moduleDefinitions.show(['*'])} element={<ModuleDefinitionShow />} />
+          <Route path={path.moduleDefinitions.show('*')} element={<ModuleDefinitionShow />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

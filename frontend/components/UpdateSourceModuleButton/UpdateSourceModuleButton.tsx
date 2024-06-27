@@ -1,27 +1,27 @@
 import { FC, useCallback } from 'react'
 import { Button, FaCopyIcon, Tooltip } from '@/components/ui'
 import { Module } from '@/models/module'
-import { useSourceModules } from '@/repositories/sourceModulesRepository'
+import { useSourceModule } from '@/repositories/sourceModuleRepository'
 
 type Props = {
   sourceName: string
-  newModules: Module[]
+  newModule: Module | null
   onSaved: () => void
 }
 
-export const UpdateSourceModulesButton: FC<Props> = ({ sourceName, newModules, onSaved }) => {
-  const { trigger } = useSourceModules(sourceName)
+export const UpdateSourceModuleButton: FC<Props> = ({ sourceName, newModule, onSaved }) => {
+  const { trigger } = useSourceModule(sourceName)
 
   const updateSourceModules = useCallback(async () => {
-    await trigger({ modules: newModules })
+    await trigger({ module: newModule })
     onSaved()
-  }, [newModules, onSaved, trigger])
+  }, [newModule, onSaved, trigger])
 
-  if (newModules.length === 0) {
+  if (newModule === null) {
     return (
       <Button square={true} variant="primary" disabled onClick={() => {}} size="s">
         <Tooltip
-          message={`Once you update source's modules, you can save it with the same modules.`}
+          message={`Once you update source's module, you can save it with the same module.`}
           horizontal="center"
           vertical="bottom"
         >
@@ -32,7 +32,7 @@ export const UpdateSourceModulesButton: FC<Props> = ({ sourceName, newModules, o
   } else {
     return (
       <Button square={true} variant="primary" onClick={updateSourceModules} size="s">
-        <Tooltip message={`Save "${newModules.join('/')}"`} horizontal="center" vertical="bottom">
+        <Tooltip message={`Save "${newModule}"`} horizontal="center" vertical="bottom">
           <FaCopyIcon />
         </Tooltip>
       </Button>
