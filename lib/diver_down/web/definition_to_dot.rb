@@ -7,7 +7,6 @@ module DiverDown
   class Web
     class DefinitionToDot
       ATTRIBUTE_DELIMITER = ' '
-      MODULE_DELIMITER = '::'
 
       # Between modules is prominently distanced
       MODULE_MINLEN = 3
@@ -31,14 +30,12 @@ module DiverDown
           private
 
           def source_to_h
-            modules = metadata.source(data.source_name).modules
-
             {
               id:,
               type: 'source',
               source_name: data.source_name,
               memo: metadata.source(data.source_name).memo,
-              modules:,
+              module: metadata.source(data.source_name).module,
             }
           end
 
@@ -64,7 +61,7 @@ module DiverDown
             {
               id:,
               type: 'module',
-              modules: data,
+              module: data,
             }
           end
         end
@@ -92,13 +89,13 @@ module DiverDown
 
         # @param module_names [Array<String>]
         # @return [String]
-        def issue_modules_id(module_names)
-          issued_metadata = @to_h.values.find { _1.type == :module && _1.data == module_names }
+        def issue_module_id(modulee)
+          issued_metadata = @to_h.values.find { _1.type == :module && _1.data == modulee }
 
           if issued_metadata
             issued_metadata.id
           else
-            build_dot_metadata_and_return_id(:module, module_names)
+            build_dot_metadata_and_return_id(:module, modulee)
           end
         end
 
@@ -178,60 +175,45 @@ module DiverDown
         dependency_map = Hash.new { |h, k| h[k] = Hash.new { |hi, ki| hi[ki] = [] } }
 
         definition.sources.sort_by(&:source_name).each do |source|
-          source_modules = metadata.source(source.source_name).modules
-          next if source_modules.empty?
+          source_module = metadata.source(source.source_name).module
+          next if source_module.empty?
 
           source.dependencies.each do |dependency|
-            dependency_modules = metadata.source(dependency.source_name).modules
-            next if dependency_modules.empty?
+            dependency_module = metadata.source(dependency.source_name).module
+            next if dependency_module.empty?
 
-            dependency_map[source_modules][dependency_modules].push(dependency)
+            dependency_map[source_module][dependency_module].push(dependency)
           end
         end
 
         # Remove duplicated prefix modules
-        # from [["A"], ["A", "B"], ["A", "C"], ["D"]] to { "A" => { "B" => {}, "C" => {} }, "D" => {} }
-        uniq_modules = [*dependency_map.keys, *dependency_map.values.map(&:keys).flatten(1)].uniq
-        uniq_modules.reject! do |modules|
-          modules.empty? ||
-            uniq_modules.any? { _1[0..modules.size - 1] == modules && _1.length > modules.size }
-        end
+        uniq_modules = [*dependency_map.keys, *dependency_map.values.map(&:keys).flatten].uniq.sort
+        uniq_modules.reject!(&:nil?)
 
-        uniq_modules.each do |specific_module_names|
-          buf = swap_io do
-            indexes = (0..(specific_module_names.length - 1)).to_a
-
-            chain_yield(indexes) do |index, next_proc|
-              module_names = specific_module_names[0..index]
-              module_name = specific_module_names[index]
-
-              io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
-              io.indented do
-                io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
-                io.puts %(label="#{escape_quote(module_name)}")
-                io.puts %("#{escape_quote(module_name)}" #{build_attributes(label: module_name, id: @dot_metadata_store.issue_modules_id(module_names))})
-
-                next_proc&.call
-              end
-              io.puts '}'
-            end
+        uniq_modules.each do |modulee|
+          io.puts %(subgraph "#{escape_quote(module_label(modulee))}" {)
+          io.indented do
+            io.puts %(id="#{@dot_metadata_store.issue_module_id(modulee)}")
+            io.puts %(label="#{escape_quote(modulee)}")
+            io.puts %("#{escape_quote(modulee)}" #{build_attributes(label: modulee, id: @dot_metadata_store.issue_module_id(modulee))})
           end
-
-          io.write buf.string
+          io.puts '}'
         end
 
-        dependency_map.each do |from_modules, h|
-          h.each do |to_modules, all_dependencies|
+        dependency_map.keys.sort_by(&:to_s).each do |from_module|
+          dependency_map.fetch(from_module).keys.sort_by(&:to_s).each do |to_module|
+            all_dependencies = dependency_map.fetch(from_module).fetch(to_module)
+
             # Do not render standalone source
             # Do not render self-dependency
-            next if from_modules.empty? || to_modules.empty? || from_modules == to_modules
+            next if from_module.nil? || to_module.empty? || from_module == to_module
 
             dependencies = DiverDown::Definition::Dependency.combine(*all_dependencies)
 
             dependencies.each do
               attributes = {}
-              ltail = module_label(*from_modules)
-              lhead = module_label(*to_modules)
+              ltail = module_label(from_module)
+              lhead = module_label(to_module)
 
               # Already rendered dependencies between modules
               # Add the dependency to the edge of the compound
@@ -251,7 +233,7 @@ module DiverDown
                 minlen: MODULE_MINLEN
               )
 
-              io.write(%("#{escape_quote(from_modules[-1])}" -> "#{escape_quote(to_modules[-1])}"))
+              io.write(%("#{escape_quote(from_module)}" -> "#{escape_quote(to_module)}"))
               io.write(%( #{build_attributes(**attributes)}), indent: false) unless attributes.empty?
               io.write("\n")
             end
@@ -260,45 +242,37 @@ module DiverDown
       end
 
       def render_sources
-        # Hash{ modules => sources }
-        # Hash{ Array<String> => Array<DiverDown::Definition::Source> }
-        by_modules = definition.sources.group_by do |source|
-          metadata.source(source.source_name).modules
+        # Hash{ module => sources }
+        # Hash{ String => Array<DiverDown::Definition::Source> }
+        by_module = definition.sources.group_by do |source|
+          metadata.source(source.source_name).module
         end
 
         # Render subgraph for each module and its sources second
-        nested_modules = array_to_hash(by_modules.keys.uniq.sort)
-        render_nested_modules_sources(by_modules, nested_modules)
+        by_module.keys.sort_by(&:to_s).each do |modulee|
+          sources = by_module.fetch(modulee).sort_by(&:source_name)
 
-        # Render dependencies last
-        definition.sources.sort_by(&:source_name).each do |source|
-          insert_dependencies(source)
-        end
-      end
-
-      def render_nested_modules_sources(by_modules, nested_modules, prefix = [])
-        nested_modules.each do |module_name, next_nested_modules|
-          module_names = prefix + [module_name].compact
-          sources = (by_modules[module_names] || []).sort_by(&:source_name)
-
-          if module_name.nil?
+          if modulee.nil?
             sources.each do |source|
               io.puts build_source_node(source)
             end
           else
-            io.puts %(subgraph "#{escape_quote(module_label(module_names))}" {)
+            io.puts %(subgraph "#{escape_quote(module_label(modulee))}" {)
             io.indented do
-              io.puts %(id="#{@dot_metadata_store.issue_modules_id(module_names)}")
-              io.puts %(label="#{escape_quote(module_name)}")
+              io.puts %(id="#{@dot_metadata_store.issue_module_id(modulee)}")
+              io.puts %(label="#{escape_quote(modulee)}")
 
               sources.each do |source|
                 io.puts build_source_node(source)
               end
-
-              render_nested_modules_sources(by_modules, next_nested_modules, module_names)
             end
             io.puts '}'
           end
+        end
+
+        # Render dependencies last
+        definition.sources.sort_by(&:source_name).each do |source|
+          insert_dependencies(source)
         end
       end
 
@@ -309,8 +283,8 @@ module DiverDown
       def insert_dependencies(source)
         source.dependencies.each do
           attributes = {}
-          ltail = module_label(*metadata.source(source.source_name).modules)
-          lhead = module_label(*metadata.source(_1.source_name).modules)
+          ltail = module_label(metadata.source(source.source_name).module)
+          lhead = module_label(metadata.source(_1.source_name).module)
 
           if @compound && (ltail || lhead)
             # Rendering of dependencies between modules is done only once
@@ -393,36 +367,14 @@ module DiverDown
         @io = old_io
       end
 
-      def module_label(*modules)
-        return if modules.empty?
+      def module_label(modulee)
+        return if modulee.nil?
 
-        "cluster_#{modules.join(MODULE_DELIMITER)}"
+        "cluster_#{modulee}"
       end
 
       def escape_quote(string)
         string.to_s.gsub(/"/, '\"')
-      end
-
-      # from [["A"], ["A", "B"], ["A", "C"], ["D"]] to { "A" => { "B" => {}, "C" => {} }, "D" => {} }
-      def array_to_hash(array)
-        hash = {}
-        array.each do |sub_array|
-          current_hash = hash
-
-          if sub_array.empty?
-            current_hash[nil] = {}
-          else
-            sub_array.each_with_index do |element, index|
-              if index == sub_array.length - 1
-                current_hash[element] = {}
-              else
-                current_hash[element] ||= {}
-                current_hash = current_hash[element]
-              end
-            end
-          end
-        end
-        hash
       end
     end
   end

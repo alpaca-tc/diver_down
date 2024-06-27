@@ -80,7 +80,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition_1, definition_2)
-      metadata.source('a.rb').modules = ['A']
+      metadata.source('a.rb').module = 'A'
 
       get '/api/definitions.json'
 
@@ -319,7 +319,7 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      metadata.source('a.rb').modules = ['A']
+      metadata.source('a.rb').module = 'A'
       metadata.source('a.rb').memo = 'memo'
 
       metadata.source_alias.update_alias('b.rb', ['a.rb'])
@@ -333,19 +333,19 @@ RSpec.describe DiverDown::Web do
             'source_name' => 'a.rb',
             'resolved_alias' => 'b.rb',
             'memo' => 'memo',
-            'modules' => ['A'],
+            'module' => 'A',
           },
           {
             'source_name' => 'b.rb',
             'resolved_alias' => nil,
             'memo' => '',
-            'modules' => [],
+            'module' => nil,
           },
           {
             'source_name' => 'c.rb',
             'resolved_alias' => nil,
             'memo' => '',
-            'modules' => [],
+            'module' => nil,
           },
         ],
         'classified_sources_count' => 1,
@@ -379,17 +379,14 @@ RSpec.describe DiverDown::Web do
         ]
       )
       store.set(definition)
-      metadata.source('a.rb').modules = ['A', 'B']
-      metadata.source('b.rb').modules = ['B', 'C']
+      metadata.source('a.rb').module = 'A'
+      metadata.source('b.rb').module = 'B'
 
       get '/api/modules.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => [
-          ['A', 'B'],
-          ['B', 'C'],
-        ],
+        'modules' => ['A', 'B'],
       })
     end
   end
@@ -420,15 +417,15 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition_1, definition_2)
-      metadata.source('a.rb').modules = ['A']
-      metadata.source('b.rb').modules = ['A', 'B']
+      metadata.source('a.rb').module = 'A'
+      metadata.source('b.rb').module = 'A'
       metadata.source('a.rb').memo = 'memo'
 
       get '/api/modules/A.json'
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => ['A'],
+        'module' => 'A',
         'sources' => [
           {
             'source_name' => 'a.rb',
@@ -450,25 +447,6 @@ RSpec.describe DiverDown::Web do
           },
         ],
       })
-
-      get '/api/modules/A/B.json'
-
-      expect(last_response.status).to eq(200)
-      expect(JSON.parse(last_response.body)).to eq({
-        'modules' => ['A', 'B'],
-        'sources' => [
-          {
-            'source_name' => 'b.rb',
-            'memo' => '',
-          },
-        ],
-        'related_definitions' => [
-          {
-            'id' => ids[1],
-            'title' => 'title 2',
-          },
-        ],
-      })
     end
 
     it 'returns module if module_name is escaped' do
@@ -482,14 +460,14 @@ RSpec.describe DiverDown::Web do
       )
 
       ids = store.set(definition)
-      metadata.source('a.rb').modules = ['グローバル']
+      metadata.source('a.rb').module = 'グローバル'
       metadata.source('a.rb').memo = 'memo'
 
       get "/api/modules/#{CGI.escape('グローバル')}.json"
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to eq({
-        'modules' => ['グローバル'],
+        'module' => 'グローバル',
         'sources' => [
           {
             'source_name' => 'a.rb',
@@ -564,13 +542,13 @@ RSpec.describe DiverDown::Web do
             'source_name' => 'a.rb',
             'resolved_alias' => nil,
             'memo' => 'memo',
-            'modules' => [],
+            'module' => nil,
           },
           {
             'source_name' => 'b.rb',
             'resolved_alias' => nil,
             'memo' => '',
-            'modules' => [],
+            'module' => nil,
           },
         ]
       )
@@ -608,7 +586,7 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      metadata.source('a.rb').modules = ['A']
+      metadata.source('a.rb').module = 'A'
 
       get '/api/module_definitions/A.json'
 
@@ -657,7 +635,7 @@ RSpec.describe DiverDown::Web do
         'source_name' => 'a.rb',
         'resolved_alias' => 'b.rb',
         'memo' => 'memo',
-        'modules' => [],
+        'module' => nil,
         'related_definitions' => [
           {
             'id' => 1,
@@ -669,14 +647,14 @@ RSpec.describe DiverDown::Web do
     end
   end
 
-  describe 'POST /api/sources/:source/modules.json' do
+  describe 'POST /api/sources/:source/module.json' do
     it 'returns 404 if source is not found' do
-      post '/api/sources/unknown/modules.json'
+      post '/api/sources/unknown/module.json'
 
       expect(last_response.status).to eq(404)
     end
 
-    it 'set modules if source is found' do
+    it 'set module if source is found' do
       definition = DiverDown::Definition.new(
         title: 'title',
         sources: [
@@ -687,14 +665,13 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      post '/api/sources/a.rb/modules.json', { modules: ['A', 'B'] }
+      post '/api/sources/a.rb/module.json', { module: 'A' }
 
       expect(last_response.status).to eq(200)
-
-      expect(metadata.source('a.rb').modules).to eq(['A', 'B'])
+      expect(metadata.source('a.rb').module).to eq('A')
     end
 
-    it 'ignores blank modules' do
+    it 'ignores blank module' do
       definition = DiverDown::Definition.new(
         title: 'title',
         sources: [
@@ -705,11 +682,11 @@ RSpec.describe DiverDown::Web do
       )
       store.set(definition)
 
-      post '/api/sources/a.rb/modules.json', { modules: ['', 'B'] }
+      post '/api/sources/a.rb/module.json', { module: '' }
 
       expect(last_response.status).to eq(200)
 
-      expect(metadata.source('a.rb').modules).to eq(['B'])
+      expect(metadata.source('a.rb').module).to be_nil
     end
   end
 

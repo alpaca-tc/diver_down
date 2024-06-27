@@ -54,7 +54,12 @@ module DiverDown
         # NOTE: This is for backward compatibility. It will be removed in the future.
         (loaded[:sources] || loaded || []).each do |source_name, source_hash|
           source(source_name).memo = source_hash[:memo] if source_hash[:memo]
-          source(source_name).modules = source_hash[:modules] if source_hash[:modules]
+
+          if source_hash[:modules].is_a?(Array)
+            source(source_name).module = source_hash[:modules][0]
+          elsif source_hash[:module]
+            source(source_name).module = source_hash[:module]
+          end
         end
 
         loaded[:source_alias]&.each do |alias_name, source_names|

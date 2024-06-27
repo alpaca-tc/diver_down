@@ -6,17 +6,16 @@ module DiverDown
       class SourceMetadata
         BLANK_MEMO = ''
         BLANK_RE = /\A\s*\z/
-        BLANK_ARRAY = [].freeze
         private_constant(:BLANK_MEMO)
         private_constant(:BLANK_RE)
-        private_constant(:BLANK_ARRAY)
 
-        attr_reader :memo, :modules
+        attr_reader :memo, :module
 
         # @param source_name [String]
-        def initialize(memo: BLANK_MEMO, modules: BLANK_ARRAY)
+        # NOTE: `module` is a reserved keyword in Ruby
+        def initialize(memo: BLANK_MEMO, modulee: nil)
           @memo = memo
-          @modules = modules
+          @module = modulee
         end
 
         # @param memo [String]
@@ -25,17 +24,19 @@ module DiverDown
           @memo = memo.strip
         end
 
-        # @param module_names [Array<String>]
+        # @param modulee [String, nil]
         # @return [void]
-        def modules=(module_names)
-          @modules = module_names.reject do
-            BLANK_RE.match?(_1)
-          end.freeze
+        def module=(modulee)
+          @module = if modulee.nil? || BLANK_RE.match?(modulee)
+                      nil
+                    else
+                      modulee.strip
+                    end
         end
 
         # @return [Boolean]
-        def modules?
-          @modules.any?
+        def module?
+          !@module.nil?
         end
 
         # @return [Hash]
@@ -43,7 +44,7 @@ module DiverDown
           hash = {}
 
           hash[:memo] = memo unless memo == BLANK_MEMO
-          hash[:modules] = modules unless modules.empty?
+          hash[:module] = @module unless @module.nil?
 
           hash
         end

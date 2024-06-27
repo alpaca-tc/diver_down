@@ -65,7 +65,7 @@ module DiverDown
           source_names.add(source.source_name)
         end
 
-        classified_sources_count = source_names.count { @metadata.source(_1).modules? }
+        classified_sources_count = source_names.count { @metadata.source(_1).module? }
 
         json(
           sources: source_names.sort.map do |source_name|
@@ -75,7 +75,7 @@ module DiverDown
               source_name:,
               resolved_alias: @metadata.source_alias.resolve_alias(source_name),
               memo: source_metadata.memo,
-              modules: source_metadata.modules,
+              module: source_metadata.module,
             }
           end,
           classified_sources_count:
@@ -85,21 +85,21 @@ module DiverDown
       # GET /api/modules.json
       def modules
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
-        module_set = Set.new
+        modules = Set.new
 
         @store.combined_definition.sources.each do |source|
-          modules = @metadata.source(source.source_name).modules
-          module_set.add(modules) unless modules.empty?
+          modulee = @metadata.source(source.source_name).module
+          modules.add(modulee) unless modulee.nil?
         end
 
         json(
-          modules: module_set.sort
+          modules: modules.sort
         )
       end
 
-      # GET /api/modules/:module_name.json
-      # @param module_names [Array<String>]
-      def module(module_names)
+      # GET /api/modules/:modulee.json
+      # @param modulee [String]
+      def module(modulee)
         # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
         related_definition_store_ids = Set.new
         source_names = Set.new
@@ -107,9 +107,7 @@ module DiverDown
         # rubocop:disable Style/HashEachMethods
         @store.each do |_, definition|
           definition.sources.each do |source|
-            source_module_names = @metadata.source(source.source_name).modules
-
-            next unless source_module_names[0..module_names.size - 1] == module_names
+            next unless @metadata.source(source.source_name).module == modulee
 
             source_names.add(source.source_name)
             related_definition_store_ids.add(definition.store_id)
@@ -124,7 +122,7 @@ module DiverDown
         related_definitions = related_definition_store_ids.map { @store.get(_1) }
 
         json(
-          modules: module_names,
+          module: modulee,
           sources: source_names.sort.map do |source_name|
             {
               source_name:,
@@ -158,7 +156,7 @@ module DiverDown
               definition_group: definition.definition_group,
               title: definition.title,
               sources_count: definition.sources.size,
-              unclassified_sources_count: definition.sources.reject { @metadata.source(_1.source_name).modules? }.size,
+              unclassified_sources_count: definition.sources.reject { @metadata.source(_1.source_name).module? }.size,
             }
           end,
           pagination: pagination.to_h
@@ -180,18 +178,18 @@ module DiverDown
         )
       end
 
-      # GET /api/module_definition/:module_names.json
+      # GET /api/module_definition/:module_name.json
       #
       # @param bit_id [Integer]
       # @param compound [Boolean]
       # @param concentrate [Boolean]
       # @param only_module [Boolean]
-      # @param modules [Array<String>]
-      def module_definition(compound, concentrate, only_module, modules)
+      # @param modulee [String]
+      def module_definition(compound, concentrate, only_module, modulee)
         definition = @store.combined_definition
 
-        # Filter all sources and dependencies by modules if match_modules is given
-        resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(definition, modules:)
+        # Filter all sources and dependencies by modulee if modulee is given
+        resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(definition, modulee:)
 
         # Resolve source aliases
         resolved_definition = @source_alias_resolver.resolve(resolved_definition)
@@ -199,7 +197,7 @@ module DiverDown
         render_combined_definition(
           (1..@store.size).to_a,
           resolved_definition,
-          modules,
+          [modulee],
           compound:,
           concentrate:,
           only_module:
@@ -284,18 +282,18 @@ module DiverDown
 
         return not_found if related_definitions.empty?
 
-        module_names = if found_sources.empty?
-                         []
-                       else
-                         source = DiverDown::Definition::Source.combine(*found_sources)
-                         @metadata.source(source.source_name).modules
-                       end
+        modulee = if found_sources.empty?
+                    nil
+                  else
+                    source = DiverDown::Definition::Source.combine(*found_sources)
+                    @metadata.source(source.source_name).module
+                  end
 
         json(
           source_name:,
           resolved_alias: @metadata.source_alias.resolve_alias(source_name),
           memo: @metadata.source(source_name).memo,
-          modules: module_names,
+          module: modulee,
           related_definitions: related_definitions.map do |id, definition|
             {
               id:,
@@ -305,7 +303,7 @@ module DiverDown
           reverse_dependencies: reverse_dependencies.values.map { |reverse_dependency|
             {
               source_name: reverse_dependency.source_name,
-              modules: @metadata.source(reverse_dependency.source_name).modules,
+              module: @metadata.source(reverse_dependency.source_name).module,
               method_ids: reverse_dependency.method_ids.sort.map do |method_id|
                 {
                   context: method_id.context,
@@ -318,11 +316,11 @@ module DiverDown
         )
       end
 
-      # POST /api/sources/:source_name/modules.json
+      # POST /api/sources/:source_name/module.json
       #
       # @param source_name [String]
-      # @param modules [Array<String>]
-      def set_modules(source_name, modules)
+      # @param module [Array<String>]
+      def set_module(source_name, modulee)
         found_source = @store.any? do |_, definition|
           definition.sources.any? do |source|
             source.source_name == source_name
@@ -330,7 +328,7 @@ module DiverDown
         end
 
         if found_source
-          @metadata.source(source_name).modules = modules
+          @metadata.source(source_name).module = modulee
           @metadata.flush
 
           json({})
@@ -430,7 +428,7 @@ module DiverDown
               source_name: _1.source_name,
               resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
               memo: @metadata.source(_1.source_name).memo,
-              modules: @metadata.source(_1.source_name).modules,
+              module: @metadata.source(_1.source_name).module,
             }
           end
         )
