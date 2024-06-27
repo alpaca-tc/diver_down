@@ -13,8 +13,8 @@ import { encode, idsToBitId } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 
 export const Show: React.FC = () => {
-  const pathModules = (useParams()['*'] ?? '').split('/')
-  const { data: specificModule, isLoading } = useModule(pathModules)
+  const pathModule = useParams()['*'] ?? ''
+  const { data: specificModule, isLoading } = useModule(pathModule)
 
   const relatedDefinitionIds = useMemo(() => {
     if (specificModule) {
@@ -31,12 +31,7 @@ export const Show: React.FC = () => {
           <Cluster>
             <Link to={path.modules.index()}>Module List</Link>
             &gt;
-            {pathModules.map((moduleName, index) => (
-              <React.Fragment key={index}>
-                {index !== 0 && <Text> / </Text>}
-                <Link to={path.modules.show(pathModules.slice(0, index + 1))}>{moduleName}</Link>
-              </React.Fragment>
-            ))}
+            <Link to={path.modules.show(pathModule)}>{pathModule}</Link>
           </Cluster>
         </Heading>
 
@@ -45,7 +40,7 @@ export const Show: React.FC = () => {
             <Section>
               <Stack gap={0.5}>
                 <Heading type="sectionTitle">Links</Heading>
-                <Link to={path.moduleDefinitions.show(pathModules)}>Graph</Link>
+                <Link to={path.moduleDefinitions.show(pathModule)}>Graph</Link>
               </Stack>
             </Section>
 

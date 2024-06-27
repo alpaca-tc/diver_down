@@ -35,16 +35,16 @@ RSpec.describe DiverDown::Web::Metadata do
     end
 
     describe '#flush' do
-      it 'writes modules to path' do
+      it 'writes module to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
-        instance.source('a.rb').modules = ['A', 'B']
+        instance.source('a.rb').module = 'A'
 
         expect {
           instance.flush
         }.to change {
-          described_class.new(tempfile.path).source('a.rb').modules
-        }.from([]).to(['A', 'B'])
+          described_class.new(tempfile.path).source('a.rb').module
+        }.from(nil).to('A')
       end
 
       it 'writes memo to path' do
@@ -78,7 +78,7 @@ RSpec.describe DiverDown::Web::Metadata do
         sources = ['a.rb', 'b.rb', 'c.rb']
 
         sources.shuffle.each do |source|
-          instance.source(source).modules = ['A']
+          instance.source(source).module = 'A'
         end
 
         expect {
@@ -98,7 +98,7 @@ RSpec.describe DiverDown::Web::Metadata do
 
         source_names.shuffle.each do |source_name|
           source = instance.source(source_name)
-          source.modules = ['A']
+          source.module = 'A'
           source.memo = 'memo'
         end
 

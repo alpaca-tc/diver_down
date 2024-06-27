@@ -11,24 +11,23 @@ module DiverDown
       # @param definition [DiverDown::Definition]
       # @param modules [Array<Array<String>>]
       # @return [DiverDown::Definition]
-      def filter(definition, modules:)
+      def filter(definition, modulee:)
         new_definition = DiverDown::Definition.new(
           definition_group: definition.definition_group,
           title: definition.title
         )
 
-        is_match_modules = ->(source_name) do
-          source_modules = @metadata.source(source_name).modules
-          source_modules.first(modules.size) == modules
+        match_module = ->(source_name) do
+          @metadata.source(source_name).module == modulee
         end
 
         definition.sources.each do |source|
-          next unless is_match_modules.call(source.source_name)
+          next unless match_module.call(source.source_name)
 
           new_source = new_definition.find_or_build_source(source.source_name)
 
           source.dependencies.each do |dependency|
-            next unless is_match_modules.call(dependency.source_name)
+            next unless match_module.call(dependency.source_name)
 
             new_dependency = new_source.find_or_build_dependency(dependency.source_name)
 

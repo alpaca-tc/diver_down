@@ -21,9 +21,9 @@ import { color } from '@/constants/theme'
 import { CombinedDefinition } from '@/models/combinedDefinition'
 
 import { Source, sortSources } from '@/models/source'
-import { RecentModulesContext } from '@/context/RecentModulesContext'
-import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
-import { UpdateSourceModulesButton } from '@/components/UpdateSourceModulesButton'
+import { RecentModuleContext } from '@/context/RecentModuleContext'
+import { SourceModuleComboBox } from '@/components/SourceModuleComboBox'
+import { UpdateSourceModuleButton } from '@/components/UpdateSourceModuleButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import React from 'react'
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
@@ -33,7 +33,7 @@ const sortTypes = ['asc', 'desc', 'none'] as const
 type SortTypes = (typeof sortTypes)[number]
 
 type SortState = {
-  key: 'sourceName' | 'modules'
+  key: 'sourceName' | 'module'
   sort: SortTypes
 }
 
@@ -52,7 +52,7 @@ const isTr = (event: MouseEvent, trRef: HTMLTableRowElement): boolean => {
 
 const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefinition, mutateCombinedDefinition }) => {
   const ref = createRef<HTMLTableRowElement>()
-  const { recentModules, setRecentModules } = useContext(RecentModulesContext)
+  const { recentModule, setRecentModule } = useContext(RecentModuleContext)
   const { setHoverDotMetadata } = useContext(HoverDotMetadataContext)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const [editingModules, setEditingModules] = useState<boolean>(false)
@@ -125,11 +125,11 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
       </Td>
       {!editingMemo && editingModules ? (
         <Td fixed colSpan={2}>
-          <SourceModulesComboBox
+          <SourceModuleComboBox
             sourceName={source.sourceName}
-            initialModules={source.modules}
-            onUpdate={(modules) => {
-              setRecentModules(modules)
+            initialModule={source.module}
+            onUpdate={(module) => {
+              setRecentModule(module)
               setEditingModules(false)
               mutateCombinedDefinition()
             }}
@@ -142,11 +142,11 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
         <Td fixed>
           <Cluster align="bottom">
             <div>
-              {source.modules.map((module, index) => (
-                <Text key={index} as="div" whiteSpace="nowrap">
-                  <Link to={path.modules.show(source.modules.slice(0, index + 1))}>{module}</Link>
+              {source.module && (
+                <Text as="div" whiteSpace="nowrap">
+                  <Link to={path.modules.show(source.module)}>{source.module}</Link>
                 </Text>
-              ))}
+              )}
             </div>
             <div>
               <Button square={true} onClick={() => setEditingModules(true)} size="s">
@@ -154,11 +154,11 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
               </Button>
             </div>
 
-            {source.modules.length === 0 && (
+            {source.module === null && (
               <div>
-                <UpdateSourceModulesButton
+                <UpdateSourceModuleButton
                   sourceName={source.sourceName}
-                  newModules={recentModules}
+                  newModule={recentModule}
                   onSaved={mutateCombinedDefinition}
                 />
               </div>
@@ -209,8 +209,8 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
                   Source name
                 </Th>
                 <Th>Memo</Th>
-                <Th fixed sort={sortState.key === 'modules' ? sortState.sort : 'none'} onSort={() => setNextSortType('modules')}>
-                  Modules
+                <Th fixed sort={sortState.key === 'module' ? sortState.sort : 'none'} onSort={() => setNextSortType('module')}>
+                  Module
                 </Th>
               </tr>
             </thead>

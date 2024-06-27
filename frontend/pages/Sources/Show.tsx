@@ -12,7 +12,6 @@ import { useSource } from '@/repositories/sourceRepository'
 import { encode, idsToBitId } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 import { Module } from '@/models/module'
-import { isEqual } from '@/utils/isEqual'
 
 export const Show: React.FC = () => {
   const sourceName = useParams().sourceName ?? ''
@@ -26,11 +25,11 @@ export const Show: React.FC = () => {
     }
   }, [specificSource])
 
-  const reverseDependencyModules: Module[][] = useMemo(() => {
+  const reverseDependencyModules: Module[] = useMemo(() => {
     if (specificSource) {
       return specificSource.reverseDependencies
-        .map(({ modules }) => modules)
-        .filter((mods) => !isEqual(mods, specificSource.modules))
+        .map(({ module }) => module)
+        .filter((module) => module !== null && module !== specificSource.module) as Module[]
     } else {
       return []
     }
@@ -74,19 +73,19 @@ export const Show: React.FC = () => {
                           <Th>Module Name</Th>
                         </tr>
                       </thead>
-                      {specificSource.modules.length === 0 ? (
+                      {specificSource.module === null ? (
                         <EmptyTableBody>
-                          <Text>no modules</Text>
+                          <Text>No module</Text>
                         </EmptyTableBody>
                       ) : (
                         <tbody>
-                          {specificSource.modules.map((module, index) => (
-                            <tr key={module}>
+                          {specificSource.module && (
+                            <tr>
                               <Td>
-                                <Link to={path.modules.show(specificSource.modules.slice(0, index + 1))}>{module}</Link>
+                                <Link to={path.modules.show(specificSource.module)}>{specificSource.module}</Link>
                               </Td>
                             </tr>
-                          ))}
+                          )}
                         </tbody>
                       )}
                     </Table>
@@ -104,20 +103,18 @@ export const Show: React.FC = () => {
                           <Th>Module Name</Th>
                         </tr>
                       </thead>
-                      {specificSource.modules.length === 0 ? (
+                      {specificSource.module === null ? (
                         <EmptyTableBody>
-                          <Text>no modules</Text>
+                          <Text>No module</Text>
                         </EmptyTableBody>
                       ) : (
                         <tbody>
-                          {reverseDependencyModules.map((modules, index) => (
-                            <tr key={modules.join('-')}>
+                          {reverseDependencyModules.map((module, index) => (
+                            <tr key={module}>
                               <Td>
-                                {modules.map((module, index) => (
-                                  <Text key={index} as="div" whiteSpace="nowrap">
-                                    <Link to={path.modules.show(modules.slice(0, index + 1))}>{module}</Link>
-                                  </Text>
-                                ))}
+                                <Text key={index} as="div" whiteSpace="nowrap">
+                                  <Link to={path.modules.show(module)}>{module}</Link>
+                                </Text>
                               </Td>
                             </tr>
                           ))}
@@ -188,15 +185,11 @@ export const Show: React.FC = () => {
                             reverseDependency.methodIds.map((methodId, index) => (
                               <tr key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}`}>
                                 <Td>
-                                  {index === 0
-                                    ? reverseDependency.modules.map((module, index) => (
-                                        <Text key={index} as="div" whiteSpace="nowrap">
-                                          <Link to={path.modules.show(reverseDependency.modules.slice(0, index + 1))}>
-                                            {module}
-                                          </Link>
-                                        </Text>
-                                      ))
-                                    : null}
+                                  {index === 0 && reverseDependency.module ? (
+                                    <Text as="div" whiteSpace="nowrap">
+                                      <Link to={path.modules.show(reverseDependency.module)}>{reverseDependency.module}</Link>
+                                    </Text>
+                                  ) : null}
                                 </Td>
                                 <Td>
                                   {index === 0 ? (

@@ -5,7 +5,7 @@ export type Source = {
   sourceName: string
   resolvedAlias: string | null
   memo: string
-  modules: Module[]
+  module: Module | null
 }
 
 type RelatedDefinition = {
@@ -15,7 +15,7 @@ type RelatedDefinition = {
 
 type ReverseDependency = {
   sourceName: string
-  modules: Module[]
+  module: Module | null
   methodIds: MethodId[]
 }
 
@@ -23,7 +23,7 @@ export type SpecificSource = {
   sourceName: string
   resolvedAlias: string | null
   memo: string
-  modules: Module[]
+  module: Module | null
   relatedDefinitions: RelatedDefinition[]
   reverseDependencies: ReverseDependency[]
 }
@@ -33,7 +33,7 @@ export type Sources = {
   classifiedSourcesCount: number
 }
 
-export const sortSources = (sources: Source[], key: 'sourceName' | 'modules', sort: 'none' | 'asc' | 'desc'): Source[] => {
+export const sortSources = (sources: Source[], key: 'sourceName' | 'module', sort: 'none' | 'asc' | 'desc'): Source[] => {
   if (sort === 'none') {
     return sources
   }
@@ -51,8 +51,8 @@ export const sortSources = (sources: Source[], key: 'sourceName' | 'modules', so
       sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
       break
     }
-    case 'modules': {
-      sorted = sorted.sort((a, b) => ascString(a.modules.join('---'), b.modules.join('---')))
+    case 'module': {
+      sorted = sorted.sort((a, b) => ascString(String(a.module), String(b.module)))
     }
   }
 

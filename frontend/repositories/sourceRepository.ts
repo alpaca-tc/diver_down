@@ -10,7 +10,7 @@ type SourcesReponse = {
     source_name: string
     resolved_alias: string | null
     memo: string
-    modules: string[]
+    module: string | null
   }>
   classified_sources_count: number
 }
@@ -23,7 +23,7 @@ export const useSources = () => {
         sourceName: source.source_name,
         resolvedAlias: source.resolved_alias,
         memo: source.memo,
-        modules: source.modules,
+        module: source.module,
       })),
       classifiedSourcesCount: response.classified_sources_count,
     }
@@ -36,14 +36,14 @@ type SpecificSourceResponse = {
   source_name: string
   resolved_alias: string | null
   memo: string
-  modules: string[]
+  module: string | null
   related_definitions: Array<{
     id: number
     title: string
   }>
   reverse_dependencies: Array<{
     source_name: string
-    modules: string[]
+    module: string | null
     method_ids: Array<{
       name: string
       context: 'instance' | 'class'
@@ -60,11 +60,11 @@ export const useSource = (sourceName: string) => {
       sourceName: response.source_name,
       resolvedAlias: response.resolved_alias,
       memo: response.memo,
-      modules: response.modules,
+      module: response.module,
       relatedDefinitions: response.related_definitions.map((definition) => ({ id: definition.id, title: definition.title })),
       reverseDependencies: response.reverse_dependencies.map((dependency) => ({
         sourceName: dependency.source_name,
-        modules: dependency.modules,
+        module: dependency.module,
         methodIds: dependency.method_ids.map((methodId) => ({
           name: methodId.name,
           context: methodId.context,

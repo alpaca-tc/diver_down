@@ -69,7 +69,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 type: 'source',
                 source_name: 'a.rb',
                 memo: 'memo',
-                modules: [],
+                module: nil,
               },
             ]
           )
@@ -112,13 +112,13 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: [],
+                module: nil,
               }, {
                 id: 'graph_2',
                 type: 'source',
                 source_name: 'b.rb',
                 memo: '',
-                modules: [],
+                module: nil,
               }, {
                 id: 'graph_3',
                 type: 'dependency',
@@ -144,7 +144,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          metadata.source('a.rb').modules = ['A', 'B']
+          metadata.source('a.rb').module = 'A'
 
           instance = described_class.new(definition, metadata)
 
@@ -153,11 +153,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               subgraph "cluster_A" {
                 id="graph_1"
                 label="A"
-                subgraph "cluster_A::B" {
-                  id="graph_2"
-                  label="B"
-                  "a.rb" [label="a.rb" id="graph_3"]
-                }
+                "a.rb" [label="a.rb" id="graph_2"]
               }
             }
           DOT
@@ -167,17 +163,13 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: ['A'],
+                module: 'A',
               }, {
                 id: 'graph_2',
-                type: 'module',
-                modules: ['A', 'B'],
-              }, {
-                id: 'graph_3',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: ['A', 'B'],
+                module: 'A',
               },
             ]
           )
@@ -224,27 +216,21 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 source_name: 'c.rb',
               }, {
                 source_name: 'd.rb',
-              }, {
-                source_name: 'e.rb',
-              }, {
-                source_name: 'f.rb',
               },
             ]
           )
 
-          metadata.source('a.rb').modules = ['A']
-          metadata.source('b.rb').modules = ['B']
-          metadata.source('c.rb').modules = ['B']
-          metadata.source('d.rb').modules = ['B', 'C']
-          metadata.source('e.rb').modules = ['B', 'D']
-          metadata.source('f.rb').modules = []
-          metadata.source('unknown.rb').modules = ['Unknown']
+          metadata.source('a.rb').module = 'A'
+          metadata.source('b.rb').module = 'B'
+          metadata.source('c.rb').module = 'B'
+          metadata.source('d.rb').module = nil
+          metadata.source('unknown.rb').module = 'Unknown'
 
           instance = described_class.new(definition, metadata)
 
           expect(instance.to_s).to eq(<<~DOT)
             strict digraph "title" {
-              "f.rb" [label="f.rb" id="graph_1"]
+              "d.rb" [label="d.rb" id="graph_1"]
               subgraph "cluster_A" {
                 id="graph_2"
                 label="A"
@@ -255,20 +241,10 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 label="B"
                 "b.rb" [label="b.rb" id="graph_5"]
                 "c.rb" [label="c.rb" id="graph_6"]
-                subgraph "cluster_B::C" {
-                  id="graph_7"
-                  label="C"
-                  "d.rb" [label="d.rb" id="graph_8"]
-                }
-                subgraph "cluster_B::D" {
-                  id="graph_9"
-                  label="D"
-                  "e.rb" [label="e.rb" id="graph_10"]
-                }
               }
-              "a.rb" -> "b.rb" [id="graph_11"]
-              "a.rb" -> "c.rb" [id="graph_12"]
-              "a.rb" -> "d.rb" [id="graph_13"]
+              "a.rb" -> "b.rb" [id="graph_7"]
+              "a.rb" -> "c.rb" [id="graph_8"]
+              "a.rb" -> "d.rb" [id="graph_9"]
             }
           DOT
         end
@@ -293,9 +269,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          metadata.source('a.rb').modules = ['A']
-          metadata.source('b.rb').modules = ['B']
-          metadata.source('c.rb').modules = ['B']
+          metadata.source('a.rb').module = 'A'
+          metadata.source('b.rb').module = 'B'
+          metadata.source('c.rb').module = 'B'
 
           instance = described_class.new(definition, metadata, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -321,29 +297,29 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: ['A'],
+                module: 'A',
               }, {
                 id: 'graph_2',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: ['A'],
+                module: 'A',
               }, {
                 id: 'graph_3',
                 type: 'module',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_4',
                 type: 'source',
                 source_name: 'b.rb',
                 memo: '',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_5',
                 type: 'source',
                 source_name: 'c.rb',
                 memo: '',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_6',
                 type: 'dependency',
@@ -395,9 +371,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          metadata.source('a.rb').modules = ['A']
-          metadata.source('b.rb').modules = ['B']
-          metadata.source('c.rb').modules = ['B']
+          metadata.source('a.rb').module = 'A'
+          metadata.source('b.rb').module = 'B'
+          metadata.source('c.rb').module = 'B'
 
           instance = described_class.new(definition, metadata, compound: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -423,29 +399,29 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
               {
                 id: 'graph_1',
                 type: 'module',
-                modules: ['A'],
+                module: 'A',
               }, {
                 id: 'graph_2',
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: ['A'],
+                module: 'A',
               }, {
                 id: 'graph_3',
                 type: 'module',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_4',
                 type: 'source',
                 source_name: 'b.rb',
                 memo: '',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_5',
                 type: 'source',
                 source_name: 'c.rb',
                 memo: '',
-                modules: ['B'],
+                module: 'B',
               }, {
                 id: 'graph_6',
                 type: 'dependency',
@@ -497,32 +473,20 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                         paths: [],
                       },
                     ],
-                  }, {
-                    source_name: 'd.rb',
-                    method_ids: [
-                      {
-                        name: 'call_d',
-                        context: 'class',
-                        paths: [],
-                      },
-                    ],
                   },
                 ],
               }, {
                 source_name: 'b.rb',
               }, {
                 source_name: 'c.rb',
-              }, {
-                source_name: 'd.rb',
               },
             ]
           )
 
-          metadata.source('a.rb').modules = ['A']
-          metadata.source('b.rb').modules = ['B']
-          metadata.source('c.rb').modules = ['B']
-          metadata.source('d.rb').modules = ['B', 'C']
-          metadata.source('unknown.rb').modules = ['Unknown']
+          metadata.source('a.rb').module = 'A'
+          metadata.source('b.rb').module = 'B'
+          metadata.source('c.rb').module = 'B'
+          metadata.source('unknown.rb').module = 'Unknown'
 
           instance = described_class.new(definition, metadata, only_module: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -537,24 +501,17 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_2"
                 label="B"
                 "B" [label="B" id="graph_2"]
-                subgraph "cluster_B::C" {
-                  id="graph_3"
-                  label="C"
-                  "C" [label="C" id="graph_3"]
-                }
               }
-              "A" -> "B" [id="graph_4" ltail="cluster_A" lhead="cluster_B" minlen="3"]
-              "A" -> "C" [id="graph_5" ltail="cluster_A" lhead="cluster_B::C" minlen="3"]
+              "A" -> "B" [id="graph_3" ltail="cluster_A" lhead="cluster_B" minlen="3"]
             }
           DOT
 
           expect(instance.dot_metadata).to eq(
             [
-              { id: 'graph_1', type: 'module', modules: ['A'] },
-              { id: 'graph_2', type: 'module', modules: ['B'] },
-              { id: 'graph_3', type: 'module', modules: ['B', 'C'] },
+              { id: 'graph_1', type: 'module', module: 'A' },
+              { id: 'graph_2', type: 'module', module: 'B' },
               {
-                id: 'graph_4',
+                id: 'graph_3',
                 type: 'dependency',
                 dependencies: [
                   {
@@ -567,11 +524,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                     method_ids: [
                       { name: 'call_c', context: 'class' },
                     ],
-
                   },
                 ],
               },
-              { id: 'graph_5', type: 'dependency', dependencies: [{ source_name: 'd.rb', method_ids: [{ name: 'call_d', context: 'class' }] }] },
             ]
           )
         end
@@ -600,7 +555,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 type: 'source',
                 source_name: 'a.rb',
                 memo: '',
-                modules: [],
+                module: nil,
               },
             ]
           )
@@ -624,9 +579,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             ]
           )
 
-          metadata.source('b.rb').modules = ['A']
-          metadata.source('c.rb').modules = ['A', 'C']
-          metadata.source('d.rb').modules = ['B']
+          metadata.source('b.rb').module = 'A'
+          metadata.source('c.rb').module = 'C'
+          metadata.source('d.rb').module = 'B'
 
           instance = described_class.new(definition, metadata, concentrate: true)
           expect(instance.to_s).to eq(<<~DOT)
@@ -637,29 +592,29 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 id="graph_2"
                 label="A"
                 "b.rb" [label="b.rb" id="graph_3"]
-                subgraph "cluster_A::C" {
-                  id="graph_4"
-                  label="C"
-                  "c.rb" [label="c.rb" id="graph_5"]
-                }
               }
               subgraph "cluster_B" {
-                id="graph_6"
+                id="graph_4"
                 label="B"
-                "d.rb" [label="d.rb" id="graph_7"]
+                "d.rb" [label="d.rb" id="graph_5"]
+              }
+              subgraph "cluster_C" {
+                id="graph_6"
+                label="C"
+                "c.rb" [label="c.rb" id="graph_7"]
               }
             }
           DOT
 
           expect(instance.dot_metadata).to eq(
             [
-              { id: 'graph_1', type: 'source', source_name: 'a.rb', memo: '', modules: [] },
-              { id: 'graph_2', type: 'module', modules: ['A'] },
-              { id: 'graph_3', type: 'source', source_name: 'b.rb', memo: '', modules: ['A'] },
-              { id: 'graph_4', type: 'module', modules: ['A', 'C'] },
-              { id: 'graph_5', type: 'source', source_name: 'c.rb', memo: '', modules: ['A', 'C'] },
-              { id: 'graph_6', type: 'module', modules: ['B'] },
-              { id: 'graph_7', type: 'source', source_name: 'd.rb', memo: '', modules: ['B'] },
+              { id: 'graph_1', type: 'source', source_name: 'a.rb', memo: '', module: nil },
+              { id: 'graph_2', type: 'module', module: 'A' },
+              { id: 'graph_3', type: 'source', source_name: 'b.rb', memo: '', module: 'A' },
+              { id: 'graph_4', type: 'module', module: 'B' },
+              { id: 'graph_5', type: 'source', source_name: 'd.rb', memo: '', module: 'B' },
+              { id: 'graph_6', type: 'module', module: 'C' },
+              { id: 'graph_7', type: 'source', source_name: 'c.rb', memo: '', module: 'C' },
             ]
           )
         end

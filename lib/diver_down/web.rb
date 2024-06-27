@@ -58,15 +58,15 @@ module DiverDown
         action.sources
       in ['GET', %r{\A/api/modules\.json\z}]
         action.modules
-      in ['GET', %r{\A/api/modules/(?<module_names>.+)\.json\z}]
-        module_names = CGI.unescape(Regexp.last_match[:module_names]).split('/')
-        action.module(module_names)
-      in ['GET', %r{\A/api/module_definitions/(?<modules>.+)\.json\z}]
-        modules = CGI.unescape(Regexp.last_match[:modules]).split('/')
+      in ['GET', %r{\A/api/modules/(?<modulee>[^/]+)\.json\z}]
+        modulee = CGI.unescape(Regexp.last_match[:modulee])
+        action.module(modulee)
+      in ['GET', %r{\A/api/module_definitions/(?<modulee>[^/]+)\.json\z}]
+        modulee = CGI.unescape(Regexp.last_match[:modulee])
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.module_definition(compound, concentrate, only_module, modules)
+        action.module_definition(compound, concentrate, only_module, modulee)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
@@ -76,10 +76,10 @@ module DiverDown
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)
-      in ['POST', %r{\A/api/sources/(?<source>[^/]+)/modules.json\z}]
+      in ['POST', %r{\A/api/sources/(?<source>[^/]+)/module.json\z}]
         source = Regexp.last_match[:source]
-        modules = request.params['modules'] || []
-        action.set_modules(source, modules)
+        modulee = request.params['module'] || ''
+        action.set_module(source, modulee)
       in ['POST', %r{\A/api/sources/(?<source>[^/]+)/memo.json\z}]
         source = Regexp.last_match[:source]
         memo = request.params['memo'] || ''

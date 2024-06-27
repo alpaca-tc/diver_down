@@ -15,7 +15,7 @@ export type DotSourceMetadata = {
   type: 'source'
   sourceName: string
   memo: string
-  modules: Module[]
+  module: Module | null
 } & BaseDotMetadata
 
 export type DotDependencyMetadata = {
@@ -32,7 +32,7 @@ export type DotDependencyMetadata = {
 
 export type DotModuleMetadata = {
   type: 'module'
-  modules: Module[]
+  module: Module
 } & BaseDotMetadata
 
 export type DotMetadata = DotSourceMetadata | DotDependencyMetadata | DotModuleMetadata

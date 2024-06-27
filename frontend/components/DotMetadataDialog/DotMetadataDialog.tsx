@@ -19,8 +19,8 @@ import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
 import { DotDependencyMetadata, DotMetadata, DotModuleMetadata, DotSourceMetadata } from '@/models/combinedDefinition'
 
-import { SourceModulesComboBox } from '@/components/SourceModulesComboBox'
-import { RecentModulesContext } from '@/context/RecentModulesContext'
+import { SourceModuleComboBox } from '@/components/SourceModuleComboBox'
+import { RecentModuleContext } from '@/context/RecentModuleContext'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 
 export type DotMetadataDialogProps = {
@@ -41,7 +41,7 @@ const SourceDotMetadataContent: FC<{ dotMetadata: DotSourceMetadata } & Pick<Pro
   dotMetadata,
   mutateCombinedDefinition,
 }) => {
-  const { setRecentModules } = useContext(RecentModulesContext)
+  const { setRecentModule } = useContext(RecentModuleContext)
   const [editingModules, setEditingModules] = useState<boolean>(false)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
   const items: ComponentProps<typeof DefinitionList>['items'] = [
@@ -83,15 +83,15 @@ const SourceDotMetadataContent: FC<{ dotMetadata: DotSourceMetadata } & Pick<Pro
       ),
     },
     {
-      term: 'Modules',
+      term: 'Module',
       description: (
         <Cluster>
           {editingModules ? (
-            <SourceModulesComboBox
+            <SourceModuleComboBox
               sourceName={dotMetadata.sourceName}
-              initialModules={dotMetadata.modules}
-              onUpdate={(modules) => {
-                setRecentModules(modules)
+              initialModule={dotMetadata.module}
+              onUpdate={(module) => {
+                setRecentModule(module)
                 setEditingModules(false)
                 mutateCombinedDefinition()
               }}
@@ -102,9 +102,7 @@ const SourceDotMetadataContent: FC<{ dotMetadata: DotSourceMetadata } & Pick<Pro
           ) : (
             <>
               <div>
-                {dotMetadata.modules.map((module) => (
-                  <p key={module}>{module}</p>
-                ))}
+                <p key={dotMetadata.module}>{dotMetadata.module}</p>
               </div>
               <Button
                 square={true}
@@ -156,7 +154,7 @@ const ModuleDotMetadataContent: FC<{ dotMetadata: DotModuleMetadata }> = ({ dotM
   const items: ComponentProps<typeof DefinitionList>['items'] = [
     {
       term: 'Module Name',
-      description: <Link to={path.modules.show(dotMetadata.modules)}>{dotMetadata.modules.join(' / ')}</Link>,
+      description: <Link to={path.modules.show(dotMetadata.module)}>{dotMetadata.module}</Link>,
     },
   ]
 

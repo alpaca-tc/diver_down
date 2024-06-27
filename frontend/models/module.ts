@@ -1,7 +1,7 @@
 export type Module = string
 
 export type SpecificModule = {
-  modules: Module[]
+  module: Module
   sources: Array<{
     sourceName: string
     memo: string

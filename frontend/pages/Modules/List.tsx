@@ -3,26 +3,10 @@ import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
 import { Loading } from '@/components/Loading'
-import { Cluster, EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
+import { EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
-import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
-
-const ModuleRow: FC<{ modules: Module[] }> = ({ modules }) => (
-  <Cluster>
-    {modules.map((module, index) => {
-      const current = modules.slice(0, index + 1)
-
-      return (
-        <Text key={index}>
-          {index > 0 && ' / '}
-          <Link to={path.modules.show(current)}>{module}</Link>
-        </Text>
-      )
-    })}
-  </Cluster>
-)
 
 export const List: FC = () => {
   const { data, isLoading } = useModules()
@@ -41,10 +25,12 @@ export const List: FC = () => {
             </thead>
             {data && data.length > 0 ? (
               <tbody>
-                {data.map((modules, index) => (
+                {data.map((module, index) => (
                   <tr key={index}>
                     <Td>
-                      <ModuleRow modules={modules} />
+                      <Text>
+                        <Link to={path.modules.show(module)}>{module}</Link>
+                      </Text>
                     </Td>
                   </tr>
                 ))}

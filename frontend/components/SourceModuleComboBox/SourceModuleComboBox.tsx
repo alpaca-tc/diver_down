@@ -1,43 +1,41 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button, Cluster, ComboBoxItem, FaXmarkIcon, FormControl, SingleComboBox } from '@/components/ui'
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
-import { useSourceModules } from '@/repositories/sourceModulesRepository'
+import { useSourceModule } from '@/repositories/sourceModuleRepository'
 
-type Item = ComboBoxItem<Module[]>
+type Item = ComboBoxItem<Module>
 
 type Props = {
   sourceName: string
-  initialModules: Module[]
+  initialModule: Module | null
   onClose: () => void
-  onUpdate: (modules: Module[]) => void
+  onUpdate: (module: Module | null) => void
 }
 
-const equalModules = (a: Module[], b: Module[]) => a.every((module, index) => module === (b[index] ?? ''))
-
-const convertModulesToItem = (modules: Module[]): Item => ({
-  label: modules.join(' / '),
-  value: modules.join('/'),
-  data: modules,
+const convertModuleToItem = (module: Module): Item => ({
+  label: module,
+  value: module,
+  data: module,
 })
 
-const DELIMITER_RE = /\s*\/\s*/
-
-export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, onClose, onUpdate }) => {
+export const SourceModuleComboBox: FC<Props> = ({ sourceName, initialModule, onClose, onUpdate }) => {
   const { data, isLoading, mutate } = useModules()
-  const { trigger } = useSourceModules(sourceName)
+  const { trigger } = useSourceModule(sourceName)
 
   const [temporaryItem, setTemporaryItem] = useState<Item | null>(null)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const initializedInitialModule = useRef<boolean>(false)
 
-  const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModulesToItem(modules)), [data])
+  const defaultItems: Item[] = useMemo(() => (data ?? []).map((module) => convertModuleToItem(module)), [data])
 
   useEffect(() => {
-    if (selectedItem || !isLoading) return
+    if (selectedItem || isLoading || defaultItems.length === 0 || initializedInitialModule.current) return
 
-    setSelectedItem(defaultItems.find((item) => equalModules(item.data!, initialModules)) ?? null)
-  }, [isLoading, defaultItems, selectedItem, initialModules])
+    setSelectedItem(defaultItems.find((item) => item.data! === initialModule) ?? null)
+    initializedInitialModule.current = true
+  }, [isLoading, defaultItems, selectedItem, initialModule, initializedInitialModule])
 
   const handleSelectItem = useCallback(
     (item: Item) => {
@@ -56,8 +54,8 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
 
   const handleAddItem = useCallback(
     (label: string) => {
-      const temporaryModules: Module[] = label.split(DELIMITER_RE)
-      const newItem = convertModulesToItem(temporaryModules)
+      const temporaryModule: Module = label
+      const newItem = convertModuleToItem(temporaryModule)
 
       setTemporaryItem(newItem)
       setSelectedItem(newItem)
@@ -66,10 +64,10 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
   )
 
   const handleUpdate = useCallback(async () => {
-    const modules = selectedItem?.data ?? []
-    await trigger({ modules })
+    const module = selectedItem?.data ?? null
+    await trigger({ module })
     mutate()
-    onUpdate(modules)
+    onUpdate(module)
   }, [mutate, trigger, selectedItem, onUpdate])
 
   const items = useMemo(() => {
@@ -85,7 +83,7 @@ export const SourceModulesComboBox: FC<Props> = ({ sourceName, initialModules, o
   return (
     <Cluster>
       <div>
-        <FormControl title="Modules" helpMessage="Submodules are separated by slash">
+        <FormControl title="Module">
           <SingleComboBox
             items={items}
             selectedItem={selectedItem}

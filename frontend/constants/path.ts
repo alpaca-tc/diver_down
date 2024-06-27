@@ -14,10 +14,10 @@ export const path = {
   },
   modules: {
     index: () => '/modules',
-    show: (moduleNames: string[]) => `/modules/${moduleNames.join('/')}`,
+    show: (module: string) => `/modules/${module}`,
   },
   moduleDefinitions: {
-    show: (moduleNames: string[]) => `/module_definitions/${moduleNames.join('/')}`,
+    show: (module: string) => `/module_definitions/${module}`,
   },
   licenses: {
     index: () => '/licenses',
@@ -35,8 +35,8 @@ export const path = {
       memo: {
         update: (sourceName: string) => `/api/sources/${sourceName}/memo.json`,
       },
-      modules: {
-        update: (sourceName: string) => `/api/sources/${sourceName}/modules.json`,
+      module: {
+        update: (sourceName: string) => `/api/sources/${sourceName}/module.json`,
       },
     },
     sourceAliases: {
@@ -45,7 +45,7 @@ export const path = {
     },
     modules: {
       index: () => '/api/modules.json',
-      show: (moduleNames: string[]) => `/api/modules/${moduleNames.join('/')}.json`,
+      show: (module: string) => `/api/modules/${module}.json`,
     },
     moduleDefinitions: {
       show: (moduleNames: string[]) => `/api/module_definitions/${moduleNames.join('/')}.json`,
