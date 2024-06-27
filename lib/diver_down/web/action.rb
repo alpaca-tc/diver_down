@@ -178,26 +178,25 @@ module DiverDown
         )
       end
 
-      # GET /api/module_definition/:module_name.json
+      # GET /api/global_definition.json
       #
       # @param bit_id [Integer]
       # @param compound [Boolean]
       # @param concentrate [Boolean]
       # @param only_module [Boolean]
-      # @param modulee [String]
-      def module_definition(compound, concentrate, only_module, modulee)
+      # @param modules [Array<String>]
+      def global_definition(compound, concentrate, only_module, remove_internal_sources, modules)
         definition = @store.combined_definition
 
-        # Filter all sources and dependencies by modulee if modulee is given
-        resolved_definition = DiverDown::Web::ModuleSourcesFilter.new(@metadata).filter(definition, modulee:)
-
         # Resolve source aliases
-        resolved_definition = @source_alias_resolver.resolve(resolved_definition)
+        resolved_definition = @source_alias_resolver.resolve(definition)
+        # Filter sources and dependencies by condition
+        resolved_definition = DiverDown::Web::DefinitionFilter.new(@metadata, modules:, remove_internal_sources:).filter(resolved_definition)
 
         render_combined_definition(
           (1..@store.size).to_a,
           resolved_definition,
-          [modulee],
+          modules,
           compound:,
           concentrate:,
           only_module:
@@ -210,7 +209,7 @@ module DiverDown
       # @param compound [Boolean]
       # @param concentrate [Boolean]
       # @param only_module [Boolean]
-      def combine_definitions(bit_id, compound, concentrate, only_module)
+      def combine_definitions(bit_id, compound, concentrate, only_module, remove_internal_sources, modules)
         ids = DiverDown::Web::BitId.bit_id_to_ids(bit_id)
 
         valid_ids = ids.select do
@@ -232,6 +231,8 @@ module DiverDown
         if definition
           # Resolve source aliases
           resolved_definition = @source_alias_resolver.resolve(definition)
+          # Filter sources and dependencies by condition
+          resolved_definition = DiverDown::Web::DefinitionFilter.new(@metadata, modules:, remove_internal_sources:).filter(resolved_definition)
 
           render_combined_definition(
             valid_ids,
@@ -429,6 +430,11 @@ module DiverDown
               resolved_alias: @metadata.source_alias.resolve_alias(_1.source_name),
               memo: @metadata.source(_1.source_name).memo,
               module: @metadata.source(_1.source_name).module,
+              dependencies: _1.dependencies.map do |dependency|
+                {
+                  source_name: dependency.source_name,
+                }
+              end,
             }
           end
         )

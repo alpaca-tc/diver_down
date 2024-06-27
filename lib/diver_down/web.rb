@@ -16,7 +16,7 @@ module DiverDown
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
     require 'diver_down/web/source_alias_resolver'
-    require 'diver_down/web/module_sources_filter'
+    require 'diver_down/web/definition_filter'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
@@ -61,18 +61,21 @@ module DiverDown
       in ['GET', %r{\A/api/modules/(?<modulee>[^/]+)\.json\z}]
         modulee = CGI.unescape(Regexp.last_match[:modulee])
         action.module(modulee)
-      in ['GET', %r{\A/api/module_definitions/(?<modulee>[^/]+)\.json\z}]
-        modulee = CGI.unescape(Regexp.last_match[:modulee])
+      in ['GET', %r{\A/api/global_definition\.json\z}]
+        modules = request.params['modules'] || []
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.module_definition(compound, concentrate, only_module, modulee)
+        remove_internal_sources = request.params['remove_internal_sources'] == '1'
+        action.global_definition(compound, concentrate, only_module, remove_internal_sources, modules)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.combine_definitions(bit_id, compound, concentrate, only_module)
+        remove_internal_sources = request.params['remove_internal_sources'] == '1'
+        modules_list = request.params['modules_list'] || []
+        action.combine_definitions(bit_id, compound, concentrate, only_module, remove_internal_sources, modules_list)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         action.source(source)

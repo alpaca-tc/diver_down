@@ -9,6 +9,7 @@ import {
   EmptyTableBody,
   FaCircleInfoIcon,
   FaPencilIcon,
+  Stack,
   Table,
   TableReel,
   Td,
@@ -27,6 +28,7 @@ import { UpdateSourceModuleButton } from '@/components/UpdateSourceModuleButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import React from 'react'
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
+import { Loading } from '@/components/Loading'
 
 const sortTypes = ['asc', 'desc', 'none'] as const
 
@@ -171,7 +173,7 @@ const DefinitionSourceTr: FC<DefinitionSourceTrProps> = ({ source, combinedDefin
 }
 
 type DefinitionSourcesProps = {
-  combinedDefinition: CombinedDefinition
+  combinedDefinition: CombinedDefinition | null
   mutateCombinedDefinition: () => void
 }
 
@@ -195,8 +197,8 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
   )
 
   const sources: CombinedDefinition['sources'] = useMemo(() => {
-    return sortSources(combinedDefinition.sources, sortState.key, sortState.sort)
-  }, [combinedDefinition.sources, sortState])
+    return sortSources(combinedDefinition?.sources ?? [], sortState.key, sortState.sort)
+  }, [combinedDefinition?.sources, sortState])
 
   return (
     <WrapperAside>
@@ -206,7 +208,7 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
             <thead>
               <tr>
                 <Th sort={sortState.key === 'sourceName' ? sortState.sort : 'none'} onSort={() => setNextSortType('sourceName')}>
-                  Source name
+                  Source name ({sources.length})
                 </Th>
                 <Th>Memo</Th>
                 <Th fixed sort={sortState.key === 'module' ? sortState.sort : 'none'} onSort={() => setNextSortType('module')}>
@@ -214,10 +216,13 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
                 </Th>
               </tr>
             </thead>
-            {sources.length === 0 ? (
+            {!combinedDefinition ? (
+              <CenterStack>
+                <Loading text="Loading..." alt="Loading" />
+              </CenterStack>
+            ) : sources.length === 0 ? (
               <EmptyTableBody>
-                <Text>お探しの条件に該当する項目はありません。</Text>
-                <Text>別の条件をお試しください。</Text>
+                <Text>No sources</Text>
               </EmptyTableBody>
             ) : (
               <tbody>
@@ -225,7 +230,7 @@ export const DefinitionSources: FC<DefinitionSourcesProps> = ({ combinedDefiniti
                   <DefinitionSourceTr
                     key={source.sourceName}
                     source={source}
-                    combinedDefinition={combinedDefinition}
+                    combinedDefinition={combinedDefinition!}
                     mutateCombinedDefinition={mutateCombinedDefinition}
                   />
                 ))}
@@ -262,4 +267,11 @@ const Transparent = styled.span`
 
 const FixedWidthMemo = styled(Cluster)`
   width: 4em;
+`
+
+const CenterStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  height: inherit;
+  justify-content: center;
 `

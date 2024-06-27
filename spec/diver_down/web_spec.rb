@@ -543,12 +543,14 @@ RSpec.describe DiverDown::Web do
             'resolved_alias' => nil,
             'memo' => 'memo',
             'module' => nil,
+            'dependencies' => [],
           },
           {
             'source_name' => 'b.rb',
             'resolved_alias' => nil,
             'memo' => '',
             'module' => nil,
+            'dependencies' => [],
           },
         ]
       )
@@ -574,7 +576,7 @@ RSpec.describe DiverDown::Web do
     end
   end
 
-  describe 'GET /api/module_definitions/:module_names+.json' do
+  describe 'GET /api/global_definition.json' do
     it 'returns combined_definition' do
       definition = DiverDown::Definition.new(
         title: 'title',
@@ -588,7 +590,7 @@ RSpec.describe DiverDown::Web do
 
       metadata.source('a.rb').module = 'A'
 
-      get '/api/module_definitions/A.json'
+      get '/api/global_definition.json'
 
       expect(last_response.status).to eq(200)
       expect(last_response.headers['content-type']).to eq('application/json')

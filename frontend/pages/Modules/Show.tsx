@@ -37,13 +37,6 @@ export const Show: React.FC = () => {
 
         <Section>
           <Stack gap={1.5}>
-            <Section>
-              <Stack gap={0.5}>
-                <Heading type="sectionTitle">Links</Heading>
-                <Link to={path.moduleDefinitions.show(pathModule)}>Graph</Link>
-              </Stack>
-            </Section>
-
             {specificModule && !isLoading ? (
               <>
                 <Section>

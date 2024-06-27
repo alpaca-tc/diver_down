@@ -1,23 +1,25 @@
 import { FC, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
-import { Button, FaGearIcon, Heading, LineClamp, Section, Text } from '@/components/ui'
+import { Button, FaGearIcon, Heading, LineClamp, Section, Stack, Text } from '@/components/ui'
 import { color } from '@/constants/theme'
-import { CombinedDefinition, DotMetadata } from '@/models/combinedDefinition'
+import { CombinedDefinition, DotMetadata, GraphOptions } from '@/models/combinedDefinition'
 
 import { ScrollableSvg } from './ScrollableSvg'
 
 import { HoverDotMetadataContext } from '@/context/HoverMetadataContext'
-import { GraphOptions } from '@/hooks/useGraphOptions'
 import { ConfigureGraphOptionsDialog } from '@/components/ConfigureGraphOptionsDialog'
 import { DotMetadataDialog, DotMetadataDialogProps } from '@/components/DotMetadataDialog'
+import { Loading } from '@/components/Loading'
 
 type Props = {
-  combinedDefinition: CombinedDefinition
+  combinedDefinition: CombinedDefinition | null
   mutateCombinedDefinition: () => void
   graphOptions: GraphOptions
   setGraphOptions: React.Dispatch<React.SetStateAction<GraphOptions>>
 }
+
+const SOURCES_LIMIT = 3000
 
 export const DefinitionGraph: FC<Props> = ({ combinedDefinition, mutateCombinedDefinition, graphOptions, setGraphOptions }) => {
   const [hoverDotMetadata, setHoverDotMetadata] = useState<DotMetadata | null>(null)
@@ -50,7 +52,7 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition, mutateCombinedD
         />
         <FixedHeightHeading type="sectionTitle">
           <LineClamp>
-            {combinedDefinition.titles.map((title, index) => (
+            {(combinedDefinition?.titles ?? []).map((title, index) => (
               <BlockText key={index} size="XXS">
                 {title}
               </BlockText>
@@ -66,7 +68,19 @@ export const DefinitionGraph: FC<Props> = ({ combinedDefinition, mutateCombinedD
           </Button>
         </FixedHeightHeading>
         <FlexHeightSvgWrapper>
-          <ScrollableSvg combinedDefinition={combinedDefinition} setOpenedDotMetadataDialog={setOpenedDotMetadataDialog} />
+          {!combinedDefinition ? (
+            <CenterStack>
+              <Loading text="Loading..." alt="Loading" />
+            </CenterStack>
+          ) : combinedDefinition.dotMetadata.length > SOURCES_LIMIT ? (
+            <Text size="S">
+              Unable to render the graph due to performance issues. The maximum number of elements is {SOURCES_LIMIT}, but you are
+              trying to render {combinedDefinition.dotMetadata.length} elements. Please reduce the number of elements by narrowing
+              down the modules from "Open Graph Options".
+            </Text>
+          ) : (
+            <ScrollableSvg combinedDefinition={combinedDefinition} setOpenedDotMetadataDialog={setOpenedDotMetadataDialog} />
+          )}
         </FlexHeightSvgWrapper>
       </WrapperSection>
     </HoverDotMetadataContext.Provider>
@@ -93,4 +107,11 @@ const FlexHeightSvgWrapper = styled.div`
 
 const BlockText = styled(Text)`
   display: block;
+`
+
+const CenterStack = styled(Stack)`
+  display: flex;
+  flex-direction: row;
+  height: inherit;
+  justify-content: center;
 `

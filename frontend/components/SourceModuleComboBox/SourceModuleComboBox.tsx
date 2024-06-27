@@ -1,11 +1,10 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { Button, Cluster, ComboBoxItem, FaXmarkIcon, FormControl, SingleComboBox } from '@/components/ui'
+import { Button, Cluster, FaXmarkIcon, FormControl, SingleComboBox } from '@/components/ui'
 import { Module } from '@/models/module'
 import { useModules } from '@/repositories/moduleRepository'
 import { useSourceModule } from '@/repositories/sourceModuleRepository'
-
-type Item = ComboBoxItem<Module>
+import { Item, convertModuleToItem } from './utils'
 
 type Props = {
   sourceName: string
@@ -13,12 +12,6 @@ type Props = {
   onClose: () => void
   onUpdate: (module: Module | null) => void
 }
-
-const convertModuleToItem = (module: Module): Item => ({
-  label: module,
-  value: module,
-  data: module,
-})
 
 export const SourceModuleComboBox: FC<Props> = ({ sourceName, initialModule, onClose, onUpdate }) => {
   const { data, isLoading, mutate } = useModules()

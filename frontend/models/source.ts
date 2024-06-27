@@ -33,18 +33,18 @@ export type Sources = {
   classifiedSourcesCount: number
 }
 
-export const sortSources = (sources: Source[], key: 'sourceName' | 'module', sort: 'none' | 'asc' | 'desc'): Source[] => {
+export const ascString = (a: string, b: string) => {
+  if (a > b) return 1
+  if (a < b) return -1
+  return 0
+}
+
+export const sortSources = <T extends Source>(sources: T[], key: 'sourceName' | 'module', sort: 'none' | 'asc' | 'desc'): T[] => {
   if (sort === 'none') {
     return sources
   }
 
   let sorted = [...sources]
-
-  const ascString = (a: string, b: string) => {
-    if (a > b) return 1
-    if (a < b) return -1
-    return 0
-  }
 
   switch (key) {
     case 'sourceName': {

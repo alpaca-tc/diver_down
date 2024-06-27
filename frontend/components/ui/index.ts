@@ -34,6 +34,7 @@ export {
   TableReel,
   Td,
   Text,
+  TextLink,
   Textarea,
   Th,
   Tooltip,
