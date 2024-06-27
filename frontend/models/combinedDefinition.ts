@@ -17,7 +17,7 @@ export type GraphOptions = {
   compound: boolean
   concentrate: boolean
   onlyModule: boolean
-  modules: string[]
+  modules: Module[]
   removeInternalSources: boolean
 }
 

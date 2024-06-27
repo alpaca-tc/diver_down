@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { ActionDialog, CheckBox, FormControl, Section, Stack } from '@/components/ui'
 import { spacing } from '@/constants/theme'
 import { useModules } from '@/repositories/moduleRepository'
-import { ModulesListComboBox } from '../ModulesListComboBox'
+import { ModuleMultiComboBox } from '../ModuleMultiComboBox'
 import { Module } from '@/models/module'
 import { GraphOptions } from '@/models/combinedDefinition'
 
@@ -100,7 +100,7 @@ export const ConfigureGraphOptionsDialog: React.FC<Props> = ({ isOpen, onClickCl
           </FormControl>
 
           <FormControl title="Filter sources by module name">
-            <ModulesListComboBox
+            <ModuleMultiComboBox
               isLoading={isLoading}
               data={modules ?? []}
               modules={temporaryViewOptions.modules}

@@ -11,13 +11,13 @@ type Props = {
   setModules: (modules: Module[]) => void
 }
 
-export const ModulesListComboBox: FC<Props> = ({ data, modules, setModules, isLoading }) => {
+export const ModuleMultiComboBox: FC<Props> = ({ data, modules, setModules, isLoading }) => {
   const [selectedItems, setSelectedItems] = useState<Item[]>([])
 
   const defaultItems: Item[] = useMemo(() => (data ?? []).map((modules) => convertModuleToItem(modules)), [data])
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading || modules.length === 0 || selectedItems.length > 0) return
 
     const initialItems = modules.map((module) => defaultItems.find((item) => item.data! === module)).filter(Boolean) as Item[]
     setSelectedItems(initialItems)

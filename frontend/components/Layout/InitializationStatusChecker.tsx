@@ -12,7 +12,7 @@ export const InitializationStatusChecker: FC = () => {
 
   const { pid, error } = usePid()
   const key = pid ? `InitializationStatusChecker-closed-${pid}` : INITIAL_KEY
-  const [closed, setClosed] = useLocalStorage<boolean>(key, false)
+  const [closed, setClosed] = useLocalStorage<boolean>(key, Boolean)
   const [initialized, setInitialized] = useState<boolean>(false)
 
   // Stop loading if initialization process is finished
