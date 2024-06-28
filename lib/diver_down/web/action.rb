@@ -12,14 +12,18 @@ module DiverDown
         :per
       )
 
+      M = Mutex.new
+
+      attr_reader :store
+
       # @param store [DiverDown::Definition::Store]
       # @param metadata [DiverDown::Web::Metadata]
-      # @param request [Rack::Request]
-      def initialize(store:, metadata:, request:)
+      def initialize(store:, metadata:)
         @store = store
         @metadata = metadata
         @source_alias_resolver = DiverDown::Web::SourceAliasResolver.new(@metadata.source_alias)
-        @request = request
+        @module_dependency_map = nil
+        @module_dependency_map_cache_id = nil
       end
 
       # GET /api/source_aliases.json
@@ -100,39 +104,56 @@ module DiverDown
       # GET /api/modules/:modulee.json
       # @param modulee [String]
       def module(modulee)
-        # Hash{ DiverDown::Definition::Modulee => Set<Integer> }
-        related_definition_store_ids = Set.new
-        source_names = Set.new
+        module_dependency_map = fetch_module_dependency_map
 
-        # rubocop:disable Style/HashEachMethods
-        @store.each do |_, definition|
-          definition.sources.each do |source|
-            next unless @metadata.source(source.source_name).module == modulee
-
-            source_names.add(source.source_name)
-            related_definition_store_ids.add(definition.store_id)
-          end
-        end
-        # rubocop:enable Style/HashEachMethods
-
-        if related_definition_store_ids.empty?
+        unless module_dependency_map.key?(modulee)
           return not_found
         end
 
-        related_definitions = related_definition_store_ids.map { @store.get(_1) }
+        module_dependency = module_dependency_map.fetch(modulee)
 
         json(
           module: modulee,
-          sources: source_names.sort.map do |source_name|
+          module_dependencies: module_dependency.module_dependencies.compact.sort,
+          module_reverse_dependencies: module_dependency.module_reverse_dependencies.compact.sort,
+          sources: module_dependency.sources.map do |source|
             {
-              source_name:,
-              memo: @metadata.source(source_name).memo,
+              source_name: source.source_name,
+              module: @metadata.source(source.source_name).module,
+              memo: @metadata.source(source.source_name).memo,
+              dependencies: source.dependencies.map do |dependency|
+                {
+                  source_name: dependency.source_name,
+                  module: @metadata.source(dependency.source_name).module,
+                  method_ids: dependency.method_ids.sort.map do |method_id|
+                    {
+                      context: method_id.context,
+                      name: method_id.name,
+                      paths: method_id.paths.sort,
+                    }
+                  end,
+                }
+              end,
             }
           end,
-          related_definitions: related_definitions.map do |definition|
+          source_reverse_dependencies: module_dependency.source_reverse_dependencies.map do |source|
             {
-              id: definition.store_id,
-              title: definition.title,
+              source_name: source.source_name,
+              module: @metadata.source(source.source_name).module,
+              memo: @metadata.source(source.source_name).memo,
+              dependencies: source.dependencies.map do |dependency|
+                {
+                  source_name: dependency.source_name,
+                  module: @metadata.source(dependency.source_name).module,
+                  method_ids: dependency.method_ids.sort.map do |method_id|
+                    {
+                      context: method_id.context,
+                      name: method_id.name,
+                      paths: method_id.paths.sort,
+                    }
+                  end,
+                }
+              end,
             }
           end
         )
@@ -365,8 +386,6 @@ module DiverDown
 
       private
 
-      attr_reader :request, :store
-
       def build_method_id_key(dependency, method_id)
         "#{dependency.source_name}-#{method_id.context}-#{method_id.name}"
       end
@@ -432,6 +451,18 @@ module DiverDown
             }
           end
         )
+      end
+
+      def fetch_module_dependency_map
+        M.synchronize do
+          if @module_dependency_map_cache_id != @store.combined_definition.object_id
+            definition = @store.combined_definition
+            @module_dependency_map = DiverDown::Web::DefinitionModuleDependencies.new(@metadata, definition).build_module_dependency_map
+            @module_dependency_map_cache_id = definition.object_id
+          end
+        end
+
+        @module_dependency_map
       end
     end
   end

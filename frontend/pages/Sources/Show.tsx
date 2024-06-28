@@ -70,7 +70,7 @@ export const Show: React.FC = () => {
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>Module Name</Th>
+                          <Th>Module</Th>
                         </tr>
                       </thead>
                       {specificSource.module === null ? (
@@ -100,7 +100,7 @@ export const Show: React.FC = () => {
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>Module Name</Th>
+                          <Th>Module</Th>
                         </tr>
                       </thead>
                       {specificSource.module === null ? (
@@ -169,7 +169,7 @@ export const Show: React.FC = () => {
                     <Table fixedHead>
                       <thead>
                         <tr>
-                          <Th>Module Name</Th>
+                          <Th>Module</Th>
                           <Th>Source Name</Th>
                           <Th>Method Id</Th>
                           <Th>Path</Th>
