@@ -3,6 +3,7 @@ import { EmptyTableBody, Heading, Section, Stack, Text, Table, Th, Td } from '@/
 import { path } from '@/constants/path'
 import { SpecificModule } from '@/models/module'
 import { FC } from 'react'
+import { StickyThead } from '../StickyThead'
 
 export const ReverseDependenciesContent: FC<{
   modules: SpecificModule['moduleReverseDependencies']
@@ -15,11 +16,11 @@ export const ReverseDependenciesContent: FC<{
           <Heading type="sectionTitle">Modules ({modules.length})</Heading>
           <div style={{ overflow: 'clip' }}>
             <Table fixedHead>
-              <thead>
+              <StickyThead>
                 <tr>
                   <Th>Module</Th>
                 </tr>
-              </thead>
+              </StickyThead>
               {modules.length === 0 ? (
                 <EmptyTableBody>
                   <Text>No module reverse dependencies</Text>
@@ -47,7 +48,7 @@ export const ReverseDependenciesContent: FC<{
           <Heading type="sectionTitle">Sources ({sources.length})</Heading>
           <div style={{ overflow: 'clip' }}>
             <Table fixedHead>
-              <thead>
+              <StickyThead>
                 <tr>
                   <Th>Source</Th>
                   <Th>Dependency Module</Th>
@@ -55,7 +56,7 @@ export const ReverseDependenciesContent: FC<{
                   <Th>Method Id</Th>
                   <Th>Path</Th>
                 </tr>
-              </thead>
+              </StickyThead>
               {sources.length === 0 ? (
                 <EmptyTableBody>
                   <Text>No sources</Text>

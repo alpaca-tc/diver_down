@@ -3,6 +3,7 @@ import { EmptyTableBody, Section, Stack, Text, Table, Th, Td } from '@/component
 import { path } from '@/constants/path'
 import { SpecificModule } from '@/models/module'
 import { FC } from 'react'
+import { StickyThead } from '../StickyThead'
 
 export const DependenciesContent: FC<{ moduleDependencies: SpecificModule['moduleDependencies'] }> = ({ moduleDependencies }) => {
   return (
@@ -10,11 +11,11 @@ export const DependenciesContent: FC<{ moduleDependencies: SpecificModule['modul
       <Stack gap={0.5}>
         <div style={{ overflow: 'clip' }}>
           <Table fixedHead>
-            <thead>
+            <StickyThead>
               <tr>
                 <Th>Module</Th>
               </tr>
-            </thead>
+            </StickyThead>
             {moduleDependencies.length === 0 ? (
               <EmptyTableBody>
                 <Text>No module dependencies</Text>

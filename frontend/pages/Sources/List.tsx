@@ -27,10 +27,7 @@ import { SourceModuleComboBox } from '@/components/SourceModuleComboBox'
 import { UpdateSourceModuleButton } from '@/components/UpdateSourceModuleButton'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import { createSearchParams, useNavigate } from 'react-router-dom'
-
-const sortTypes = ['asc', 'desc', 'none'] as const
-
-type SortTypes = (typeof sortTypes)[number]
+import { SortTypes, sortTypes } from '@/utils/sort'
 
 type SortState = {
   key: 'sourceName' | 'module'

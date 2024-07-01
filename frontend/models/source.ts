@@ -1,3 +1,4 @@
+import { ascString } from '@/utils/sort'
 import { MethodId } from './methodId'
 import { Module } from './module'
 
@@ -39,12 +40,6 @@ export const sortSources = (sources: Source[], key: 'sourceName' | 'module', sor
   }
 
   let sorted = [...sources]
-
-  const ascString = (a: string, b: string) => {
-    if (a > b) return 1
-    if (a < b) return -1
-    return 0
-  }
 
   switch (key) {
     case 'sourceName': {

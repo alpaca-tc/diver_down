@@ -1,0 +1,1 @@
+export { StickyThead } from './StickyThead'
