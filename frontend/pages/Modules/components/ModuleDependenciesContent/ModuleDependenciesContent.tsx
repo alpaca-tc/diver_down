@@ -5,7 +5,11 @@ import { SpecificModule } from '@/models/module'
 import { FC } from 'react'
 import { StickyThead } from '../StickyThead'
 
-export const DependenciesContent: FC<{ moduleDependencies: SpecificModule['moduleDependencies'] }> = ({ moduleDependencies }) => {
+type Props = {
+  moduleDependencies: SpecificModule['moduleDependencies']
+}
+
+export const ModuleDependenciesContent: FC<Props> = ({ moduleDependencies }) => {
   return (
     <Section>
       <Stack gap={0.5}>
@@ -14,6 +18,7 @@ export const DependenciesContent: FC<{ moduleDependencies: SpecificModule['modul
             <StickyThead>
               <tr>
                 <Th>Module</Th>
+                <Th></Th>
               </tr>
             </StickyThead>
             {moduleDependencies.length === 0 ? (
@@ -28,6 +33,8 @@ export const DependenciesContent: FC<{ moduleDependencies: SpecificModule['modul
                       <Text as="div" whiteSpace="nowrap">
                         <Link to={path.modules.show(module)}>{module}</Link>
                       </Text>
+                    </Td>
+                    <Td>
                     </Td>
                   </tr>
                 ))}

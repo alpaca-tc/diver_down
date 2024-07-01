@@ -123,10 +123,10 @@ type SortType = {
 }
 
 type Props = {
-  sources: SpecificModule['sources']
+  sources: SpecificModule['sourceReverseDependencies']
 }
 
-export const SourcesContent: FC<Props> = ({ sources }) => {
+export const SourceReverseDependenciesContent: FC<Props> = ({ sources }) => {
   const [sort, setSort] = useState<SortType>({ key: 'sourceName', sort: 'none' })
 
   const sortedSources = useMemo(() => {

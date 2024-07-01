@@ -10,7 +10,7 @@ export type SpecificModuleDependency = {
 
 export type SpecificModuleSource = {
   sourceName: string
-  module: Module
+  module: Module | null
   memo: string
   dependencies: SpecificModuleDependency[]
 }
@@ -20,14 +20,5 @@ export type SpecificModule = {
   moduleDependencies: Module[]
   moduleReverseDependencies: Module[]
   sources: SpecificModuleSource[]
-  sourceReverseDependencies: Array<{
-    sourceName: string
-    module: Module | null
-    memo: string
-    dependencies: Array<{
-      sourceName: string
-      module: Module
-      methodIds: MethodId[]
-    }>
-  }>
+  sourceReverseDependencies: SpecificModuleSource[]
 }
