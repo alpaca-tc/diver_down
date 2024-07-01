@@ -1,0 +1,1 @@
+export { DependenciesContent } from './DependenciesContent'

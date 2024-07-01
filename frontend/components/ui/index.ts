@@ -30,6 +30,8 @@ export {
   Sidebar,
   SingleComboBox,
   Stack,
+  TabBar,
+  TabItem,
   Table,
   TableReel,
   Td,
