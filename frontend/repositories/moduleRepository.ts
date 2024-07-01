@@ -20,13 +20,35 @@ export const useModules = () => {
 
 type SpecificModuleResponse = {
   module: string
-  related_definitions: Array<{
-    id: number
-    title: string
-  }>
+  module_dependencies: string[]
+  module_reverse_dependencies: string[]
   sources: Array<{
     source_name: string
+    module: string
     memo: string
+    dependencies: Array<{
+      source_name: string
+      module: string | null
+      method_ids: Array<{
+        context: 'instance' | 'class'
+        name: string
+        paths: string[]
+      }>
+    }>
+  }>
+  source_reverse_dependencies: Array<{
+    source_name: string
+    module: string | null
+    memo: string
+    dependencies: Array<{
+      source_name: string
+      module: string
+      method_ids: Array<{
+        context: 'instance' | 'class'
+        name: string
+        paths: string[]
+      }>
+    }>
   }>
 }
 
@@ -36,13 +58,35 @@ export const useModule = (module: string) => {
 
     return {
       module: response.module,
+      moduleDependencies: response.module_dependencies,
+      moduleReverseDependencies: response.module_reverse_dependencies,
       sources: response.sources.map((source) => ({
         sourceName: source.source_name,
+        module: source.module,
         memo: source.memo,
+        dependencies: source.dependencies.map((dependency) => ({
+          sourceName: dependency.source_name,
+          module: dependency.module,
+          methodIds: dependency.method_ids.map((methodId) => ({
+            context: methodId.context,
+            name: methodId.name,
+            paths: methodId.paths,
+          })),
+        })),
       })),
-      relatedDefinitions: response.related_definitions.map((definition) => ({
-        id: definition.id,
-        title: definition.title,
+      sourceReverseDependencies: response.source_reverse_dependencies.map((source) => ({
+        sourceName: source.source_name,
+        module: source.module,
+        memo: source.memo,
+        dependencies: source.dependencies.map((dependency) => ({
+          sourceName: dependency.source_name,
+          module: dependency.module,
+          methodIds: dependency.method_ids.map((methodId) => ({
+            context: methodId.context,
+            name: methodId.name,
+            paths: methodId.paths,
+          })),
+        })),
       })),
     }
   })

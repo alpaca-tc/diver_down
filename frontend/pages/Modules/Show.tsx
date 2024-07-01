@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -7,22 +7,11 @@ import { Loading } from '@/components/Loading'
 import { Cluster, EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
 import { path } from '@/constants/path'
 import { spacing } from '@/constants/theme'
-import { KEY } from '@/hooks/useBitIdHash'
 import { useModule } from '@/repositories/moduleRepository'
-import { encode, idsToBitId } from '@/utils/bitId'
-import { stringify } from '@/utils/queryString'
 
 export const Show: React.FC = () => {
   const pathModule = useParams()['*'] ?? ''
-  const { data: specificModule, isLoading } = useModule(pathModule)
-
-  const relatedDefinitionIds = useMemo(() => {
-    if (specificModule) {
-      return specificModule.relatedDefinitions.map(({ id }) => id)
-    } else {
-      return []
-    }
-  }, [specificModule])
+  const { data, isLoading } = useModule(pathModule)
 
   return (
     <StyledSection>
@@ -44,32 +33,30 @@ export const Show: React.FC = () => {
               </Stack>
             </Section>
 
-            {specificModule && !isLoading ? (
+            {data && !isLoading ? (
               <>
                 <Section>
                   <Stack gap={0.5}>
-                    <Heading type="sectionTitle">Sources</Heading>
+                    <Heading type="sectionTitle">Module Dependencies ({data.moduleDependencies.length})</Heading>
                     <div style={{ overflow: 'clip' }}>
                       <Table fixedHead>
                         <thead>
                           <tr>
-                            <Th>Source Name</Th>
-                            <Th>Memo</Th>
+                            <Th>Module</Th>
                           </tr>
                         </thead>
-                        {specificModule.sources.length === 0 ? (
+                        {data.sources.length === 0 ? (
                           <EmptyTableBody>
-                            <Text>no sources</Text>
+                            <Text>No module dependencies</Text>
                           </EmptyTableBody>
                         ) : (
                           <tbody>
-                            {specificModule.sources.map((source) => (
-                              <tr key={source.sourceName}>
+                            {data.moduleDependencies.map((module) => (
+                              <tr key={module}>
                                 <Td>
-                                  <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-                                </Td>
-                                <Td>
-                                  <Text>{source.memo}</Text>
+                                  <Text as="div" whiteSpace="nowrap">
+                                    <Link to={path.modules.show(module)}>{module}</Link>
+                                  </Text>
                                 </Td>
                               </tr>
                             ))}
@@ -82,34 +69,149 @@ export const Show: React.FC = () => {
 
                 <Section>
                   <Stack gap={0.5}>
-                    <Cluster>
-                      <Heading type="sectionTitle">Related Definitions</Heading>
-                      <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId(relatedDefinitionIds)) })}`}>
-                        Select All
-                      </Link>
-                    </Cluster>
+                    <Heading type="sectionTitle">Module Reverse Dependencies ({data.moduleReverseDependencies.length})</Heading>
                     <div style={{ overflow: 'clip' }}>
                       <Table fixedHead>
                         <thead>
                           <tr>
-                            <Th>Title</Th>
+                            <Th>Module</Th>
                           </tr>
                         </thead>
-                        {specificModule.relatedDefinitions.length === 0 ? (
+                        {data.sources.length === 0 ? (
                           <EmptyTableBody>
-                            <Text>no related definitions</Text>
+                            <Text>No module reverse dependencies</Text>
                           </EmptyTableBody>
                         ) : (
                           <tbody>
-                            {specificModule.relatedDefinitions.map((relatedDefinition) => (
-                              <tr key={relatedDefinition.id}>
+                            {data.moduleReverseDependencies.map((module) => (
+                              <tr key={module}>
                                 <Td>
-                                  <Link to={`${path.home()}?${stringify({ [KEY]: encode(idsToBitId([relatedDefinition.id])) })}`}>
-                                    {relatedDefinition.title}
-                                  </Link>
+                                  <Text as="div" whiteSpace="nowrap">
+                                    <Link to={path.modules.show(module)}>{module}</Link>
+                                  </Text>
                                 </Td>
                               </tr>
                             ))}
+                          </tbody>
+                        )}
+                      </Table>
+                    </div>
+                  </Stack>
+                </Section>
+
+                <Section>
+                  <Stack gap={0.5}>
+                    <Heading type="sectionTitle">Sources ({data.sources.length})</Heading>
+                    <div style={{ overflow: 'clip' }}>
+                      <Table fixedHead>
+                        <thead>
+                          <tr>
+                            <Th>Source</Th>
+                            <Th>Dependency Module</Th>
+                            <Th>Dependency</Th>
+                            <Th>Method Id</Th>
+                            <Th>Path</Th>
+                          </tr>
+                        </thead>
+                        {data.sources.length === 0 ? (
+                          <EmptyTableBody>
+                            <Text>No sources</Text>
+                          </EmptyTableBody>
+                        ) : (
+                          <tbody>
+                            {data.sources.map((source) =>
+                              source.dependencies.map((dependency) =>
+                                dependency.methodIds.map((methodId) => (
+                                  <tr key={`${source.sourceName}-${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
+                                    <Td>
+                                      <Text as="div" whiteSpace="nowrap">
+                                        <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                                      </Text>
+                                    </Td>
+                                    <Td>
+                                      {dependency.module && (
+                                        <Text as="div" whiteSpace="nowrap">
+                                          <Link to={path.modules.show(dependency.module)}>{dependency.module}</Link>
+                                        </Text>
+                                      )}
+                                    </Td>
+                                    <Td>
+                                      <Text as="div" whiteSpace="nowrap">
+                                        <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
+                                      </Text>
+                                    </Td>
+                                    <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
+                                    <Td>
+                                      {methodId.paths.map((methodIdPath) => (
+                                        <div key={methodIdPath}>
+                                          <Text>{methodIdPath}</Text>
+                                        </div>
+                                      ))}
+                                    </Td>
+                                  </tr>
+                                )),
+                              ),
+                            )}
+                          </tbody>
+                        )}
+                      </Table>
+                    </div>
+                  </Stack>
+                </Section>
+
+                <Section>
+                  <Stack gap={0.5}>
+                    <Heading type="sectionTitle">Source Reverse Dependencies ({data.sourceReverseDependencies.length})</Heading>
+                    <div style={{ overflow: 'clip' }}>
+                      <Table fixedHead>
+                        <thead>
+                          <tr>
+                            <Th>Source</Th>
+                            <Th>Dependency Module</Th>
+                            <Th>Dependency</Th>
+                            <Th>Method Id</Th>
+                            <Th>Path</Th>
+                          </tr>
+                        </thead>
+                        {data.sourceReverseDependencies.length === 0 ? (
+                          <EmptyTableBody>
+                            <Text>No sources</Text>
+                          </EmptyTableBody>
+                        ) : (
+                          <tbody>
+                            {data.sourceReverseDependencies.map((source) =>
+                              source.dependencies.map((dependency) =>
+                                dependency.methodIds.map((methodId) => (
+                                  <tr key={`${source.sourceName}-${dependency.sourceName}`}>
+                                    <Td>
+                                      <Text as="div" whiteSpace="nowrap">
+                                        <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
+                                      </Text>
+                                    </Td>
+                                    <Td>
+                                      {dependency.module && (
+                                        <Text as="div" whiteSpace="nowrap">
+                                          <Link to={path.modules.show(dependency.module)}>{dependency.module}</Link>
+                                        </Text>
+                                      )}
+                                    </Td>
+                                    <Td>
+                                      <Text as="div" whiteSpace="nowrap">
+                                        <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
+                                      </Text>
+                                    </Td>
+                                    <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
+                                    <Td>
+                                      {methodId.paths.map((methodIdPath) => (
+                                        <div key={methodIdPath}>
+                                          <Text>{methodIdPath}</Text>
+                                        </div>
+                                      ))}
+                                    </Td>
+                                  </tr>
+                                )),
+                              ),
+                            )}
                           </tbody>
                         )}
                       </Table>

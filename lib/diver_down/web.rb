@@ -15,6 +15,7 @@ module DiverDown
     require 'diver_down/web/indented_string_io'
     require 'diver_down/web/definition_store'
     require 'diver_down/web/definition_loader'
+    require 'diver_down/web/definition_module_dependencies'
     require 'diver_down/web/source_alias_resolver'
     require 'diver_down/web/module_sources_filter'
 
@@ -35,6 +36,7 @@ module DiverDown
 
       definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"].sort
       @total_definition_files_size = definition_files.size
+      @action = nil
 
       load_definition_files_on_thread(definition_files)
     end
@@ -43,11 +45,14 @@ module DiverDown
     # @return [Array[Integer, Hash, Array]]
     def call(env)
       request = Rack::Request.new(env)
-      action = DiverDown::Web::Action.new(store: self.class.store, metadata: @metadata, request:)
+
+      if @action&.store.object_id != self.class.store.object_id
+        @action = DiverDown::Web::Action.new(store: self.class.store, metadata: @metadata)
+      end
 
       case [request.request_method, request.path]
       in ['GET', %r{\A/api/definitions\.json\z}]
-        action.definitions(
+        @action.definitions(
           page: request.params['page']&.to_i || 1,
           per: request.params['per']&.to_i || 100,
           title: request.params['title'] || '',
@@ -55,51 +60,51 @@ module DiverDown
           definition_group: request.params['definition_group'] || ''
         )
       in ['GET', %r{\A/api/sources\.json\z}]
-        action.sources
+        @action.sources
       in ['GET', %r{\A/api/modules\.json\z}]
-        action.modules
+        @action.modules
       in ['GET', %r{\A/api/modules/(?<modulee>[^/]+)\.json\z}]
         modulee = CGI.unescape(Regexp.last_match[:modulee])
-        action.module(modulee)
+        @action.module(modulee)
       in ['GET', %r{\A/api/module_definitions/(?<modulee>[^/]+)\.json\z}]
         modulee = CGI.unescape(Regexp.last_match[:modulee])
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.module_definition(compound, concentrate, only_module, modulee)
+        @action.module_definition(compound, concentrate, only_module, modulee)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        action.combine_definitions(bit_id, compound, concentrate, only_module)
+        @action.combine_definitions(bit_id, compound, concentrate, only_module)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
-        action.source(source)
+        @action.source(source)
       in ['POST', %r{\A/api/sources/(?<source>[^/]+)/module.json\z}]
         source = Regexp.last_match[:source]
         modulee = request.params['module'] || ''
-        action.set_module(source, modulee)
+        @action.set_module(source, modulee)
       in ['POST', %r{\A/api/sources/(?<source>[^/]+)/memo.json\z}]
         source = Regexp.last_match[:source]
         memo = request.params['memo'] || ''
-        action.set_memo(source, memo)
+        @action.set_memo(source, memo)
       in ['GET', %r{\A/api/pid\.json\z}]
-        action.pid
+        @action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
-        action.initialization_status(@total_definition_files_size)
+        @action.initialization_status(@total_definition_files_size)
       in ['GET', %r{\A/api/source_aliases\.json\z}]
-        action.source_aliases
+        @action.source_aliases
       in ['POST', %r{\A/api/source_aliases\.json\z}]
         alias_name = request.params['alias_name']
         old_alias_name = request.params['old_alias_name'] # NOTE: nillable
         source_names = request.params['source_names'] || []
 
-        action.update_source_alias(alias_name, old_alias_name, source_names)
+        @action.update_source_alias(alias_name, old_alias_name, source_names)
       in ['GET', %r{\A/assets/}]
         @files_server.call(env)
       in ['GET', /\.json\z/], ['POST', /\.json\z/]
-        action.not_found
+        @action.not_found
       else
         @files_server.call(env.merge('PATH_INFO' => '/index.html'))
       end

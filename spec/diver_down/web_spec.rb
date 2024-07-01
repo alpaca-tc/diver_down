@@ -391,7 +391,7 @@ RSpec.describe DiverDown::Web do
     end
   end
 
-  describe 'GET /api/modules/:module_name.json' do
+  describe 'GET /api/modules/:modulee.json' do
     it 'returns unknown if store is blank' do
       get '/api/modules/unknown.json'
 
@@ -416,7 +416,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
 
-      ids = store.set(definition_1, definition_2)
+      store.set(definition_1, definition_2)
       metadata.source('a.rb').module = 'A'
       metadata.source('b.rb').module = 'A'
       metadata.source('a.rb').memo = 'memo'
@@ -429,23 +429,20 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'dependencies' => [],
+            'module' => 'A',
             'memo' => 'memo',
           },
           {
+            'dependencies' => [],
+            'module' => 'A',
             'source_name' => 'b.rb',
             'memo' => '',
           },
         ],
-        'related_definitions' => [
-          {
-            'id' => ids[0],
-            'title' => 'title',
-          },
-          {
-            'id' => ids[1],
-            'title' => 'title 2',
-          },
-        ],
+        'module_dependencies' => [],
+        'module_reverse_dependencies' => [],
+        'source_reverse_dependencies' => [],
       })
     end
 
@@ -459,7 +456,7 @@ RSpec.describe DiverDown::Web do
         ]
       )
 
-      ids = store.set(definition)
+      store.set(definition)
       metadata.source('a.rb').module = 'グローバル'
       metadata.source('a.rb').memo = 'memo'
 
@@ -471,15 +468,14 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
+            'module' => 'グローバル',
+            'dependencies' => [],
             'memo' => 'memo',
           },
         ],
-        'related_definitions' => [
-          {
-            'id' => ids[0],
-            'title' => 'title',
-          },
-        ],
+        'module_dependencies' => [],
+        'module_reverse_dependencies' => [],
+        'source_reverse_dependencies' => [],
       })
     end
   end
