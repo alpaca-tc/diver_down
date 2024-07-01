@@ -1,12 +1,12 @@
 import { Link } from '@/components/Link'
-import { EmptyTableBody, Table, Th, Text, Td, Button, Chip, Cluster } from '@/components/ui'
+import { EmptyTableBody, Table, Th, Text, Td, Button, Cluster, Chip } from '@/components/ui'
 import { path } from '@/constants/path'
 import { Module, SpecificModule, SpecificModuleSource } from '@/models/module'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { StickyThead } from '../StickyThead'
 import { SortTypes, ascNumber, ascString, sortTypes } from '@/utils/sort'
 
-const SourceTr: FC<{ source: SpecificModuleSource; filteredModule: Module | null }> = ({ source, filteredModule }) => {
+const SourceTr: FC<{ source: SpecificModuleSource; filteredModule: Module | null }> = ({ filteredModule, source }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
 
   const modules = useMemo(() => {
@@ -123,11 +123,11 @@ type SortType = {
 }
 
 type Props = {
-  sources: SpecificModule['sources']
+  sources: SpecificModule['sourceReverseDependencies']
   filteredModule: Module | null
 }
 
-export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
+export const SourceReverseDependenciesContent: FC<Props> = ({ filteredModule, sources }) => {
   const [sort, setSort] = useState<SortType>({ key: 'sourceName', sort: 'none' })
 
   const sortedSources = useMemo(() => {
@@ -160,9 +160,7 @@ export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
     <>
       {filteredModule && (
         <Cluster>
-          <Chip>
-            <Text>Filter: {filteredModule}</Text>
-          </Chip>
+          <Chip>Filter: {filteredModule}</Chip>
         </Cluster>
       )}
       <Table fixedHead>
@@ -187,7 +185,7 @@ export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
         ) : (
           <tbody>
             {sortedSources.map((source) => (
-              <SourceTr key={source.sourceName} filteredModule={filteredModule} source={source} />
+              <SourceTr filteredModule={filteredModule} key={source.sourceName} source={source} />
             ))}
           </tbody>
         )}

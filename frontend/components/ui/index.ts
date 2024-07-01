@@ -5,6 +5,7 @@ export {
   Base,
   Button,
   CheckBox,
+  Chip,
   Cluster,
   DefinitionList,
   EmptyTableBody,
