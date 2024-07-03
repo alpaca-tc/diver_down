@@ -1,17 +1,77 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
 import { Loading } from '@/components/Loading'
-import { Cluster, EmptyTableBody, Heading, Section, Stack, Table, Td, Text, Th } from '@/components/ui'
+import { Chip, Cluster, Heading, Section, Stack, TabBar, TabItem } from '@/components/ui'
 import { path } from '@/constants/path'
-import { spacing } from '@/constants/theme'
+import { color, spacing } from '@/constants/theme'
 import { useModule } from '@/repositories/moduleRepository'
+import { SourcesContent } from './components/SourcesContent/SourcesContent'
+import { ModuleDependenciesContent } from './components/ModuleDependenciesContent'
+import { SourceReverseDependenciesContent } from './components/SourceReverseDependenciesContent'
+import { useSearchParamsState } from '@/hooks/useSearchParams'
+import { Module } from '@/models/module'
+
+const validTabs = ['sources', 'sourceReverseDependencies', 'moduleDependencies', 'moduleReverseDependencies'] as const
+type ValidTab = (typeof validTabs)[number]
+
+type Query = {
+  module: Module | null
+}
 
 export const Show: React.FC = () => {
   const pathModule = useParams()['*'] ?? ''
   const { data, isLoading } = useModule(pathModule)
+  const [params, setParams] = useSearchParamsState<{ tab: ValidTab; q: Query }>({
+    tab: (val: any) => (validTabs.includes(String(val) as ValidTab) ? (String(val) as ValidTab) : 'sources'),
+    q: (val: any) => {
+      const q: Query = { module: null }
+
+      if (val && val.module) {
+        q.module = val.module
+      }
+
+      return q
+    },
+  })
+
+  const content = useMemo(() => {
+    if (isLoading || data === undefined) {
+      return <Loading />
+    }
+
+    switch (params.tab) {
+      case 'sources': {
+        return <SourcesContent sources={data.sources} filteredModule={params.q.module} />
+      }
+      case 'moduleDependencies': {
+        return (
+          <ModuleDependenciesContent
+            pathModule={pathModule}
+            sources={data.sources}
+            moduleDependencies={data.moduleDependencies}
+          />
+        )
+      }
+      case 'moduleReverseDependencies': {
+        return (
+          <ModuleDependenciesContent
+            pathModule={pathModule}
+            sources={data.sources}
+            moduleDependencies={data.moduleReverseDependencies}
+          />
+        )
+      }
+      case 'sourceReverseDependencies': {
+        return <SourceReverseDependenciesContent filteredModule={params.q.module} sources={data.sourceReverseDependencies} />
+      }
+      default: {
+        throw new Error(`Invalid tab: ${params.tab}`)
+      }
+    }
+  }, [data, pathModule, isLoading, params])
 
   return (
     <StyledSection>
@@ -26,208 +86,51 @@ export const Show: React.FC = () => {
 
         <Section>
           <Stack gap={1.5}>
-            <Section>
-              <Stack gap={0.5}>
-                <Heading type="sectionTitle">Links</Heading>
-                <Link to={path.moduleDefinitions.show(pathModule)}>Graph</Link>
-              </Stack>
-            </Section>
+            <StickyTabBar>
+              <TabItem
+                id="tab-sources"
+                onClick={() => setParams((prev) => ({ ...prev, tab: 'sources' }))}
+                selected={params.tab === 'sources'}
+              >
+                Sources{data ? ` (${data.sources.length})` : ''}
+              </TabItem>
+              <TabItem
+                id="tab-dependencies"
+                onClick={() => setParams((prev) => ({ ...prev, tab: 'moduleDependencies' }))}
+                selected={params.tab === 'moduleDependencies'}
+              >
+                Module Dependencies{data ? ` (${data.moduleDependencies.length})` : ''}
+              </TabItem>
+              <TabItem
+                id="tab-module-reverse-dependencies"
+                onClick={() => setParams((prev) => ({ ...prev, tab: 'moduleReverseDependencies' }))}
+                selected={params.tab === 'moduleReverseDependencies'}
+              >
+                Module Reverse Dependencies{data ? ` (${data.moduleReverseDependencies.length})` : ''}
+              </TabItem>
+              <TabItem
+                id="tab-source-reverse-dependencies"
+                onClick={() => setParams((prev) => ({ ...prev, tab: 'sourceReverseDependencies' }))}
+                selected={params.tab === 'sourceReverseDependencies'}
+              >
+                Source Reverse Dependencies{data ? ` (${data.sourceReverseDependencies.length})` : ''}
+              </TabItem>
+            </StickyTabBar>
 
-            {data && !isLoading ? (
-              <>
-                <Section>
-                  <Stack gap={0.5}>
-                    <Heading type="sectionTitle">Module Dependencies ({data.moduleDependencies.length})</Heading>
-                    <div style={{ overflow: 'clip' }}>
-                      <Table fixedHead>
-                        <thead>
-                          <tr>
-                            <Th>Module</Th>
-                          </tr>
-                        </thead>
-                        {data.sources.length === 0 ? (
-                          <EmptyTableBody>
-                            <Text>No module dependencies</Text>
-                          </EmptyTableBody>
-                        ) : (
-                          <tbody>
-                            {data.moduleDependencies.map((module) => (
-                              <tr key={module}>
-                                <Td>
-                                  <Text as="div" whiteSpace="nowrap">
-                                    <Link to={path.modules.show(module)}>{module}</Link>
-                                  </Text>
-                                </Td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        )}
-                      </Table>
-                    </div>
-                  </Stack>
-                </Section>
-
-                <Section>
-                  <Stack gap={0.5}>
-                    <Heading type="sectionTitle">Module Reverse Dependencies ({data.moduleReverseDependencies.length})</Heading>
-                    <div style={{ overflow: 'clip' }}>
-                      <Table fixedHead>
-                        <thead>
-                          <tr>
-                            <Th>Module</Th>
-                          </tr>
-                        </thead>
-                        {data.sources.length === 0 ? (
-                          <EmptyTableBody>
-                            <Text>No module reverse dependencies</Text>
-                          </EmptyTableBody>
-                        ) : (
-                          <tbody>
-                            {data.moduleReverseDependencies.map((module) => (
-                              <tr key={module}>
-                                <Td>
-                                  <Text as="div" whiteSpace="nowrap">
-                                    <Link to={path.modules.show(module)}>{module}</Link>
-                                  </Text>
-                                </Td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        )}
-                      </Table>
-                    </div>
-                  </Stack>
-                </Section>
-
-                <Section>
-                  <Stack gap={0.5}>
-                    <Heading type="sectionTitle">Sources ({data.sources.length})</Heading>
-                    <div style={{ overflow: 'clip' }}>
-                      <Table fixedHead>
-                        <thead>
-                          <tr>
-                            <Th>Source</Th>
-                            <Th>Dependency Module</Th>
-                            <Th>Dependency</Th>
-                            <Th>Method Id</Th>
-                            <Th>Path</Th>
-                          </tr>
-                        </thead>
-                        {data.sources.length === 0 ? (
-                          <EmptyTableBody>
-                            <Text>No sources</Text>
-                          </EmptyTableBody>
-                        ) : (
-                          <tbody>
-                            {data.sources.map((source) =>
-                              source.dependencies.map((dependency) =>
-                                dependency.methodIds.map((methodId) => (
-                                  <tr key={`${source.sourceName}-${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
-                                    <Td>
-                                      <Text as="div" whiteSpace="nowrap">
-                                        <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-                                      </Text>
-                                    </Td>
-                                    <Td>
-                                      {dependency.module && (
-                                        <Text as="div" whiteSpace="nowrap">
-                                          <Link to={path.modules.show(dependency.module)}>{dependency.module}</Link>
-                                        </Text>
-                                      )}
-                                    </Td>
-                                    <Td>
-                                      <Text as="div" whiteSpace="nowrap">
-                                        <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
-                                      </Text>
-                                    </Td>
-                                    <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
-                                    <Td>
-                                      {methodId.paths.map((methodIdPath) => (
-                                        <div key={methodIdPath}>
-                                          <Text>{methodIdPath}</Text>
-                                        </div>
-                                      ))}
-                                    </Td>
-                                  </tr>
-                                )),
-                              ),
-                            )}
-                          </tbody>
-                        )}
-                      </Table>
-                    </div>
-                  </Stack>
-                </Section>
-
-                <Section>
-                  <Stack gap={0.5}>
-                    <Heading type="sectionTitle">Source Reverse Dependencies ({data.sourceReverseDependencies.length})</Heading>
-                    <div style={{ overflow: 'clip' }}>
-                      <Table fixedHead>
-                        <thead>
-                          <tr>
-                            <Th>Source</Th>
-                            <Th>Dependency Module</Th>
-                            <Th>Dependency</Th>
-                            <Th>Method Id</Th>
-                            <Th>Path</Th>
-                          </tr>
-                        </thead>
-                        {data.sourceReverseDependencies.length === 0 ? (
-                          <EmptyTableBody>
-                            <Text>No sources</Text>
-                          </EmptyTableBody>
-                        ) : (
-                          <tbody>
-                            {data.sourceReverseDependencies.map((source) =>
-                              source.dependencies.map((dependency) =>
-                                dependency.methodIds.map((methodId) => (
-                                  <tr key={`${source.sourceName}-${dependency.sourceName}`}>
-                                    <Td>
-                                      <Text as="div" whiteSpace="nowrap">
-                                        <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-                                      </Text>
-                                    </Td>
-                                    <Td>
-                                      {dependency.module && (
-                                        <Text as="div" whiteSpace="nowrap">
-                                          <Link to={path.modules.show(dependency.module)}>{dependency.module}</Link>
-                                        </Text>
-                                      )}
-                                    </Td>
-                                    <Td>
-                                      <Text as="div" whiteSpace="nowrap">
-                                        <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
-                                      </Text>
-                                    </Td>
-                                    <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
-                                    <Td>
-                                      {methodId.paths.map((methodIdPath) => (
-                                        <div key={methodIdPath}>
-                                          <Text>{methodIdPath}</Text>
-                                        </div>
-                                      ))}
-                                    </Td>
-                                  </tr>
-                                )),
-                              ),
-                            )}
-                          </tbody>
-                        )}
-                      </Table>
-                    </div>
-                  </Stack>
-                </Section>
-              </>
-            ) : (
-              <Loading />
-            )}
+            {content}
           </Stack>
         </Section>
       </Stack>
     </StyledSection>
   )
 }
+
+const StickyTabBar = styled(TabBar)`
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: ${color.BACKGROUND};
+`
 
 const StyledSection = styled(Section)`
   padding: ${spacing.XS};
