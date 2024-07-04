@@ -17,7 +17,7 @@ module DiverDown
     require 'diver_down/web/definition_loader'
     require 'diver_down/web/definition_module_dependencies'
     require 'diver_down/web/source_alias_resolver'
-    require 'diver_down/web/module_sources_filter'
+    require 'diver_down/web/definition_filter'
 
     # For development
     autoload :DevServerMiddleware, 'diver_down/web/dev_server_middleware'
@@ -66,18 +66,23 @@ module DiverDown
       in ['GET', %r{\A/api/modules/(?<modulee>[^/]+)\.json\z}]
         modulee = CGI.unescape(Regexp.last_match[:modulee])
         @action.module(modulee)
-      in ['GET', %r{\A/api/module_definitions/(?<modulee>[^/]+)\.json\z}]
-        modulee = CGI.unescape(Regexp.last_match[:modulee])
+      in ['GET', %r{\A/api/global_definition\.json\z}]
+        focus_modules = request.params['focus_modules'] || []
+        modules = request.params['modules'] || []
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        @action.module_definition(compound, concentrate, only_module, modulee)
+        remove_internal_sources = request.params['remove_internal_sources'] == '1'
+        @action.global_definition(compound, concentrate, only_module, remove_internal_sources, focus_modules, modules)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'
         concentrate = request.params['concentrate'] == '1'
         only_module = request.params['only_module'] == '1'
-        @action.combine_definitions(bit_id, compound, concentrate, only_module)
+        remove_internal_sources = request.params['remove_internal_sources'] == '1'
+        focus_modules = request.params['focus_modules'] || []
+        modules = request.params['modules'] || []
+        @action.combine_definitions(bit_id, compound, concentrate, only_module, remove_internal_sources, focus_modules, modules)
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         @action.source(source)
@@ -132,6 +137,11 @@ module DiverDown
 
         # Cache combined_definition
         store.combined_definition
+
+        # For development
+        if ENV['DIVER_DOWN_DIR']
+          File.write(File.expand_path('../../tmp/combined_definition.yml', __dir__), store.combined_definition.to_h.to_yaml)
+        end
       end
     end
   end

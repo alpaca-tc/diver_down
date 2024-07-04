@@ -19,7 +19,7 @@ export const DefinitionList: FC<Props> = ({ selectedDefinitionIds, setSelectedDe
   const [openedConfigureSearchOptionsDialog, setOpenedConfigureSearchOptionsDialog] = useState<boolean>(false)
   const [searchDefinitionsOptions, setSearchDefinitionsOptions] = useLocalStorage<SearchDefinitionsOptions>(
     'Home-DefinitionList-SearchDefinitionOptions-v1',
-    { definitionGroup: '', title: '', source: '', folding: false },
+    { definitionGroup: String, title: String, source: String, folding: Boolean },
   )
   const [foldingSection, setFoldingSection] = useState<boolean>(false)
 

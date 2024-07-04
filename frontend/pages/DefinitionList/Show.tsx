@@ -11,13 +11,13 @@ import { DefinitionList } from './components/DefinitionList'
 
 import { RecentModuleContext } from '@/context/RecentModuleContext'
 import { Module } from '@/models/module'
-import { useGraphOptions } from '@/hooks/useGraphOptions'
+import { useLocalStorageGraphOptions } from '@/hooks/useGraphOptions'
 import { DefinitionGraph } from '@/components/DefinitionGraph'
 import { DefinitionSources } from '@/components/DefinitionSources'
 
 export const Show: React.FC = () => {
   const [selectedDefinitionIds, setSelectedDefinitionIds] = useBitIdHash()
-  const [graphOptions, setGraphOptions] = useGraphOptions()
+  const [graphOptions, setGraphOptions] = useLocalStorageGraphOptions()
   const {
     data: combinedDefinition,
     isLoading,

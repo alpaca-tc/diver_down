@@ -1,14 +1,26 @@
 import { Module } from './module'
 import { Source } from './source'
 
-export type CombinedDefinitionOptions = {
+type BaseDotMetadata = {
+  id: string
+}
+
+export const defaultGraphOptions: GraphOptions = {
+  compound: false,
+  concentrate: false,
+  onlyModule: false,
+  focusModules: [],
+  modules: [],
+  removeInternalSources: false,
+}
+
+export type GraphOptions = {
   compound: boolean
   concentrate: boolean
   onlyModule: boolean
-}
-
-type BaseDotMetadata = {
-  id: string
+  focusModules: Module[]
+  modules: Module[]
+  removeInternalSources: boolean
 }
 
 export type DotSourceMetadata = {
@@ -37,10 +49,18 @@ export type DotModuleMetadata = {
 
 export type DotMetadata = DotSourceMetadata | DotDependencyMetadata | DotModuleMetadata
 
+export type Dependency = {
+  sourceName: string
+}
+
+export type CombinedDefinitionSource = {
+  dependencies: Dependency[]
+} & Source
+
 export type CombinedDefinition = {
   ids: number[]
   titles: string[]
   dot: string
   dotMetadata: DotMetadata[]
-  sources: Source[]
+  sources: CombinedDefinitionSource[]
 }

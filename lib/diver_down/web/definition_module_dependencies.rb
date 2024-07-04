@@ -37,6 +37,8 @@ module DiverDown
 
         @definition.sources.each do |source|
           source_module = @metadata.source(source.source_name).module
+          next if source_module.nil?
+
           source_module_dependency = module_dependency_map[source_module]
           source_module_dependency.source_map[source.source_name] ||= DiverDown::Definition::Source.new(source_name: source.source_name)
 
@@ -44,6 +46,7 @@ module DiverDown
             dependency_module = @metadata.source(dependency.source_name).module
 
             next if source_module == dependency_module
+            next if dependency_module.nil?
 
             dependency_module_dependency = module_dependency_map[dependency_module]
 
