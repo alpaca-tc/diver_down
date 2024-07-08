@@ -34,12 +34,6 @@ export type Sources = {
   classifiedSourcesCount: number
 }
 
-export const ascString = (a: string, b: string) => {
-  if (a > b) return 1
-  if (a < b) return -1
-  return 0
-}
-
 export const sortSources = <T extends Source>(sources: T[], key: 'sourceName' | 'module', sort: 'none' | 'asc' | 'desc'): T[] => {
   if (sort === 'none') {
     return sources
@@ -49,11 +43,11 @@ export const sortSources = <T extends Source>(sources: T[], key: 'sourceName' | 
 
   switch (key) {
     case 'sourceName': {
-      sorted = sorted.sort((a, b) => ascString(a.sourceName, b.sourceName))
+      sorted = sorted.toSorted((a, b) => ascString(a.sourceName, b.sourceName))
       break
     }
     case 'module': {
-      sorted = sorted.sort((a, b) => ascString(String(a.module), String(b.module)))
+      sorted = sorted.toSorted((a, b) => ascString(a.module ?? '', b.module ?? ''))
     }
   }
 

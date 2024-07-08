@@ -7,12 +7,12 @@ import { path } from '@/constants/path'
 import { color } from '@/constants/theme'
 import { CombinedDefinition, GraphOptions } from '@/models/combinedDefinition'
 
-import { ascString } from '@/models/source'
 import React from 'react'
 import { Loading } from '@/components/Loading'
 import { Module } from '@/models/module'
 import { ModuleDependency, buildModuleDependencyMap } from './buildModuleDependencyMap'
 import { stringify } from '@/utils/queryString'
+import { ascString } from '@/utils/sort'
 
 const sortTypes = ['asc', 'desc'] as const
 
