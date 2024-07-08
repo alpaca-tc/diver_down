@@ -192,8 +192,8 @@ RSpec.describe DiverDown::Web::DefinitionFilter do
               dependencies: [
                 {
                   source_name: 'C::User',
-                }
-              ]
+                },
+              ],
             }, {
               source_name: 'C::User',
             },
