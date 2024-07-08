@@ -101,7 +101,7 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
             strict digraph "title" {
               "a.rb" [label="a.rb" id="graph_1"]
               "b.rb" [label="b.rb" id="graph_2"]
-              "a.rb" -> "b.rb" [id="graph_3"]
+              "a.rb" -> "b.rb" [id="graph_3" minlen="3"]
             }
           DOT
 
@@ -242,9 +242,9 @@ RSpec.describe DiverDown::Web::DefinitionToDot do
                 "b.rb" [label="b.rb" id="graph_5"]
                 "c.rb" [label="c.rb" id="graph_6"]
               }
-              "a.rb" -> "b.rb" [id="graph_7"]
-              "a.rb" -> "c.rb" [id="graph_8"]
-              "a.rb" -> "d.rb" [id="graph_9"]
+              "a.rb" -> "b.rb" [id="graph_7" minlen="3"]
+              "a.rb" -> "c.rb" [id="graph_8" minlen="3"]
+              "a.rb" -> "d.rb" [id="graph_9" minlen="3"]
             }
           DOT
         end
