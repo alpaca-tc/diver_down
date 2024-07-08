@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useState } from 'react'
 
 import { Notification, NotificationContext } from '@/context/NotificationContext'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { usePrimitiveLocalStorage } from '@/hooks/useLocalStorage'
 import { useInitializationStatus } from '@/repositories/initializationStatusRepository'
 import { usePid } from '@/repositories/pidRepository'
 
@@ -12,7 +12,7 @@ export const InitializationStatusChecker: FC = () => {
 
   const { pid, error } = usePid()
   const key = pid ? `InitializationStatusChecker-closed-${pid}` : INITIAL_KEY
-  const [closed, setClosed] = useLocalStorage<boolean>(key, false)
+  const [closed, setClosed] = usePrimitiveLocalStorage<boolean>(key, Boolean)
   const [initialized, setInitialized] = useState<boolean>(false)
 
   // Stop loading if initialization process is finished

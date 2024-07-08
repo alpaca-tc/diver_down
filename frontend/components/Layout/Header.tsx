@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import { AppNavi, NotificationBar } from '@/components/ui'
 import { path } from '@/constants/path'
 import { NotificationContext } from '@/context/NotificationContext'
+import { stringify } from '@/utils/queryString'
+import { GraphOptions } from '@/models/combinedDefinition'
 
 export const Header: React.FC = () => {
   const { notification, setNotification } = useContext(NotificationContext)
@@ -18,6 +20,13 @@ export const Header: React.FC = () => {
 
     setNotification(null)
   }, [notification, setNotification])
+
+  const globalDefinitionQuery = stringify({
+    compound: true,
+    concentrate: true,
+    onlyModule: true,
+  } as GraphOptions)
+  const globalDefinitionPath = `${path.globalDefinition.show()}?${globalDefinitionQuery}`
 
   const buttons: ComponentProps<typeof AppNavi>['buttons'] = [
     {
@@ -34,9 +43,15 @@ export const Header: React.FC = () => {
     },
     {
       children: 'Module List',
-      current: pathname === path.modules.index() || /^\/modules\//.test(pathname) || /^\/module_definitions\//.test(pathname),
+      current: pathname === path.modules.index() || /^\/modules\//.test(pathname),
       href: path.modules.index(),
       onClick: () => navigate(path.modules.index()),
+    },
+    {
+      children: 'Global Definition',
+      current: pathname === path.globalDefinition.show(),
+      href: globalDefinitionPath,
+      onClick: () => navigate(globalDefinitionPath),
     },
     {
       children: 'Source Aliases',

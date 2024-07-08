@@ -13,6 +13,7 @@ module DefinitionHelper
         dependency[:method_ids] ||= []
       end
     end
-    hash
+
+    DiverDown::Definition.from_hash(hash).to_h
   end
 end

@@ -157,41 +157,32 @@ export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
   )
 
   return (
-    <>
-      {filteredModule && (
-        <Cluster>
-          <Chip>
-            <Text>Filter: {filteredModule}</Text>
-          </Chip>
-        </Cluster>
+    <Table fixedHead>
+      <StickyThead>
+        <tr>
+          <Th></Th>
+          <Th sort={sort.key === 'sourceName' ? sort.sort : 'none'} onSort={() => setNextSort('sourceName')}>
+            Source
+          </Th>
+          <Th>Dependency Module</Th>
+          <Th sort={sort.key === 'dependency' ? sort.sort : 'none'} onSort={() => setNextSort('dependency')}>
+            Dependency
+          </Th>
+          <Th>Method Id</Th>
+          <Th>Path</Th>
+        </tr>
+      </StickyThead>
+      {sortedSources.length === 0 ? (
+        <EmptyTableBody>
+          <Text>No sources</Text>
+        </EmptyTableBody>
+      ) : (
+        <tbody>
+          {sortedSources.map((source) => (
+            <SourceTr key={source.sourceName} filteredModule={filteredModule} source={source} />
+          ))}
+        </tbody>
       )}
-      <Table fixedHead>
-        <StickyThead>
-          <tr>
-            <Th></Th>
-            <Th sort={sort.key === 'sourceName' ? sort.sort : 'none'} onSort={() => setNextSort('sourceName')}>
-              Source
-            </Th>
-            <Th>Dependency Module</Th>
-            <Th sort={sort.key === 'dependency' ? sort.sort : 'none'} onSort={() => setNextSort('dependency')}>
-              Dependency
-            </Th>
-            <Th>Method Id</Th>
-            <Th>Path</Th>
-          </tr>
-        </StickyThead>
-        {sortedSources.length === 0 ? (
-          <EmptyTableBody>
-            <Text>No sources</Text>
-          </EmptyTableBody>
-        ) : (
-          <tbody>
-            {sortedSources.map((source) => (
-              <SourceTr key={source.sourceName} filteredModule={filteredModule} source={source} />
-            ))}
-          </tbody>
-        )}
-      </Table>
-    </>
+    </Table>
   )
 }

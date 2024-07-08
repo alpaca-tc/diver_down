@@ -5,14 +5,16 @@ import { Module, SpecificModule } from '@/models/module'
 import { FC, useMemo } from 'react'
 import { StickyThead } from '../StickyThead'
 import { stringify } from '@/utils/queryString'
+import { Params } from '../../hooks/useModuleParams'
 
 type Props = {
   pathModule: Module
+  tab: Params['tab']
   sources: SpecificModule['sources']
   moduleDependencies: SpecificModule['moduleDependencies']
 }
 
-export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, moduleDependencies }) => {
+export const ModuleDependenciesContent: FC<Props> = ({ pathModule, tab, sources, moduleDependencies }) => {
   const dependenciesMap = useMemo(() => {
     const map = new Map<string, Set<string>>()
 
@@ -32,6 +34,10 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
     return map
   }, [sources, moduleDependencies])
 
+  const pathToModule = (params: Params) => {
+    return `${path.modules.show(pathModule)}?${stringify(params)}`
+  }
+
   return (
     <Section>
       <Stack gap={0.5}>
@@ -40,7 +46,7 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
             <StickyThead>
               <tr>
                 <Th>Module</Th>
-                <Th>Sources</Th>
+                <Th>Sources Count</Th>
               </tr>
             </StickyThead>
             {moduleDependencies.length === 0 ? (
@@ -58,10 +64,7 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
                     </Td>
                     <Td>
                       <Text as="div" whiteSpace="nowrap">
-                        <Link
-                          reloadDocument
-                          to={`${path.modules.show(pathModule)}?${stringify({ tab: 'sources', q: { module } })}`}
-                        >
+                        <Link reloadDocument to={pathToModule({ tab, filteredModule: module })}>
                           {dependenciesMap.get(module)?.size ?? 0}
                         </Link>
                       </Text>

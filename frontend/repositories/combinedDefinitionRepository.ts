@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 
 import { path } from '@/constants/path'
-import { CombinedDefinition, CombinedDefinitionOptions, DotMetadata } from '@/models/combinedDefinition'
+import { CombinedDefinition, DotMetadata, GraphOptions } from '@/models/combinedDefinition'
 import { bitIdToIds } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 
@@ -45,6 +45,9 @@ type CombinedDefinitionReponse = {
     resolved_alias: string | null
     memo: string
     module: string | null
+    dependencies: Array<{
+      source_name: string
+    }>
   }>
 }
 
@@ -96,21 +99,27 @@ export const fetchCombinedDefinition = async (requestPath: string): Promise<Comb
       resolvedAlias: source.resolved_alias,
       memo: source.memo,
       module: source.module,
+      dependencies: source.dependencies.map((dependency) => ({
+        sourceName: dependency.source_name,
+      })),
     })),
   }
 }
 
-export const stringifyCombinedDefinitionOptions = (graphOptions: CombinedDefinitionOptions): string => {
+export const stringifyCombinedDefinitionOptions = (graphOptions: GraphOptions): string => {
   const params = {
     compound: graphOptions.compound,
     concentrate: graphOptions.concentrate,
     only_module: graphOptions.onlyModule,
+    focusModules: graphOptions.focusModules,
+    modules: graphOptions.modules,
+    remove_internal_sources: graphOptions.removeInternalSources,
   }
 
   return stringify(params)
 }
 
-export const useCombinedDefinition = (ids: number[], graphOptions: CombinedDefinitionOptions) => {
+export const useCombinedDefinition = (ids: number[], graphOptions: GraphOptions) => {
   const requestPath = `${path.api.definitions.show(ids)}?${stringifyCombinedDefinitionOptions(graphOptions)}`
   const shouldFetch = ids.length > 0
   const { data, isLoading, mutate } = useSWR(shouldFetch ? requestPath : null, fetchCombinedDefinition)

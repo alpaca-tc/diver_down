@@ -1,41 +1,24 @@
 import React, { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
 import { Loading } from '@/components/Loading'
-import { Chip, Cluster, Heading, Section, Stack, TabBar, TabItem } from '@/components/ui'
+import { Chip, Cluster, Heading, Section, Stack, Text, TabBar, TabItem, Button, FaXmarkIcon } from '@/components/ui'
 import { path } from '@/constants/path'
 import { color, spacing } from '@/constants/theme'
 import { useModule } from '@/repositories/moduleRepository'
 import { SourcesContent } from './components/SourcesContent/SourcesContent'
 import { ModuleDependenciesContent } from './components/ModuleDependenciesContent'
 import { SourceReverseDependenciesContent } from './components/SourceReverseDependenciesContent'
-import { useSearchParamsState } from '@/hooks/useSearchParams'
-import { Module } from '@/models/module'
-
-const validTabs = ['sources', 'sourceReverseDependencies', 'moduleDependencies', 'moduleReverseDependencies'] as const
-type ValidTab = (typeof validTabs)[number]
-
-type Query = {
-  module: Module | null
-}
+import { stringify } from '@/utils/queryString'
+import { Params, useModuleParams } from './hooks/useModuleParams'
 
 export const Show: React.FC = () => {
+  const navigate = useNavigate()
   const pathModule = useParams()['*'] ?? ''
   const { data, isLoading } = useModule(pathModule)
-  const [params, setParams] = useSearchParamsState<{ tab: ValidTab; q: Query }>({
-    tab: (val: any) => (validTabs.includes(String(val) as ValidTab) ? (String(val) as ValidTab) : 'sources'),
-    q: (val: any) => {
-      const q: Query = { module: null }
-
-      if (val && val.module) {
-        q.module = val.module
-      }
-
-      return q
-    },
-  })
+  const [params, setParams] = useModuleParams()
 
   const content = useMemo(() => {
     if (isLoading || data === undefined) {
@@ -44,7 +27,7 @@ export const Show: React.FC = () => {
 
     switch (params.tab) {
       case 'sources': {
-        return <SourcesContent sources={data.sources} filteredModule={params.q.module} />
+        return <SourcesContent sources={data.sources} filteredModule={params.filteredModule} />
       }
       case 'moduleDependencies': {
         return (
@@ -52,6 +35,7 @@ export const Show: React.FC = () => {
             pathModule={pathModule}
             sources={data.sources}
             moduleDependencies={data.moduleDependencies}
+            tab="sources"
           />
         )
       }
@@ -59,19 +43,26 @@ export const Show: React.FC = () => {
         return (
           <ModuleDependenciesContent
             pathModule={pathModule}
-            sources={data.sources}
+            sources={data.sourceReverseDependencies}
             moduleDependencies={data.moduleReverseDependencies}
+            tab="sourceReverseDependencies"
           />
         )
       }
       case 'sourceReverseDependencies': {
-        return <SourceReverseDependenciesContent filteredModule={params.q.module} sources={data.sourceReverseDependencies} />
+        return (
+          <SourceReverseDependenciesContent filteredModule={params.filteredModule} sources={data.sourceReverseDependencies} />
+        )
       }
       default: {
         throw new Error(`Invalid tab: ${params.tab}`)
       }
     }
   }, [data, pathModule, isLoading, params])
+
+  const pathToModule = (newParams: Params) => {
+    return `${path.modules.show(pathModule)}?${stringify(newParams)}`
+  }
 
   return (
     <StyledSection>
@@ -83,6 +74,19 @@ export const Show: React.FC = () => {
             <Link to={path.modules.show(pathModule)}>{pathModule}</Link>
           </Cluster>
         </Heading>
+
+        {params.filteredModule && (
+          <Cluster>
+            <Chip size="s">
+              <Cluster align="center">
+                <Text>Filter: {params.filteredModule}</Text>
+                <TextLink reloadDocument to={pathToModule({ ...params, filteredModule: null })}>
+                  <FaXmarkIcon />
+                </TextLink>
+              </Cluster>
+            </Chip>
+          </Cluster>
+        )}
 
         <Section>
           <Stack gap={1.5}>
@@ -134,4 +138,8 @@ const StickyTabBar = styled(TabBar)`
 
 const StyledSection = styled(Section)`
   padding: ${spacing.XS};
+`
+
+const TextLink = styled(Link)`
+  color: ${color.TEXT_GREY};
 `

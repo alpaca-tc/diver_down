@@ -176,11 +176,11 @@ module DiverDown
 
         definition.sources.sort_by(&:source_name).each do |source|
           source_module = metadata.source(source.source_name).module
-          next if source_module.empty?
+          next if source_module.nil?
 
           source.dependencies.each do |dependency|
             dependency_module = metadata.source(dependency.source_name).module
-            next if dependency_module.empty?
+            next if dependency_module.nil?
 
             dependency_map[source_module][dependency_module].push(dependency)
           end
@@ -309,7 +309,8 @@ module DiverDown
             )
           else
             attributes.merge!(
-              id: @dot_metadata_store.issue_dependency_id(_1)
+              id: @dot_metadata_store.issue_dependency_id(_1),
+              minlen: MODULE_MINLEN
             )
           end
 
