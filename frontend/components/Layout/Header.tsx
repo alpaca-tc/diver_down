@@ -21,13 +21,6 @@ export const Header: React.FC = () => {
     setNotification(null)
   }, [notification, setNotification])
 
-  const globalDefinitionQuery = stringify({
-    compound: true,
-    concentrate: true,
-    onlyModule: true,
-  } as GraphOptions)
-  const globalDefinitionPath = `${path.globalDefinition.show()}?${globalDefinitionQuery}`
-
   const buttons: ComponentProps<typeof AppNavi>['buttons'] = [
     {
       children: 'Definition List',
@@ -46,12 +39,6 @@ export const Header: React.FC = () => {
       current: pathname === path.modules.index() || /^\/modules\//.test(pathname),
       href: path.modules.index(),
       onClick: () => navigate(path.modules.index()),
-    },
-    {
-      children: 'Global Definition',
-      current: pathname === path.globalDefinition.show(),
-      href: globalDefinitionPath,
-      onClick: () => navigate(globalDefinitionPath),
     },
     {
       children: 'Source Aliases',
