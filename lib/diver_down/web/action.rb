@@ -199,31 +199,6 @@ module DiverDown
         )
       end
 
-      # GET /api/global_definition.json
-      #
-      # @param bit_id [Integer]
-      # @param compound [Boolean]
-      # @param concentrate [Boolean]
-      # @param only_module [Boolean]
-      # @param modules [Array<String>]
-      def global_definition(compound, concentrate, only_module, remove_internal_sources, focus_modules, modules)
-        definition = @store.combined_definition
-
-        # Resolve source aliases
-        resolved_definition = @source_alias_resolver.resolve(definition)
-        # Filter sources and dependencies by condition
-        resolved_definition = DiverDown::Web::DefinitionFilter.new(@metadata, focus_modules:, modules:, remove_internal_sources:).filter(resolved_definition)
-
-        render_combined_definition(
-          (1..@store.size).to_a,
-          resolved_definition,
-          modules,
-          compound:,
-          concentrate:,
-          only_module:
-        )
-      end
-
       # GET /api/definitions/:bit_id.json
       #
       # @param bit_id [Integer]

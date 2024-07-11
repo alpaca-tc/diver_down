@@ -1,1 +1,0 @@
-export { GlobalDefinitionModulesTable } from './GlobalDefinitionModulesTable'

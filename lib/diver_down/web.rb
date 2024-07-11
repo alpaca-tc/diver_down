@@ -66,14 +66,6 @@ module DiverDown
       in ['GET', %r{\A/api/modules/(?<modulee>[^/]+)\.json\z}]
         modulee = CGI.unescape(Regexp.last_match[:modulee])
         @action.module(modulee)
-      in ['GET', %r{\A/api/global_definition\.json\z}]
-        focus_modules = request.params['focus_modules'] || []
-        modules = request.params['modules'] || []
-        compound = request.params['compound'] == '1'
-        concentrate = request.params['concentrate'] == '1'
-        only_module = request.params['only_module'] == '1'
-        remove_internal_sources = request.params['remove_internal_sources'] == '1'
-        @action.global_definition(compound, concentrate, only_module, remove_internal_sources, focus_modules, modules)
       in ['GET', %r{\A/api/definitions/(?<bit_id>\d+)\.json\z}]
         bit_id = Regexp.last_match[:bit_id].to_i
         compound = request.params['compound'] == '1'

@@ -16,9 +16,6 @@ export const path = {
     index: () => '/modules',
     show: (module: string) => `/modules/${module}`,
   },
-  globalDefinition: {
-    show: () => `/global_definition`,
-  },
   licenses: {
     index: () => '/licenses',
   },
@@ -46,9 +43,6 @@ export const path = {
     modules: {
       index: () => '/api/modules.json',
       show: (module: string) => `/api/modules/${module}.json`,
-    },
-    globalDefinition: {
-      show: () => `/api/global_definition.json`,
     },
   },
 }
