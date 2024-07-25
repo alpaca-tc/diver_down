@@ -53,7 +53,7 @@ type SpecificModuleResponse = {
 }
 
 export const useModule = (module: string) => {
-  const { data, isLoading } = useSWR<SpecificModule>(path.api.modules.show(module), async (): Promise<SpecificModule> => {
+  const { data, isLoading, mutate } = useSWR<SpecificModule>(path.api.modules.show(module), async (): Promise<SpecificModule> => {
     const response = await get<SpecificModuleResponse>(path.api.modules.show(module))
 
     return {
@@ -91,5 +91,5 @@ export const useModule = (module: string) => {
     }
   })
 
-  return { data, isLoading }
+  return { data, isLoading, mutate }
 }

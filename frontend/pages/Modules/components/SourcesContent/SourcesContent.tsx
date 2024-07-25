@@ -1,13 +1,32 @@
 import { Link } from '@/components/Link'
-import { EmptyTableBody, Table, Th, Text, Td, Button, Chip, Cluster } from '@/components/ui'
+import {
+  EmptyTableBody,
+  Table,
+  Th,
+  Text,
+  Td,
+  Button,
+  Chip,
+  Cluster,
+  FaPencilIcon,
+  FaCircleInfoIcon,
+  Tooltip,
+} from '@/components/ui'
 import { path } from '@/constants/path'
 import { Module, SpecificModule, SpecificModuleSource } from '@/models/module'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { StickyThead } from '../StickyThead'
 import { SortTypes, ascNumber, ascString, sortTypes } from '@/utils/sort'
+import styled from 'styled-components'
+import { SourceMemoInput } from '@/components/SourceMemoInput'
 
-const SourceTr: FC<{ source: SpecificModuleSource; filteredModule: Module | null }> = ({ source, filteredModule }) => {
+const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredModule: Module | null }> = ({
+  mutate,
+  source,
+  filteredModule,
+}) => {
   const [expanded, setExpanded] = useState<boolean>(false)
+  const [editingMemo, setEditingMemo] = useState<boolean>(false)
 
   const modules = useMemo(() => {
     const modules = new Set<Module>()
@@ -43,6 +62,38 @@ const SourceTr: FC<{ source: SpecificModuleSource; filteredModule: Module | null
           </Text>
         </Td>
         <Td>
+          {editingMemo ? (
+            <SourceMemoInput
+              sourceName={source.sourceName}
+              initialMemo={source.memo}
+              onUpdate={() => {
+                setEditingMemo(false)
+                mutate()
+              }}
+              onClose={() => {
+                setEditingMemo(false)
+              }}
+            />
+          ) : (
+            <FixedWidthMemo align="center">
+              {source.memo !== '' ? (
+                <Tooltip message={source.memo} horizontal="center" vertical="bottom">
+                  <FaCircleInfoIcon />
+                </Tooltip>
+              ) : (
+                <Transparent>
+                  <FaCircleInfoIcon />
+                </Transparent>
+              )}
+              <div>
+                <Button square={true} onClick={() => setEditingMemo(true)} size="s">
+                  <FaPencilIcon alt="Edit" />
+                </Button>
+              </div>
+            </FixedWidthMemo>
+          )}
+        </Td>
+        <Td>
           {modules.map((module) => (
             <Text key={module} as="div" whiteSpace="nowrap">
               <Link to={path.modules.show(module)}>{module}</Link>
@@ -58,6 +109,7 @@ const SourceTr: FC<{ source: SpecificModuleSource; filteredModule: Module | null
         dependencies.map((dependency) =>
           dependency.methodIds.map((methodId, index) => (
             <tr key={`${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
+              <Td></Td>
               <Td></Td>
               <Td></Td>
               <Td>
@@ -123,11 +175,12 @@ type SortType = {
 }
 
 type Props = {
+  mutate: () => void
   sources: SpecificModule['sources']
   filteredModule: Module | null
 }
 
-export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
+export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) => {
   const [sort, setSort] = useState<SortType>({ key: 'sourceName', sort: 'none' })
 
   const sortedSources = useMemo(() => {
@@ -164,6 +217,7 @@ export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
           <Th sort={sort.key === 'sourceName' ? sort.sort : 'none'} onSort={() => setNextSort('sourceName')}>
             Source
           </Th>
+          <Th>Memo</Th>
           <Th>Dependency Module</Th>
           <Th sort={sort.key === 'dependency' ? sort.sort : 'none'} onSort={() => setNextSort('dependency')}>
             Dependency
@@ -179,10 +233,18 @@ export const SourcesContent: FC<Props> = ({ filteredModule, sources }) => {
       ) : (
         <tbody>
           {sortedSources.map((source) => (
-            <SourceTr key={source.sourceName} filteredModule={filteredModule} source={source} />
+            <SourceTr key={source.sourceName} mutate={mutate} filteredModule={filteredModule} source={source} />
           ))}
         </tbody>
       )}
     </Table>
   )
 }
+
+const Transparent = styled.span`
+  opacity: 0;
+`
+
+const FixedWidthMemo = styled(Cluster)`
+  width: 4em;
+`

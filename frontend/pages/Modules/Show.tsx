@@ -15,9 +15,8 @@ import { stringify } from '@/utils/queryString'
 import { Params, useModuleParams } from './hooks/useModuleParams'
 
 export const Show: React.FC = () => {
-  const navigate = useNavigate()
   const pathModule = useParams()['*'] ?? ''
-  const { data, isLoading } = useModule(pathModule)
+  const { data, isLoading, mutate } = useModule(pathModule)
   const [params, setParams] = useModuleParams()
 
   const content = useMemo(() => {
@@ -27,7 +26,7 @@ export const Show: React.FC = () => {
 
     switch (params.tab) {
       case 'sources': {
-        return <SourcesContent sources={data.sources} filteredModule={params.filteredModule} />
+        return <SourcesContent mutate={mutate} sources={data.sources} filteredModule={params.filteredModule} />
       }
       case 'moduleDependencies': {
         return (
@@ -51,7 +50,11 @@ export const Show: React.FC = () => {
       }
       case 'sourceReverseDependencies': {
         return (
-          <SourceReverseDependenciesContent filteredModule={params.filteredModule} sources={data.sourceReverseDependencies} />
+          <SourceReverseDependenciesContent
+            mutate={mutate}
+            filteredModule={params.filteredModule}
+            sources={data.sourceReverseDependencies}
+          />
         )
       }
       default: {
