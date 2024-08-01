@@ -38,12 +38,14 @@ module DiverDown
       private
 
       def build_trace_point
-        call_stack = DiverDown::Trace::CallStack.new
+        call_stacks = {}
 
         TracePoint.new(*DiverDown::Trace::Tracer.trace_events) do |tp|
           # Skip the trace of the library itself
           next if tp.path&.start_with?(DiverDown::LIB_DIR)
           next if TracePoint == tp.defined_class
+
+          call_stack = call_stacks[Thread.current] ||= DiverDown::Trace::CallStack.new
 
           case tp.event
           when :b_call
