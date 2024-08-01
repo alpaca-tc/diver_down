@@ -6,6 +6,7 @@ require 'rack/contrib'
 require 'diver_down'
 require 'diver_down-web'
 require 'optparse'
+require 'tempfile'
 
 options = {}
 option_parser = OptionParser.new do |opts|
