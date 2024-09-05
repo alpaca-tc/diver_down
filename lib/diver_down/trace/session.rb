@@ -66,9 +66,12 @@ module DiverDown
               next
             end
 
-            if !@ignored_method_ids.nil? && @ignored_method_ids.ignored?(mod, DiverDown::Helper.module?(tp.self), tp.method_id)
-              # If this method is ignored, the call stack is ignored until the method returns.
-              call_stack.push(ignored: true)
+            ignored = @ignored_method_ids.ignored(mod, DiverDown::Helper.module?(tp.self), tp.method_id) if @ignored_method_ids
+
+            if ignored
+              # If ignored is :all, the call stack is ignored until the method returns.
+              # If ignored is :single, the call stack is ignored only current call.
+              call_stack.push(ignored: ignored == :all)
               next
             end
 

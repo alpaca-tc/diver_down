@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@hpcc-js/wasm':
-        specifier: ^2.16.2
+        specifier: 2.16.2
         version: 2.16.2
       react:
         specifier: ^18.3.1

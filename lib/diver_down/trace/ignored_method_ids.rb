@@ -3,34 +3,41 @@
 module DiverDown
   module Trace
     class IgnoredMethodIds
+      VALID_VALUE = %i[
+        single
+        all
+      ].freeze
+
       def initialize(ignored_methods)
         # Ignore all methods in the module
-        # Hash{ Module => Boolean }
+        # Hash{ Module => Symbol }
         @ignored_modules = {}
 
         # Ignore all methods in the class
-        # Hash{ Module => Hash{ Symbol => Boolean } }
+        # Hash{ Module => Hash{ Symbol => Symbol } }
         @ignored_class_method_id = Hash.new { |h, k| h[k] = {} }
 
         # Ignore all methods in the instance
-        # Hash{ Module => Hash{ Symbol => Boolean } }
+        # Hash{ Module => Hash{ Symbol => Symbol } }
         @ignored_instance_method_id = Hash.new { |h, k| h[k] = {} }
 
-        ignored_methods.each do |ignored_method|
+        ignored_methods.each do |ignored_method, value|
+          raise ArgumentError, "Invalid value: #{value}. valid values are #{VALID_VALUE}" unless VALID_VALUE.include?(value)
+
           if ignored_method.include?('.')
             # instance method
             class_name, method_id = ignored_method.split('.')
             mod = DiverDown::Helper.constantize(class_name)
-            @ignored_class_method_id[mod][method_id.to_sym] = true
+            @ignored_class_method_id[mod][method_id.to_sym] = value
           elsif ignored_method.include?('#')
             # class method
             class_name, method_id = ignored_method.split('#')
             mod = DiverDown::Helper.constantize(class_name)
-            @ignored_instance_method_id[mod][method_id.to_sym] = true
+            @ignored_instance_method_id[mod][method_id.to_sym] = value
           else
             # module
             mod = DiverDown::Helper.constantize(ignored_method)
-            @ignored_modules[mod] = true
+            @ignored_modules[mod] = value
           end
         end
       end
@@ -38,14 +45,14 @@ module DiverDown
       # @param mod [Module]
       # @param is_class [Boolean] class is true, instance is false
       # @param method_id [Symbol]
-      # @return [Boolean]
-      def ignored?(mod, is_class, method_id)
-        ignored_module?(mod) || ignored_method?(mod, is_class, method_id)
+      # @return [Symbol, false] VALID_VALUE
+      def ignored(mod, is_class, method_id)
+        ignored_module(mod) || ignored_method(mod, is_class, method_id)
       end
 
       private
 
-      def ignored_module?(mod)
+      def ignored_module(mod)
         unless @ignored_modules.key?(mod)
           dig_superclass(mod)
         end
@@ -53,7 +60,7 @@ module DiverDown
         @ignored_modules.fetch(mod)
       end
 
-      def ignored_method?(mod, is_class, method_id)
+      def ignored_method(mod, is_class, method_id)
         store = if is_class
                   # class methods
                   @ignored_class_method_id
@@ -96,10 +103,8 @@ module DiverDown
         end
 
         # Convert nil to boolean
-        ignored = !!ignored
-
         stack.each do
-          @ignored_modules[_1] = ignored
+          @ignored_modules[_1] = ignored || false
         end
       end
 
@@ -125,10 +130,8 @@ module DiverDown
         end
 
         # Convert nil to boolean
-        ignored = !!ignored
-
         stack.each do
-          store[_1][method_id] = ignored
+          store[_1][method_id] = ignored || false
         end
       end
     end

@@ -653,9 +653,9 @@ RSpec.describe DiverDown::Trace::Tracer do
       it 'traces tracer_ignored_call_stack.rb' do
         definition = trace_fixture(
           'tracer_ignored_call_stack.rb',
-          ignored_method_ids: [
-            'AntipollutionModule::B.class_call',
-          ],
+          ignored_method_ids: {
+            'AntipollutionModule::B.class_call' => :all,
+          },
           module_set: {
             modules: [
               'AntipollutionModule::A',
@@ -683,6 +683,67 @@ RSpec.describe DiverDown::Trace::Tracer do
                       context: 'class',
                       paths: [
                         match(/tracer_ignored_call_stack\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            }, {
+              source_name: 'AntipollutionModule::D', dependencies: [],
+            },
+          ]
+        ))
+      end
+
+      it 'traces tracer_ignored_call_stack.rb, single' do
+        definition = trace_fixture(
+          'tracer_ignored_single_call_stack.rb',
+          ignored_method_ids: {
+            'AntipollutionModule::B.class_call' => :single,
+          },
+          module_set: {
+            modules: [
+              'AntipollutionModule::A',
+              'AntipollutionModule::B',
+              'AntipollutionModule::C',
+              'AntipollutionModule::D',
+            ],
+          },
+          caller_paths: [
+            fixture_path('tracer_ignored_single_call_stack.rb'),
+          ]
+        )
+
+        expect(definition.to_h).to match(fill_default(
+          title: 'title',
+          sources: [
+            {
+              source_name: 'AntipollutionModule::A',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::C',
+                  method_ids: [
+                    {
+                      name: 'class_call',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_ignored_single_call_stack\.rb:\d+/),
+                      ],
+                    },
+                  ],
+                },
+              ],
+            }, {
+              source_name: 'AntipollutionModule::C',
+              dependencies: [
+                {
+                  source_name: 'AntipollutionModule::D',
+                  method_ids: [
+                    {
+                      name: 'class_call',
+                      context: 'class',
+                      paths: [
+                        match(/tracer_ignored_single_call_stack\.rb:\d+/),
                       ],
                     },
                   ],
