@@ -24,7 +24,7 @@ module DiverDown
 
       # @param module_set [DiverDown::Trace::ModuleSet, Array<Module, String>]
       # @param caller_paths [Array<String>, nil] if nil, trace all files
-      # @param ignored_method_ids [Array<String>]
+      # @param ignored_method_ids [Hash{ String => Symbol }, nil]
       # @param filter_method_id_path [#call, nil] filter method_id.path
       # @param module_set [DiverDown::Trace::ModuleSet, nil] for optimization
       def initialize(module_set: {}, caller_paths: nil, ignored_method_ids: nil, filter_method_id_path: nil)
