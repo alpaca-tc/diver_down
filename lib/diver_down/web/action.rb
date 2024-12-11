@@ -21,9 +21,8 @@ module DiverDown
       def initialize(store:, metadata:)
         @store = store
         @metadata = metadata
-        @source_alias_resolver = DiverDown::Web::SourceAliasResolver.new(@metadata.source_alias)
-        @module_dependency_map = nil
-        @module_dependency_map_cache_id = nil
+
+        reload
       end
 
       # GET /api/source_aliases.json
@@ -327,6 +326,7 @@ module DiverDown
         if found_source
           @metadata.source(source_name).module = modulee
           @metadata.flush
+          reload
 
           json({})
         else
@@ -348,6 +348,7 @@ module DiverDown
         if found_source
           @metadata.source(source_name).memo = memo
           @metadata.flush
+          reload
 
           json({})
         else
@@ -444,6 +445,12 @@ module DiverDown
         end
 
         @module_dependency_map
+      end
+
+      def reload
+        @source_alias_resolver = DiverDown::Web::SourceAliasResolver.new(@metadata.source_alias)
+        @module_dependency_map = nil
+        @module_dependency_map_cache_id = nil
       end
     end
   end
