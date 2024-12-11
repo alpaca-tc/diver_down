@@ -6,12 +6,12 @@ module DiverDown
       require 'diver_down/web/metadata/source_metadata'
       require 'diver_down/web/metadata/source_alias'
 
-      attr_reader :source_alias
+      attr_reader :path, :source_alias
 
       # @param path [String]
       def initialize(path)
         @path = path
-        load
+        reload
       end
 
       # @param source_name [String]
@@ -41,25 +41,19 @@ module DiverDown
         File.write(@path, to_h.to_yaml)
       end
 
-      private
-
-      def load
+      # Reload metadata from file
+      # @return [void]
+      def reload
         @source_map = Hash.new { |h, source_name| h[source_name] = DiverDown::Web::Metadata::SourceMetadata.new }
         @source_alias = DiverDown::Web::Metadata::SourceAlias.new
 
-        loaded = YAML.load_file(@path)
+        loaded = YAML.load_file(@path) if File.exist?(@path)
 
         return if loaded.nil?
 
-        # NOTE: This is for backward compatibility. It will be removed in the future.
-        (loaded[:sources] || loaded || []).each do |source_name, source_hash|
+        loaded[:sources]&.each do |source_name, source_hash|
           source(source_name).memo = source_hash[:memo] if source_hash[:memo]
-
-          if source_hash[:modules].is_a?(Array)
-            source(source_name).module = source_hash[:modules][0]
-          elsif source_hash[:module]
-            source(source_name).module = source_hash[:module]
-          end
+          source(source_name).module = source_hash[:module] if source_hash[:module]
         end
 
         loaded[:source_alias]&.each do |alias_name, source_names|

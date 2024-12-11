@@ -790,4 +790,20 @@ RSpec.describe DiverDown::Web do
       expect(metadata.source_alias.to_h).to eq(prev)
     end
   end
+
+  describe 'POST /api/reload.json' do
+    it 'reloads metadata from file' do
+      new_metadata = DiverDown::Web::Metadata.new(metadata.path)
+      new_metadata.source('a.rb').module = 'A'
+      new_metadata.flush
+
+      expect {
+        get '/api/reload.json'
+      }.to change {
+        metadata.source('a.rb').module
+      }.from(nil).to('A')
+
+      expect(last_response.status).to eq(200)
+    end
+  end
 end

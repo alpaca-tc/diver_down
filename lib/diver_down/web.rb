@@ -78,6 +78,8 @@ module DiverDown
       in ['GET', %r{\A/api/sources/(?<source>[^/]+)\.json\z}]
         source = Regexp.last_match[:source]
         @action.source(source)
+      in ['GET', %r{\A/api/reload\.json\z}]
+        @action.reload_cache
       in ['POST', %r{\A/api/sources/(?<source>[^/]+)/module.json\z}]
         source = Regexp.last_match[:source]
         modulee = request.params['module'] || ''
