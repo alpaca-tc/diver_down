@@ -6,7 +6,7 @@ module DiverDown
       require 'diver_down/web/metadata/source_metadata'
       require 'diver_down/web/metadata/source_alias'
 
-      attr_reader :source_alias
+      attr_reader :path, :source_alias
 
       # @param path [String]
       def initialize(path)
@@ -47,7 +47,7 @@ module DiverDown
         @source_map = Hash.new { |h, source_name| h[source_name] = DiverDown::Web::Metadata::SourceMetadata.new }
         @source_alias = DiverDown::Web::Metadata::SourceAlias.new
 
-        loaded = YAML.load_file(@path)
+        loaded = YAML.load_file(@path) if File.exist?(@path)
 
         return if loaded.nil?
 

@@ -357,6 +357,13 @@ module DiverDown
       end
 
       # @return [Array[Integer, Hash, Array]]
+      def reload_cache
+        @metadata.reload
+        reload
+        json({})
+      end
+
+      # @return [Array[Integer, Hash, Array]]
       def not_found
         [404, { 'content-type' => 'text/plain' }, ['not found']]
       end
