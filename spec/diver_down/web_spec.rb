@@ -647,6 +647,30 @@ RSpec.describe DiverDown::Web do
       expect(metadata.source('a.rb').module).to eq('A')
     end
 
+    it 'deletes cache' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb'
+          ),
+          DiverDown::Definition::Source.new(
+            source_name: 'b.rb'
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/module.json', { module: 'A' }
+      post '/api/sources/b.rb/module.json', { module: 'A' }
+      get '/api/modules/A.json'
+      expect(JSON.parse(last_response.body)['sources'].size).to eq(2)
+
+      post '/api/sources/b.rb/module.json', { module: 'B' }
+      get '/api/modules/A.json'
+      expect(JSON.parse(last_response.body)['sources'].size).to eq(1)
+    end
+
     it 'ignores blank module' do
       definition = DiverDown::Definition.new(
         title: 'title',
