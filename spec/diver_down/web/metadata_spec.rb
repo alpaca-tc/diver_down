@@ -6,10 +6,25 @@ RSpec.describe DiverDown::Web::Metadata do
       Tempfile.new(['test', '.yaml']).path
     end
 
-    describe '#load' do
+    describe '#reload' do
       it "does not raise error if file doesn't exist" do
         path = build_temp_path
         expect { described_class.new(path) }.to_not raise_error
+      end
+
+      it 'reloads metadata' do
+        path = build_temp_path
+        instance_1 = described_class.new(path)
+        instance_2 = described_class.new(path)
+
+        instance_1.source('a.rb').module = 'A'
+        instance_1.flush
+
+        expect {
+          instance_2.reload
+        }.to change {
+          instance_2.source('a.rb').module
+        }.from(nil).to('A')
       end
     end
 

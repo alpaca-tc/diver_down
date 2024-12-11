@@ -11,7 +11,7 @@ module DiverDown
       # @param path [String]
       def initialize(path)
         @path = path
-        load
+        reload
       end
 
       # @param source_name [String]
@@ -41,9 +41,9 @@ module DiverDown
         File.write(@path, to_h.to_yaml)
       end
 
-      private
-
-      def load
+      # Reload metadata from file
+      # @return [void]
+      def reload
         @source_map = Hash.new { |h, source_name| h[source_name] = DiverDown::Web::Metadata::SourceMetadata.new }
         @source_alias = DiverDown::Web::Metadata::SourceAlias.new
 
