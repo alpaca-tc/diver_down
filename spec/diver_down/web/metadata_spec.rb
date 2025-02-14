@@ -74,6 +74,18 @@ RSpec.describe DiverDown::Web::Metadata do
         }.from('').to('memo')
       end
 
+      it 'writes dependency_types to path' do
+        tempfile = Tempfile.new(['test', '.yaml'])
+        instance = described_class.new(tempfile.path)
+        instance.source('a.rb').update_dependency_type('A', 'todo')
+
+        expect {
+          instance.flush
+        }.to change {
+          described_class.new(tempfile.path).source('a.rb').dependency_types
+        }.from({}).to({ 'A' => 'todo' })
+      end
+
       it 'writes alias to path' do
         tempfile = Tempfile.new(['test', '.yaml'])
         instance = described_class.new(tempfile.path)
@@ -115,9 +127,11 @@ RSpec.describe DiverDown::Web::Metadata do
           source = instance.source(source_name)
           source.module = 'A'
           source.memo = 'memo'
+          source.dependency_types = { 'B' => 'todo' }
         end
 
         expect(instance.to_h[:sources].keys).to eq(source_names)
+        expect(instance.to_h[:sources]['a.rb'][:dependency_types]).to eq({ 'B' => 'todo' })
       end
 
       it "doesn't include blank source" do

@@ -33,6 +33,54 @@ RSpec.describe DiverDown::Web::Metadata::SourceMetadata do
       end
     end
 
+    describe '#dependency_types/dependency_type/dependency_types=/update_dependency_type' do
+      it 'read/write dependency_types' do
+        instance = described_class.new
+
+        expect {
+          instance.dependency_types = { 'A' => 'valid' }
+        }.to change {
+          instance.dependency_types
+        }.from({}).to({ 'A' => 'valid' })
+      end
+
+      it 'read dependency_type' do
+        instance = described_class.new
+        expect(instance.dependency_type('A')).to be_nil
+
+        instance.dependency_types = { 'A' => 'valid' }
+
+        expect(instance.dependency_type('A')).to eq('valid')
+      end
+
+      it 'raises error if given invalid dependency_type' do
+        instance = described_class.new
+        valid = ['valid', 'invalid', 'todo']
+        invalid = 'invalid2'
+
+        expect {
+          valid.each do
+            instance.update_dependency_type('A', _1)
+          end
+        }.to_not raise_error
+
+        expect {
+          instance.update_dependency_type('A', invalid)
+        }.to raise_error(ArgumentError, "invalid dependency_type: #{invalid}")
+      end
+
+      it 'update dependency_type' do
+        instance = described_class.new
+        instance.dependency_types = { 'A' => 'valid' }
+
+        expect {
+          instance.update_dependency_type('A', 'invalid')
+        }.to change {
+          instance.dependency_types
+        }.from({ 'A' => 'valid' }).to({ 'A' => 'invalid' })
+      end
+    end
+
     describe '#module?' do
       it 'returns bool' do
         instance = described_class.new
