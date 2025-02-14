@@ -18,6 +18,8 @@ export const useModules = () => {
   return { data, isLoading, mutate }
 }
 
+type DependencyTypeResponse = 'valid' | 'invalid' | 'todo' | null
+
 type SpecificModuleResponse = {
   module: string
   module_dependencies: string[]
@@ -29,6 +31,7 @@ type SpecificModuleResponse = {
     dependencies: Array<{
       source_name: string
       module: string | null
+      dependency_type: DependencyTypeResponse
       method_ids: Array<{
         context: 'instance' | 'class'
         name: string
@@ -43,11 +46,7 @@ type SpecificModuleResponse = {
     dependencies: Array<{
       source_name: string
       module: string
-      method_ids: Array<{
-        context: 'instance' | 'class'
-        name: string
-        paths: string[]
-      }>
+      dependency_type: DependencyTypeResponse
     }>
   }>
 }
@@ -67,6 +66,7 @@ export const useModule = (module: string) => {
         dependencies: source.dependencies.map((dependency) => ({
           sourceName: dependency.source_name,
           module: dependency.module,
+          dependencyType: dependency.dependency_type,
           methodIds: dependency.method_ids.map((methodId) => ({
             context: methodId.context,
             name: methodId.name,
@@ -81,11 +81,7 @@ export const useModule = (module: string) => {
         dependencies: source.dependencies.map((dependency) => ({
           sourceName: dependency.source_name,
           module: dependency.module,
-          methodIds: dependency.method_ids.map((methodId) => ({
-            context: methodId.context,
-            name: methodId.name,
-            paths: methodId.paths,
-          })),
+          dependencyType: dependency.dependency_type,
         })),
       })),
     }

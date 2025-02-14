@@ -35,6 +35,11 @@ export const path = {
       module: {
         update: (sourceName: string) => `/api/sources/${sourceName}/module.json`,
       },
+      dependencyTypes: {
+        update(sourceName: string, toSourceName: string) {
+          return `/api/sources/${sourceName}/dependency_types/${toSourceName}.json`
+        },
+      },
     },
     sourceAliases: {
       index: () => '/api/source_aliases.json',
@@ -43,6 +48,11 @@ export const path = {
     modules: {
       index: () => '/api/modules.json',
       show: (module: string) => `/api/modules/${module}.json`,
+      dependencyTypes: {
+        update(fromModule: string, toModule: string) {
+          return `/api/modules/${fromModule}/dependency_types/${toModule}.json`
+        },
+      },
     },
   },
 }
