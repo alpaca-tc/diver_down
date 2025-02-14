@@ -9,7 +9,7 @@ module DiverDown
         private_constant(:BLANK_MEMO)
         private_constant(:BLANK_RE)
 
-        DEPENDENCY_TYPES = %w[valid invalid todo].freeze
+        DEPENDENCY_TYPES = %w[valid invalid todo ignore].freeze
 
         attr_reader :memo, :module, :dependency_types
 

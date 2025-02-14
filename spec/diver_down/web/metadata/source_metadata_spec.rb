@@ -55,7 +55,7 @@ RSpec.describe DiverDown::Web::Metadata::SourceMetadata do
 
       it 'raises error if given invalid dependency_type' do
         instance = described_class.new
-        valid = ['valid', 'invalid', 'todo']
+        valid = ['valid', 'invalid', 'todo', 'ignore']
         invalid = 'invalid2'
 
         expect {
