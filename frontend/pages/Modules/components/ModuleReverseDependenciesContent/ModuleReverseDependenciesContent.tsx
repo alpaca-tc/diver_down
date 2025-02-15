@@ -1,5 +1,5 @@
 import { Link } from '@/components/Link'
-import { EmptyTableBody, Section, Stack, Text, Table, Th, Td, Select } from '@/components/ui'
+import { EmptyTableBody, Section, Stack, Text, Table, Th, Td } from '@/components/ui'
 import { path } from '@/constants/path'
 import { DependencyType, Module, SpecificModule } from '@/models/module'
 import { FC, useMemo } from 'react'
@@ -11,25 +11,23 @@ import { ModuleDependencyTypeSelect } from '../ModuleDependencyTypeSelect'
 type Props = {
   mutate: () => void
   pathModule: Module
-  sources: SpecificModule['sources']
+  sources: SpecificModule['sourceReverseDependencies']
   moduleDependencies: SpecificModule['moduleDependencies']
 }
 
-export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, moduleDependencies, mutate }) => {
+export const ModuleReverseDependenciesContent: FC<Props> = ({ pathModule, sources, moduleDependencies, mutate }) => {
   const dependenciesMap = useMemo(() => {
     const map = new Map<string, Set<string>>()
 
     sources.forEach((source) => {
-      source.dependencies.forEach((dependency) => {
-        if (dependency.module) {
-          if (!map.has(dependency.module)) {
-            map.set(dependency.module, new Set<string>())
-          }
-
-          const set = map.get(dependency.module)!
-          set.add(dependency.sourceName)
+      if (source.module) {
+        if (!map.has(source.module)) {
+          map.set(source.module, new Set<string>())
         }
-      })
+
+        const set = map.get(source.module)!
+        set.add(source.sourceName)
+      }
     })
 
     return map
@@ -39,10 +37,10 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
     const map = new Map<string, Set<DependencyType>>()
 
     sources.forEach((source) => {
-      source.dependencies.forEach((dependency) => {
-        const module = dependency.module
+      const module = source.module
 
-        if (module) {
+      if (module) {
+        source.dependencies.forEach((dependency) => {
           if (!map.has(module)) {
             map.set(module, new Set<DependencyType>())
           }
@@ -52,8 +50,8 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
           if (dependency.dependencyType) {
             set.add(dependency.dependencyType)
           }
-        }
-      })
+        })
+      }
     })
 
     return map
@@ -71,8 +69,8 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
     return count
   }, [dependencyTypeMap, moduleDependencies])
 
-  const pathToModule = (params: Params) => {
-    return `${path.modules.show(pathModule)}?${stringify(params)}`
+  const moduleSourcesPath = (module: Module, params: Params) => {
+    return `${path.modules.show(module)}?${stringify(params)}`
   }
 
   return (
@@ -108,7 +106,7 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
                     </Td>
                     <Td>
                       <Text as="div" whiteSpace="nowrap">
-                        <Link reloadDocument to={pathToModule({ tab: 'sources', filteredModule: module })}>
+                        <Link reloadDocument to={moduleSourcesPath(module, { tab: 'sources', filteredModule: pathModule })}>
                           {dependenciesMap.get(module)?.size ?? 0}
                         </Link>
                       </Text>
@@ -116,8 +114,8 @@ export const ModuleDependenciesContent: FC<Props> = ({ pathModule, sources, modu
                     <Td>
                       <ModuleDependencyTypeSelect
                         onUpdated={mutate}
-                        fromModule={pathModule}
-                        toModule={module}
+                        fromModule={module}
+                        toModule={pathModule}
                         dependencyTypes={dependencyTypeMap.get(module)}
                       />
                     </Td>

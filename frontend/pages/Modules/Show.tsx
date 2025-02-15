@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Link } from '@/components/Link'
@@ -10,9 +10,9 @@ import { color, spacing } from '@/constants/theme'
 import { useModule } from '@/repositories/moduleRepository'
 import { SourcesContent } from './components/SourcesContent/SourcesContent'
 import { ModuleDependenciesContent } from './components/ModuleDependenciesContent'
-import { SourceReverseDependenciesContent } from './components/SourceReverseDependenciesContent'
 import { stringify } from '@/utils/queryString'
 import { Params, useModuleParams } from './hooks/useModuleParams'
+import { ModuleReverseDependenciesContent } from './components/ModuleReverseDependenciesContent'
 
 export const Show: React.FC = () => {
   const pathModule = useParams()['*'] ?? ''
@@ -31,29 +31,20 @@ export const Show: React.FC = () => {
       case 'moduleDependencies': {
         return (
           <ModuleDependenciesContent
+            mutate={mutate}
             pathModule={pathModule}
             sources={data.sources}
             moduleDependencies={data.moduleDependencies}
-            tab="sources"
           />
         )
       }
       case 'moduleReverseDependencies': {
         return (
-          <ModuleDependenciesContent
+          <ModuleReverseDependenciesContent
+            mutate={mutate}
             pathModule={pathModule}
             sources={data.sourceReverseDependencies}
             moduleDependencies={data.moduleReverseDependencies}
-            tab="sourceReverseDependencies"
-          />
-        )
-      }
-      case 'sourceReverseDependencies': {
-        return (
-          <SourceReverseDependenciesContent
-            mutate={mutate}
-            filteredModule={params.filteredModule}
-            sources={data.sourceReverseDependencies}
           />
         )
       }
@@ -114,13 +105,6 @@ export const Show: React.FC = () => {
                 selected={params.tab === 'moduleReverseDependencies'}
               >
                 Module Reverse Dependencies{data ? ` (${data.moduleReverseDependencies.length})` : ''}
-              </TabItem>
-              <TabItem
-                id="tab-source-reverse-dependencies"
-                onClick={() => setParams((prev) => ({ ...prev, tab: 'sourceReverseDependencies' }))}
-                selected={params.tab === 'sourceReverseDependencies'}
-              >
-                Source Reverse Dependencies{data ? ` (${data.sourceReverseDependencies.length})` : ''}
               </TabItem>
             </StickyTabBar>
 

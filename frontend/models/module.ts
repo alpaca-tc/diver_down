@@ -2,7 +2,7 @@ import { MethodId } from './methodId'
 
 export type Module = string
 
-export type DependencyType = 'valid' | 'invalid' | 'todo' | null
+export type DependencyType = 'valid' | 'invalid' | 'todo' | 'ignore' | null
 
 export type SpecificModuleDependency = {
   sourceName: string
