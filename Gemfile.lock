@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    diver_down (0.0.1.alpha17)
+    diver_down (0.0.1.alpha18)
       activesupport (>= 7.0.0)
       rack-contrib (>= 2.3.0)
 
