@@ -27,6 +27,7 @@ export {
   NotificationBar,
   PageHeading,
   Section,
+  Select,
   SideNav,
   Sidebar,
   SingleComboBox,

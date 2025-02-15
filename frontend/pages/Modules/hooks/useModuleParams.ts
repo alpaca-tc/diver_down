@@ -1,7 +1,7 @@
 import { useSearchParamsState } from '@/hooks/useSearchParamsState'
 import { Module } from '@/models/module'
 
-export const validTabs = ['sources', 'sourceReverseDependencies', 'moduleDependencies', 'moduleReverseDependencies'] as const
+export const validTabs = ['sources', 'moduleDependencies', 'moduleReverseDependencies'] as const
 export type ValidTab = (typeof validTabs)[number]
 
 export type Params = {

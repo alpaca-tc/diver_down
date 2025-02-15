@@ -88,6 +88,18 @@ module DiverDown
         source = Regexp.last_match[:source]
         memo = request.params['memo'] || ''
         @action.set_memo(source, memo)
+      in ['POST', %r{\A/api/modules/(?<from_module>[^/]+)/dependency_types/(?<to_module>[^/]+)\.json\z}]
+        from_module = CGI.unescape(Regexp.last_match[:from_module])
+        to_module = CGI.unescape(Regexp.last_match[:to_module])
+        dependency_type = request.params['dependency_type']
+
+        @action.update_module_dependency_type(from_module, to_module, dependency_type)
+      in ['POST', %r{\A/api/sources/(?<from_source>[^/]+)/dependency_types/(?<to_source>[^/]+)\.json\z}]
+        from_source = Regexp.last_match[:from_source]
+        to_source = Regexp.last_match[:to_source]
+        dependency_type = request.params['dependency_type']
+
+        @action.update_source_dependency_type(from_source, to_source, dependency_type)
       in ['GET', %r{\A/api/pid\.json\z}]
         @action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]

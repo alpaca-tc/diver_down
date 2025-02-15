@@ -124,6 +124,7 @@ module DiverDown
                 {
                   source_name: dependency.source_name,
                   module: @metadata.source(dependency.source_name).module,
+                  dependency_type: @metadata.source(source.source_name).dependency_type(dependency.source_name),
                   method_ids: dependency.method_ids.sort.map do |method_id|
                     {
                       context: method_id.context,
@@ -144,13 +145,7 @@ module DiverDown
                 {
                   source_name: dependency.source_name,
                   module: @metadata.source(dependency.source_name).module,
-                  method_ids: dependency.method_ids.sort.map do |method_id|
-                    {
-                      context: method_id.context,
-                      name: method_id.name,
-                      paths: method_id.paths.sort,
-                    }
-                  end,
+                  dependency_type: @metadata.source(source.source_name).dependency_type(dependency.source_name),
                 }
               end,
             }
@@ -189,6 +184,44 @@ module DiverDown
           total:,
           loaded: @store.size
         )
+      end
+
+      # POST /api/modules/:from_module/dependency_types/:to_module.json
+      def update_module_dependency_type(from_module, to_module, dependency_type)
+        module_dependency_map = fetch_module_dependency_map
+
+        unless module_dependency_map.key?(from_module) && module_dependency_map.key?(to_module)
+          return not_found
+        end
+
+        module_dependency = module_dependency_map.fetch(from_module)
+        module_dependency.sources.each do |source|
+          source_metadata = @metadata.source(source.source_name)
+
+          source.dependencies.each do |dependency|
+            next unless @metadata.source(dependency.source_name).module == to_module
+
+            source_metadata.update_dependency_type(dependency.source_name, dependency_type)
+          end
+        end
+
+        @metadata.flush
+
+        json({})
+      end
+
+      # POST /api/sources/:from_source_name/dependency_types/:to_source_name.json
+      def update_source_dependency_type(from_source_name, to_source_name, dependency_type)
+        source = @metadata.source(from_source_name)
+
+        begin
+          source.update_dependency_type(to_source_name, dependency_type)
+        rescue ArgumentError => e
+          return json_error(e.message)
+        end
+
+        @metadata.flush
+        json({})
       end
 
       # GET /api/pid.json

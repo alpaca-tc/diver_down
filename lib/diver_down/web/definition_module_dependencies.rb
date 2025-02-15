@@ -64,11 +64,9 @@ module DiverDown
             end
 
             # Add source reverse dependencies
-            definition_source = dependency_module_dependency.source_reverse_dependency_map[dependency.source_name] ||= DiverDown::Definition::Source.new(source_name: dependency.source_name)
-            definition_dependency = definition_source.find_or_build_dependency(source.source_name)
-            dependency.method_ids.each do |method_id|
-              definition_dependency.find_or_build_method_id(name: method_id.name, context: method_id.context).add_path(*method_id.paths)
-            end
+            # NOTE: Reverse dependencies's method_ids are not added because they are difficult to understand and not used.
+            definition_source = dependency_module_dependency.source_reverse_dependency_map[source.source_name] ||= DiverDown::Definition::Source.new(source_name: source.source_name)
+            definition_source.find_or_build_dependency(dependency.source_name)
           end
         end
 

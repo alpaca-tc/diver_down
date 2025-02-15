@@ -54,6 +54,7 @@ module DiverDown
         loaded[:sources]&.each do |source_name, source_hash|
           source(source_name).memo = source_hash[:memo] if source_hash[:memo]
           source(source_name).module = source_hash[:module] if source_hash[:module]
+          source(source_name).dependency_types = source_hash[:dependency_types] if source_hash[:dependency_types]
         end
 
         loaded[:source_alias]&.each do |alias_name, source_names|

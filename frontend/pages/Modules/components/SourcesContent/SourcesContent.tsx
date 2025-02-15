@@ -1,24 +1,13 @@
 import { Link } from '@/components/Link'
-import {
-  EmptyTableBody,
-  Table,
-  Th,
-  Text,
-  Td,
-  Button,
-  Chip,
-  Cluster,
-  FaPencilIcon,
-  FaCircleInfoIcon,
-  Tooltip,
-} from '@/components/ui'
+import { EmptyTableBody, Table, Th, Text, Td, Button, Cluster, FaPencilIcon, FaCircleInfoIcon, Tooltip } from '@/components/ui'
 import { path } from '@/constants/path'
-import { Module, SpecificModule, SpecificModuleSource } from '@/models/module'
+import { DependencyType, Module, SpecificModule, SpecificModuleSource } from '@/models/module'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { StickyThead } from '../StickyThead'
 import { SortTypes, ascNumber, ascString, sortTypes } from '@/utils/sort'
 import styled from 'styled-components'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
+import { SourceDependencyTypeSelect } from '../SourceDependencyTypeSelect'
 
 const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredModule: Module | null }> = ({
   mutate,
@@ -45,6 +34,18 @@ const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredM
       .filter((dependency) => !filteredModule || dependency.module === filteredModule)
       .toSorted((a, b) => ascString(String(a.module), String(b.module)) || ascString(String(a.sourceName), String(b.sourceName)))
   }, [source, filteredModule])
+
+  const dependencyTypes = useMemo(() => {
+    const set = new Set<DependencyType>()
+
+    dependencies.forEach((dependency) => {
+      if (dependency.dependencyType) {
+        set.add(dependency.dependencyType)
+      }
+    })
+
+    return [...set].sort()
+  }, [dependencies])
 
   return (
     <>
@@ -101,6 +102,7 @@ const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredM
           ))}
         </Td>
         <Td>{dependencies.length}</Td>
+        <Td>{dependencyTypes.join(', ')}</Td>
         <Td></Td>
         <Td></Td>
       </tr>
@@ -124,6 +126,16 @@ const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredM
                   <Text as="div" whiteSpace="nowrap">
                     <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
                   </Text>
+                )}
+              </Td>
+              <Td>
+                {index === 0 && (
+                  <SourceDependencyTypeSelect
+                    onUpdated={mutate}
+                    fromSource={source.sourceName}
+                    toSource={dependency.sourceName}
+                    dependencyType={dependency.dependencyType}
+                  />
                 )}
               </Td>
               <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
@@ -209,6 +221,25 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
     [setSort],
   )
 
+  const [totalDependenciesCount, notSelectedDependenciesCount] = useMemo(() => {
+    let totalDependenciesCount = 0
+    let notSelectedDependenciesCount = 0
+
+    sortedSources.forEach((source) => {
+      source.dependencies.forEach((dependency) => {
+        if (!filteredModule || dependency.module === filteredModule) {
+          totalDependenciesCount++
+
+          if (dependency.dependencyType) {
+            notSelectedDependenciesCount++
+          }
+        }
+      })
+    })
+
+    return [totalDependenciesCount, notSelectedDependenciesCount] as const
+  }, [sortedSources, filteredModule])
+
   return (
     <Table fixedHead>
       <StickyThead>
@@ -221,6 +252,13 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
           <Th>Dependency Module</Th>
           <Th sort={sort.key === 'dependency' ? sort.sort : 'none'} onSort={() => setNextSort('dependency')}>
             Dependency
+          </Th>
+          <Th>
+            Dependency Type(
+            {notSelectedDependenciesCount === totalDependenciesCount
+              ? totalDependenciesCount
+              : `${notSelectedDependenciesCount}/${totalDependenciesCount}`}
+            )
           </Th>
           <Th>Method Id</Th>
           <Th>Path</Th>

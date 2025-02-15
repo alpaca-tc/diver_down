@@ -403,7 +403,38 @@ RSpec.describe DiverDown::Web do
         title: 'title',
         sources: [
           DiverDown::Definition::Source.new(
-            source_name: 'a.rb'
+            source_name: 'a.rb',
+            dependencies: [
+              DiverDown::Definition::Dependency.new(
+                source_name: 'b.rb',
+                method_ids: [
+                  DiverDown::Definition::MethodId.new(
+                    name: 'method_name',
+                    context: 'instance',
+                    paths: [
+                      'a.rb:1',
+                    ]
+                  ),
+                ]
+              ),
+            ]
+          ),
+          DiverDown::Definition::Source.new(
+            source_name: 'c.rb',
+            dependencies: [
+              DiverDown::Definition::Dependency.new(
+                source_name: 'a.rb',
+                method_ids: [
+                  DiverDown::Definition::MethodId.new(
+                    name: 'method_name',
+                    context: 'instance',
+                    paths: [
+                      'c.rb:1',
+                    ]
+                  ),
+                ]
+              ),
+            ]
           ),
         ]
       )
@@ -418,7 +449,8 @@ RSpec.describe DiverDown::Web do
 
       store.set(definition_1, definition_2)
       metadata.source('a.rb').module = 'A'
-      metadata.source('b.rb').module = 'A'
+      metadata.source('b.rb').module = 'B'
+      metadata.source('c.rb').module = 'C'
       metadata.source('a.rb').memo = 'memo'
 
       get '/api/modules/A.json'
@@ -429,20 +461,42 @@ RSpec.describe DiverDown::Web do
         'sources' => [
           {
             'source_name' => 'a.rb',
-            'dependencies' => [],
+            'dependencies' => [
+              {
+                'source_name' => 'b.rb',
+                'module' => 'B',
+                'dependency_type' => nil,
+                'method_ids' => [
+                  {
+                    'context' => 'instance',
+                    'name' => 'method_name',
+                    'paths' => [
+                      'a.rb:1',
+                    ],
+                  },
+                ],
+              },
+            ],
             'module' => 'A',
             'memo' => 'memo',
           },
+        ],
+        'module_dependencies' => ['B'],
+        'module_reverse_dependencies' => ['C'],
+        'source_reverse_dependencies' => [
           {
-            'dependencies' => [],
-            'module' => 'A',
-            'source_name' => 'b.rb',
+            'dependencies' => [
+              {
+                'dependency_type' => nil,
+                'module' => 'A',
+                'source_name' => 'a.rb',
+              },
+            ],
+            'source_name' => 'c.rb',
+            'module' => 'C',
             'memo' => '',
           },
         ],
-        'module_dependencies' => [],
-        'module_reverse_dependencies' => [],
-        'source_reverse_dependencies' => [],
       })
     end
 
@@ -713,6 +767,74 @@ RSpec.describe DiverDown::Web do
       expect(last_response.status).to eq(200)
 
       expect(metadata.source('a.rb').memo).to eq('memo')
+    end
+  end
+
+  describe 'POST /api/modules/:from_module/dependency_types/:to_module.json' do
+    it 'returns 422 if context is invalid' do
+      post '/api/modules/a/dependency_types/b.json', { dependency_type: 'todo' }
+      expect(last_response.status).to eq(404)
+    end
+
+    it 'update dependency_type' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb',
+            dependencies: [
+              DiverDown::Definition::Dependency.new(
+                source_name: 'b.rb'
+              ),
+              DiverDown::Definition::Dependency.new(
+                source_name: 'c.rb'
+              ),
+            ]
+          ),
+        ]
+      )
+      store.set(definition)
+      metadata.source('a.rb').module = 'A'
+      metadata.source('b.rb').module = 'B'
+      metadata.source('c.rb').module = 'C'
+
+      post '/api/modules/A/dependency_types/B.json', { dependency_type: 'todo' }
+
+      expect(last_response.status).to eq(200)
+      expect(metadata.source('a.rb').dependency_types).to eq({ 'b.rb' => 'todo' })
+      expect(metadata.source('c.rb').dependency_types).to eq({})
+
+      post '/api/modules/A/dependency_types/C.json', { dependency_type: 'invalid' }
+      expect(metadata.source('a.rb').dependency_types).to eq({ 'b.rb' => 'todo', 'c.rb' => 'invalid' })
+    end
+  end
+
+  describe 'POST /api/sources/:source/dependency_types/:to_source.json' do
+    it 'returns 422 if dependency_type is wrong' do
+      post '/api/sources/a/dependency_types/b.json', { dependency_type: 'w' }
+      expect(last_response.status).to eq(422)
+    end
+
+    it 'update dependency_type' do
+      definition = DiverDown::Definition.new(
+        title: 'title',
+        sources: [
+          DiverDown::Definition::Source.new(
+            source_name: 'a.rb',
+            dependencies: [
+              DiverDown::Definition::Dependency.new(
+                source_name: 'b.rb'
+              ),
+            ]
+          ),
+        ]
+      )
+      store.set(definition)
+
+      post '/api/sources/a.rb/dependency_types/b.rb.json', { dependency_type: 'todo' }
+
+      expect(last_response.status).to eq(200)
+      expect(metadata.source('a.rb').dependency_type('b.rb')).to eq('todo')
     end
   end
 
