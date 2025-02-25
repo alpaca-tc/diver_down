@@ -93,7 +93,7 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
   }, [sortedSources, filteredModule])
 
   return (
-    <Table fixedHead>
+    <Table fixedHead layout="fixed">
       <StickyThead>
         <tr>
           <Th></Th>
