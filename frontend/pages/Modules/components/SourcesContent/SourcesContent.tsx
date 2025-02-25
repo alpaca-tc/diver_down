@@ -1,4 +1,4 @@
-import { EmptyTableBody, Table, Th, Text, Cluster } from '@/components/ui'
+import { EmptyTableBody, Table, Th, Text } from '@/components/ui'
 import { Module, SpecificModule, SpecificModuleSource } from '@/models/module'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { StickyThead } from '../StickyThead'
@@ -93,7 +93,17 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
   }, [sortedSources, filteredModule])
 
   return (
-    <Table fixedHead layout="fixed">
+    <Table fixedHead layout="fixed" style={{ width: '120%' }}>
+      <colgroup>
+        <col style={{ width: '70px' }} />
+        <col style={{ width: '390px' }} />
+        <col style={{ width: '80px' }} />
+        <col style={{ width: '150px' }} />
+        <col style={{ width: '200px' }} />
+        <col style={{ width: '150px' }} />
+        <col style={{ width: '250px' }} />
+        <col style={{ width: '200px' }} />
+      </colgroup>
       <StickyThead>
         <tr>
           <Th></Th>
@@ -121,7 +131,7 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
           <Text>No sources</Text>
         </EmptyTableBody>
       ) : (
-        <tbody>
+        <tbody style={{ overflowY: 'scroll' }}>
           {sortedSources.map((source) => (
             <SourceRow key={source.sourceName} mutate={mutate} filteredModule={filteredModule} source={source} />
           ))}
