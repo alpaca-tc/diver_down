@@ -1,157 +1,9 @@
-import { Link } from '@/components/Link'
-import { EmptyTableBody, Table, Th, Text, Td, Button, Cluster, FaPencilIcon, FaCircleInfoIcon, Tooltip } from '@/components/ui'
-import { path } from '@/constants/path'
-import { DependencyType, Module, SpecificModule, SpecificModuleSource } from '@/models/module'
+import { EmptyTableBody, Table, Th, Text, Cluster } from '@/components/ui'
+import { Module, SpecificModule, SpecificModuleSource } from '@/models/module'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { StickyThead } from '../StickyThead'
 import { SortTypes, ascNumber, ascString, sortTypes } from '@/utils/sort'
-import styled from 'styled-components'
-import { SourceMemoInput } from '@/components/SourceMemoInput'
-import { SourceDependencyTypeSelect } from '../SourceDependencyTypeSelect'
-
-const SourceTr: FC<{ mutate: () => void; source: SpecificModuleSource; filteredModule: Module | null }> = ({
-  mutate,
-  source,
-  filteredModule,
-}) => {
-  const [expanded, setExpanded] = useState<boolean>(false)
-  const [editingMemo, setEditingMemo] = useState<boolean>(false)
-
-  const modules = useMemo(() => {
-    const modules = new Set<Module>()
-
-    source.dependencies.forEach((dependency) => {
-      if (dependency.module && (!filteredModule || dependency.module === filteredModule)) {
-        modules.add(dependency.module)
-      }
-    })
-
-    return [...modules].sort()
-  }, [source])
-
-  const dependencies = useMemo(() => {
-    return source.dependencies
-      .filter((dependency) => !filteredModule || dependency.module === filteredModule)
-      .toSorted((a, b) => ascString(String(a.module), String(b.module)) || ascString(String(a.sourceName), String(b.sourceName)))
-  }, [source, filteredModule])
-
-  const dependencyTypes = useMemo(() => {
-    const set = new Set<DependencyType>()
-
-    dependencies.forEach((dependency) => {
-      if (dependency.dependencyType) {
-        set.add(dependency.dependencyType)
-      }
-    })
-
-    return [...set].sort()
-  }, [dependencies])
-
-  return (
-    <>
-      <tr>
-        <Td>
-          {dependencies.length > 0 && (
-            <Button size="s" onClick={() => setExpanded((prev) => !prev)}>
-              {expanded ? 'Close' : 'Open'}
-            </Button>
-          )}
-        </Td>
-        <Td>
-          <Text as="div" whiteSpace="nowrap">
-            <Link to={path.sources.show(source.sourceName)}>{source.sourceName}</Link>
-          </Text>
-        </Td>
-        <Td>
-          {editingMemo ? (
-            <SourceMemoInput
-              sourceName={source.sourceName}
-              initialMemo={source.memo}
-              onUpdate={() => {
-                setEditingMemo(false)
-                mutate()
-              }}
-              onClose={() => {
-                setEditingMemo(false)
-              }}
-            />
-          ) : (
-            <FixedWidthMemo align="center">
-              {source.memo !== '' ? (
-                <Tooltip message={source.memo} horizontal="center" vertical="bottom">
-                  <FaCircleInfoIcon />
-                </Tooltip>
-              ) : (
-                <Transparent>
-                  <FaCircleInfoIcon />
-                </Transparent>
-              )}
-              <div>
-                <Button square={true} onClick={() => setEditingMemo(true)} size="s">
-                  <FaPencilIcon alt="Edit" />
-                </Button>
-              </div>
-            </FixedWidthMemo>
-          )}
-        </Td>
-        <Td>
-          {modules.map((module) => (
-            <Text key={module} as="div" whiteSpace="nowrap">
-              <Link to={path.modules.show(module)}>{module}</Link>
-            </Text>
-          ))}
-        </Td>
-        <Td>{dependencies.length}</Td>
-        <Td>{dependencyTypes.join(', ')}</Td>
-        <Td></Td>
-        <Td></Td>
-      </tr>
-
-      {expanded &&
-        dependencies.map((dependency) =>
-          dependency.methodIds.map((methodId, index) => (
-            <tr key={`${dependency.sourceName}-${methodId.context}-${methodId.name}`}>
-              <Td></Td>
-              <Td></Td>
-              <Td></Td>
-              <Td>
-                {index === 0 && dependency.module && (
-                  <Text as="div" whiteSpace="nowrap">
-                    <Link to={path.modules.show(dependency.module)}>{dependency.module}</Link>
-                  </Text>
-                )}
-              </Td>
-              <Td>
-                {index === 0 && (
-                  <Text as="div" whiteSpace="nowrap">
-                    <Link to={path.sources.show(dependency.sourceName)}>{dependency.sourceName}</Link>
-                  </Text>
-                )}
-              </Td>
-              <Td>
-                {index === 0 && (
-                  <SourceDependencyTypeSelect
-                    onUpdated={mutate}
-                    fromSource={source.sourceName}
-                    toSource={dependency.sourceName}
-                    dependencyType={dependency.dependencyType}
-                  />
-                )}
-              </Td>
-              <Td>{`${methodId.context === 'class' ? '.' : '#'}${methodId.name}`}</Td>
-              <Td>
-                {methodId.paths.map((methodIdPath) => (
-                  <div key={methodIdPath}>
-                    <Text>{methodIdPath}</Text>
-                  </div>
-                ))}
-              </Td>
-            </tr>
-          )),
-        )}
-    </>
-  )
-}
+import { SourceRow } from '../SourceRow'
 
 const sortSources = (
   sources: SpecificModuleSource[],
@@ -271,18 +123,10 @@ export const SourcesContent: FC<Props> = ({ mutate, filteredModule, sources }) =
       ) : (
         <tbody>
           {sortedSources.map((source) => (
-            <SourceTr key={source.sourceName} mutate={mutate} filteredModule={filteredModule} source={source} />
+            <SourceRow key={source.sourceName} mutate={mutate} filteredModule={filteredModule} source={source} />
           ))}
         </tbody>
       )}
     </Table>
   )
 }
-
-const Transparent = styled.span`
-  opacity: 0;
-`
-
-const FixedWidthMemo = styled(Cluster)`
-  width: 4em;
-`
