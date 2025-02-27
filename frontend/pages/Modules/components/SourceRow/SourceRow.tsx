@@ -8,6 +8,7 @@ import { SourceMemoInput } from '@/components/SourceMemoInput'
 import { SourceDependencyTypeSelect } from '../SourceDependencyTypeSelect'
 import styled from 'styled-components'
 import { useConfiguration } from '@/repositories/configurationRepository'
+import { toBlobSuffix } from '@/utils/toBlobSuffix'
 
 type Props = {
   mutate: () => void
@@ -50,28 +51,11 @@ export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
     return [...set].sort()
   }, [dependencies])
 
-  const blobPrefix: null | string = useMemo(() => {
-    if (configuration?.blobPrefix) {
-      return configuration.blobPrefix.replace(/\/$/, '')
-    } else {
-      return null
-    }
-  }, [configuration])
+  const blobPrefix = configuration?.blobPrefix ?? null
 
   const onUpdated = useCallback(() => {
     mutate()
   }, [source, mutate])
-
-  const toBlobSuffix = (fullPath: string) => {
-    const chunks = fullPath.split(':')
-
-    if (chunks.length > 1 && chunks[chunks.length - 1].match(/^\d+$/)) {
-      const line = chunks.pop()
-      return `${chunks.join(':')}#L${line}`
-    } else {
-      return chunks.join(':')
-    }
-  }
 
   return (
     <>

@@ -33,7 +33,7 @@ module DiverDown
     # @param store [DiverDown::Web::DefinitionStore]
     def initialize(definition_dir:, metadata:, blob_prefix:)
       @metadata = metadata
-      @blob_prefix = blob_prefix
+      @blob_prefix = blob_prefix&.sub(%r{/+$}, '')
       @files_server = Rack::Files.new(File.join(WEB_DIR))
 
       definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"].sort
