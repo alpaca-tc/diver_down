@@ -44,7 +44,7 @@ app = Rack::JSONBodyParser.new(
   DiverDown::Web.new(
     definition_dir: options.fetch(:definition_dir),
     metadata: DiverDown::Web::Metadata.new(options[:metadata] || Tempfile.new(['metadata', '.yaml']).path),
-    blob_prefix: option_parser.blob_prefix
+    blob_prefix: options[:blob_prefix]
   )
 )
 
