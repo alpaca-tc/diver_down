@@ -20,6 +20,7 @@ export const path = {
     index: () => '/licenses',
   },
   api: {
+    configuration: () => `/api/configuration.json`,
     pid: () => `/api/pid.json`,
     initializationStatus: () => `/api/initialization_status.json`,
     definitions: {

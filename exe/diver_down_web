@@ -14,7 +14,7 @@ option_parser = OptionParser.new do |opts|
     Usage: diver_down_web [options]
 
     Example:
-      diver_down_web --definition-dir /path/to/definitions --metadata /path/to/metadata.yml
+      diver_down_web --definition-dir /path/to/definitions --metadata /path/to/metadata.yml --blob-prefix https://github.com/owner/repo/blob/master
 
     Options:
   BANNER
@@ -25,6 +25,10 @@ option_parser = OptionParser.new do |opts|
 
   opts.on('--metadata PATH', 'Path to the metadata.yml') do |path|
     options[:metadata] = path
+  end
+
+  opts.on('--blob-prefix URL', 'blob url prefix for paths') do |url|
+    options[:blob_prefix] = url
   end
 end
 option_parser.parse!(ARGV)
@@ -39,7 +43,8 @@ end
 app = Rack::JSONBodyParser.new(
   DiverDown::Web.new(
     definition_dir: options.fetch(:definition_dir),
-    metadata: DiverDown::Web::Metadata.new(options[:metadata] || Tempfile.new(['metadata', '.yaml']).path)
+    metadata: DiverDown::Web::Metadata.new(options[:metadata] || Tempfile.new(['metadata', '.yaml']).path),
+    blob_prefix: option_parser.blob_prefix
   )
 )
 

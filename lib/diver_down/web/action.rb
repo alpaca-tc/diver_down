@@ -18,9 +18,10 @@ module DiverDown
 
       # @param store [DiverDown::Definition::Store]
       # @param metadata [DiverDown::Web::Metadata]
-      def initialize(store:, metadata:)
+      def initialize(store:, metadata:, blob_prefix:)
         @store = store
         @metadata = metadata
+        @blob_prefix = blob_prefix
 
         reload
       end
@@ -183,6 +184,13 @@ module DiverDown
         json(
           total:,
           loaded: @store.size
+        )
+      end
+
+      # GET /api/configuration.json
+      def configuration
+        json(
+          blob_prefix: @blob_prefix
         )
       end
 

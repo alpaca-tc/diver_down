@@ -4,7 +4,7 @@ RSpec.describe DiverDown::Web do
   include Rack::Test::Methods
 
   def app
-    @app ||= described_class.new(definition_dir:, metadata:)
+    @app ||= described_class.new(definition_dir:, metadata:, blob_prefix:)
   end
 
   let(:definition_dir) do
@@ -18,6 +18,10 @@ RSpec.describe DiverDown::Web do
   let(:metadata) do
     metadata_path = Tempfile.new(['test', '.yaml']).path
     DiverDown::Web::Metadata.new(metadata_path)
+  end
+
+  let(:blob_prefix) do
+    nil
   end
 
   before do
@@ -244,6 +248,32 @@ RSpec.describe DiverDown::Web do
         assert_definition_group 'group', [definition_1_id, definition_2_id]
         assert_definition_group 'group_1', [definition_1_id]
         assert_definition_group 'group_2', [definition_2_id]
+      end
+    end
+  end
+
+  describe 'GET /api/configuration.json' do
+    context 'blob_prefix is nil' do
+      it 'returns blob_prefix' do
+        get '/api/configuration.json'
+
+        expect(last_response.status).to eq(200)
+        expect(JSON.parse(last_response.body)).to eq({
+          'blob_prefix' => nil,
+        })
+      end
+    end
+
+    context 'blob_prefix is present' do
+      let(:blob_prefix) { 'https://github.com/alpaca-tc/diver_down/blob/main' }
+
+      it 'returns blob_prefix' do
+        get '/api/configuration.json'
+
+        expect(last_response.status).to eq(200)
+        expect(JSON.parse(last_response.body)).to eq({
+          'blob_prefix' => blob_prefix,
+        })
       end
     end
   end

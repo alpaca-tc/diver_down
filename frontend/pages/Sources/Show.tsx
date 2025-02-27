@@ -12,10 +12,15 @@ import { useSource } from '@/repositories/sourceRepository'
 import { encode, idsToBitId } from '@/utils/bitId'
 import { stringify } from '@/utils/queryString'
 import { Module } from '@/models/module'
+import { toBlobSuffix } from '@/utils/toBlobSuffix'
+import { useConfiguration } from '@/repositories/configurationRepository'
 
 export const Show: React.FC = () => {
   const sourceName = useParams().sourceName ?? ''
   const { specificSource, isLoading } = useSource(sourceName)
+  const { data: configuration } = useConfiguration()
+
+  const blobPrefix = configuration?.blobPrefix ?? null
 
   const relatedDefinitionIds = useMemo(() => {
     if (specificSource) {
@@ -204,7 +209,13 @@ export const Show: React.FC = () => {
                                     <div
                                       key={`${reverseDependency.sourceName}-${methodId.context}-${methodId.name}-${methodIdPath}`}
                                     >
-                                      <Text>{methodIdPath}</Text>
+                                      {blobPrefix ? (
+                                        <Link target="_blank" to={`${blobPrefix}/${toBlobSuffix(methodIdPath)}`}>
+                                          {methodIdPath}
+                                        </Link>
+                                      ) : (
+                                        <Text>{methodIdPath}</Text>
+                                      )}
                                     </div>
                                   ))}
                                 </Td>

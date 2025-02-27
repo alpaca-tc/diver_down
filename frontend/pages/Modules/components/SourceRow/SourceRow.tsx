@@ -7,6 +7,8 @@ import { ascString } from '@/utils/sort'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import { SourceDependencyTypeSelect } from '../SourceDependencyTypeSelect'
 import styled from 'styled-components'
+import { useConfiguration } from '@/repositories/configurationRepository'
+import { toBlobSuffix } from '@/utils/toBlobSuffix'
 
 type Props = {
   mutate: () => void
@@ -17,6 +19,7 @@ type Props = {
 export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
+  const { data: configuration } = useConfiguration()
 
   const modules = useMemo(() => {
     const modules = new Set<Module>()
@@ -47,6 +50,8 @@ export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
 
     return [...set].sort()
   }, [dependencies])
+
+  const blobPrefix = configuration?.blobPrefix ?? null
 
   const onUpdated = useCallback(() => {
     mutate()
@@ -147,7 +152,13 @@ export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
               <Td>
                 {methodId.paths.map((methodIdPath) => (
                   <div key={methodIdPath}>
-                    <Text>{methodIdPath}</Text>
+                    {blobPrefix ? (
+                      <Link target="_blank" to={`${blobPrefix}/${toBlobSuffix(methodIdPath)}`}>
+                        {methodIdPath}
+                      </Link>
+                    ) : (
+                      <Text>{methodIdPath}</Text>
+                    )}
                   </div>
                 ))}
               </Td>

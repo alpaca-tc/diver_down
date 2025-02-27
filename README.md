@@ -122,9 +122,10 @@ This gem is specifically designed to analyze large applications with a modular m
 
 - `--definition-dir` Specifies the directory where the analysis results are stored.
 - `--metadata` Designates a path to save the results that include details on which module each file belongs to. If this option is not specified, the results will be temporarily stored in a default temporary file.
+- `--blob-prefix` Specifies the prefix used to construct GitHub URLs for files, allowing direct access to the repository’s source code.
 
 ```sh
-bundle exec diver_down_web --definition-dir tmp/diver_down --metadata tmp/metadata.yml
+bundle exec diver_down_web --definition-dir tmp/diver_down --metadata tmp/metadata.yml --blob-prefix https://github.com/alpaca-tc/diver_down/blob/main
 open http://localhost:8080
 ```
 
