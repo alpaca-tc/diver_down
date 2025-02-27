@@ -29,9 +29,11 @@ module DiverDown
 
     # @param definition_dir [String]
     # @param metadata [DiverDown::Web::Metadata]
+    # @param blob_prefix [String]
     # @param store [DiverDown::Web::DefinitionStore]
-    def initialize(definition_dir:, metadata:)
+    def initialize(definition_dir:, metadata:, blob_prefix:)
       @metadata = metadata
+      @blob_prefix = blob_prefix
       @files_server = Rack::Files.new(File.join(WEB_DIR))
 
       definition_files = ::Dir["#{definition_dir}/**/*.{yml,yaml,msgpack,json}"].sort
@@ -47,7 +49,7 @@ module DiverDown
       request = Rack::Request.new(env)
 
       if @action&.store.object_id != self.class.store.object_id
-        @action = DiverDown::Web::Action.new(store: self.class.store, metadata: @metadata)
+        @action = DiverDown::Web::Action.new(store: self.class.store, metadata: @metadata, blob_prefix: @blob_prefix)
       end
 
       case [request.request_method, request.path]
@@ -104,6 +106,8 @@ module DiverDown
         @action.pid
       in ['GET', %r{\A/api/initialization_status\.json\z}]
         @action.initialization_status(@total_definition_files_size)
+      in ['GET', %r{\A/api/configuration\.json\z}]
+        @action.configuration
       in ['GET', %r{\A/api/source_aliases\.json\z}]
         @action.source_aliases
       in ['POST', %r{\A/api/source_aliases\.json\z}]
