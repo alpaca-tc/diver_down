@@ -7,6 +7,7 @@ import { ascString } from '@/utils/sort'
 import { SourceMemoInput } from '@/components/SourceMemoInput'
 import { SourceDependencyTypeSelect } from '../SourceDependencyTypeSelect'
 import styled from 'styled-components'
+import { useConfiguration } from '@/repositories/configurationRepository'
 
 type Props = {
   mutate: () => void
@@ -17,6 +18,7 @@ type Props = {
 export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
   const [expanded, setExpanded] = useState<boolean>(false)
   const [editingMemo, setEditingMemo] = useState<boolean>(false)
+  const { data: configuration } = useConfiguration()
 
   const modules = useMemo(() => {
     const modules = new Set<Module>()
@@ -48,9 +50,28 @@ export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
     return [...set].sort()
   }, [dependencies])
 
+  const blobPrefix: null | string = useMemo(() => {
+    if (configuration?.blobPrefix) {
+      return configuration.blobPrefix.replace(/\/$/, '')
+    } else {
+      return null
+    }
+  }, [configuration])
+
   const onUpdated = useCallback(() => {
     mutate()
   }, [source, mutate])
+
+  const toBlobSuffix = (fullPath: string) => {
+    const chunks = fullPath.split(':')
+
+    if (chunks.length > 1 && chunks[chunks.length - 1].match(/^\d+$/)) {
+      const line = chunks.pop()
+      return `${chunks.join(':')}#L${line}`
+    } else {
+      return chunks.join(':')
+    }
+  }
 
   return (
     <>
@@ -147,7 +168,13 @@ export const SourceRow: FC<Props> = ({ mutate, source, filteredModule }) => {
               <Td>
                 {methodId.paths.map((methodIdPath) => (
                   <div key={methodIdPath}>
-                    <Text>{methodIdPath}</Text>
+                    {blobPrefix ? (
+                      <Link target="_blank" to={`${blobPrefix}/${toBlobSuffix(methodIdPath)}`}>
+                        {methodIdPath}
+                      </Link>
+                    ) : (
+                      <Text>{methodIdPath}</Text>
+                    )}
                   </div>
                 ))}
               </Td>
