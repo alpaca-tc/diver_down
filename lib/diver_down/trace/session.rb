@@ -4,10 +4,7 @@ module DiverDown
   module Trace
     class Session
       StackContext = Data.define(
-        :source,
-        :method_id,
-        :path,
-        :lineno
+        :source
       )
 
       attr_reader :definition
@@ -37,6 +34,8 @@ module DiverDown
 
       private
 
+      M = Mutex.new
+
       def build_trace_point
         call_stacks = {}
 
@@ -53,7 +52,7 @@ module DiverDown
           when :b_return
             call_stack.pop
           when :call, :c_call
-            # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}"
+            # puts "#{tp.method_id} #{tp.path}:#{tp.lineno}" if @caller_paths.include?(tp.path)
             if call_stack.ignored?
               call_stack.push
               next
@@ -80,6 +79,10 @@ module DiverDown
             pushed = false
 
             unless source_name.nil?
+              # Search is a heavy process and should be terminated early.
+              # The position of the most recently found caller or the start of trace is used as the maximum value.
+              caller_location = find_neast_caller_location(1000, tp)
+
               # If the call stack contains a call to a module to be traced
               # `@ignored_call_stack` is not nil means the call stack contains a call to a module to be ignored
               unless call_stack.empty_context_stack?
@@ -90,18 +93,15 @@ module DiverDown
 
                 # `dependency.nil?` means source_name equals to called_source.source.
                 # self-references are not tracked because it is not "dependency".
-                if dependency
+                if dependency && caller_location
                   context = DiverDown::Helper.module?(tp.self) ? 'class' : 'instance'
+
                   method_id = dependency.find_or_build_method_id(name: tp.method_id, context:)
-                  method_id_path = "#{called_stack_context.path}:#{called_stack_context.lineno}"
+                  method_id_path = "#{caller_location.path}:#{caller_location.lineno}"
                   method_id_path = @filter_method_id_path.call(method_id_path) if @filter_method_id_path
                   method_id.add_path(method_id_path)
                 end
               end
-
-              # Search is a heavy process and should be terminated early.
-              # The position of the most recently found caller or the start of trace is used as the maximum value.
-              caller_location = find_neast_caller_location(call_stack.stack_size)
 
               # `caller_location` is nil if it is filtered by caller_paths
               if caller_location
@@ -110,10 +110,7 @@ module DiverDown
 
                 call_stack.push(
                   StackContext.new(
-                    source:,
-                    method_id: tp.method_id,
-                    path: caller_location.path,
-                    lineno: caller_location.lineno
+                    source:
                   )
                 )
               end
@@ -129,7 +126,7 @@ module DiverDown
         end
       end
 
-      def find_neast_caller_location(stack_size)
+      def find_neast_caller_location(stack_size, tp)
         excluded_frame_size = 1 # Ignore neast caller because it is stack of #find_neast_caller_location.
         finished_frame_size = excluded_frame_size + stack_size + 1
         frame_pos = 1
@@ -139,7 +136,7 @@ module DiverDown
 
         Thread.each_caller_location do
           break if finished_frame_size < frame_pos
-          return _1 if @caller_paths.include?(_1.path)
+          return _1 if @caller_paths.include?(_1.path) && _1.path != tp.path && _1.lineno != tp.lineno
 
           frame_pos += 1
         end
